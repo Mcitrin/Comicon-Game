@@ -48,7 +48,16 @@ public class InputMan : MonoBehaviour {
         vec = new Vector2(joystick2.RightStickX, joystick2.RightStickY).normalized;  
         else
         {
-            vec =  (Input.mousePosition - GameObject.Find("player1").transform.position).normalized;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            Vector3 target = Vector2.zero;
+
+            if (Physics.Raycast(ray, out hit, 100))
+            {
+                target = new Vector2(hit.point.x,hit.point.y);
+                vec = (target - GameObject.Find("player1").transform.position).normalized;
+            }
+            Debug.Log(vec);
         }
 
         return vec;
