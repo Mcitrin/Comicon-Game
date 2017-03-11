@@ -4,7 +4,7 @@ using System.Collections;
 public class ButtonActions : MonoBehaviour {
 
 
-    // SetupPopUp
+    
     PlayManager manager;
 
 	// Use this for initialization
@@ -20,7 +20,7 @@ public class ButtonActions : MonoBehaviour {
     {
         if (manager.TimeIndex != 0 || manager.ScoreIndex != 0)
         {
-            Application.LoadLevel("Level");
+            Application.LoadLevel("test");
             manager.gameState = PlayManager.GameState.PlayingGame;
         }
 
