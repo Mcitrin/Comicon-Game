@@ -12,9 +12,11 @@ public class PlayManager : MonoBehaviour {
         Restarting
     };
 
+    public InputMan inputMan;
     public GameState gameState = GameState.MainMenu;
 
-    public GameObject Warning;
+    public GameObject TimeScoreWarning;
+    public GameObject ControllerWarning;
     public Text ScoreLabel;
     public Text TimeLabel;
     public int ScoreIndex;
@@ -24,9 +26,9 @@ public class PlayManager : MonoBehaviour {
     
 
     // Use this for initialization
-    void Start () {
-	
-	}
+    void Awake () {
+        inputMan = GameManager.gameManager.GetComponent<InputMan>();
+    }
 
     // Update is called once per frame
     void Update() {
@@ -51,12 +53,22 @@ public class PlayManager : MonoBehaviour {
     {
         if(ScoreIndex == 0 && TimeIndex == 0)
         {
-            Warning.SetActive(true);
+            TimeScoreWarning.SetActive(true);
         }
         else
         {
-            Warning.SetActive(false);
+            TimeScoreWarning.SetActive(false);
         }
+
+        if (inputMan.NoJoysticks)
+        {
+            ControllerWarning.SetActive(true);
+        }
+        else
+        {
+            ControllerWarning.SetActive(false);
+        }
+
 
         switch (ScoreIndex)
         {

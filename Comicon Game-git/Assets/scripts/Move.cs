@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Move : MonoBehaviour {
 
-    InputMan input;
+    InputMan inputMan;
     float distToGround;
 
     public int PlayerNumber;
@@ -17,16 +17,13 @@ public class Move : MonoBehaviour {
     // Use this for initialization
     void Awake()
     {
-        input = GameManager.gameManager.GetComponent<InputMan>();
+        inputMan = GameManager.gameManager.GetComponent<InputMan>();
         distToGround = GetComponent<BoxCollider>().bounds.extents.y;
     }
     
     // Update is called once per frame
     void Update () {
-        if (PlayerNumber == 1)
-            Input1();
-        else
-            Input2();
+            Input();
 
     }
 
@@ -35,20 +32,20 @@ public class Move : MonoBehaviour {
         return Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.1f);
     }
 
-    void Input1()
+    void Input()
     {
-        if (input.Jump1() && IsGrounded())
+        if (inputMan.Jump(PlayerNumber) && IsGrounded())
         {
             this.GetComponent<Rigidbody>().velocity = new Vector3(0, 7.5f, 0);//7.5f;
         }
 
         Vector3 curVel = this.GetComponent<Rigidbody>().velocity;
-        curVel.x = input.Move1() * 9.0f; // max speed = 5
+        curVel.x = inputMan.Move(PlayerNumber) * 9.0f; // max speed = 5
         this.GetComponent<Rigidbody>().velocity = curVel;
 
-        if (input.Aim1() != Vector2.zero)
+        if (inputMan.Aim(PlayerNumber) != Vector2.zero)
         {
-            angle = input.Aim1();
+            angle = inputMan.Aim(PlayerNumber);
         }
 
 
@@ -56,43 +53,20 @@ public class Move : MonoBehaviour {
 
 
         arrow.transform.position = angle + this.transform.position;
-        CalcPower1();
-
-    }
-    void Input2()
-    {
-        if (input.Jump2() && IsGrounded())
-        {
-            this.GetComponent<Rigidbody>().velocity = new Vector3(0, 7.5f, 0);//7.5f;
-        }
-
-        Vector3 curVel = this.GetComponent<Rigidbody>().velocity;
-        curVel.x = input.Move2() * 9.0f; // max speed = 5
-        this.GetComponent<Rigidbody>().velocity = curVel;
-
-        if (input.Aim2() != Vector2.zero)
-        {
-            angle = input.Aim2();
-        }
-
-
-
-
-
-        arrow.transform.position = angle + this.transform.position;
-        CalcPower2();
+        CalcPower();
 
     }
 
-    void CalcPower1()
+
+    void CalcPower()
     {
-        if (input.Charge1())
+        if (inputMan.Charge(PlayerNumber))
         {
             if (power == 0)
                 power = Time.time;
         }
 
-        if (!input.Charge1())
+        if (!inputMan.Charge(PlayerNumber))
         {
             if (power != 0)
             {
@@ -111,7 +85,6 @@ public class Move : MonoBehaviour {
                     ,ball.transform.position) <= distance)
                 {
                     ball.HitBall((int)power, angle);
-                    Debug.Log(power);
                 }
 
                 chargeTime = 0;
@@ -119,39 +92,7 @@ public class Move : MonoBehaviour {
             }
         }
     }
-    void CalcPower2()
-    {
-        if (input.Charge2())
-        {
-            if (power == 0)
-                power = Time.time;
-        }
-
-        if (!input.Charge2())
-        {
-            if (power != 0)
-            {
-                chargeTime = (int)(Time.time - power);
-                if (chargeTime >= 1)
-                {
-                    power = 2;
-                    StartCoroutine(Flash());
-                }
-                else
-                {
-                    power = 1;
-                }
-
-                if (Vector3.Distance(new Vector3(this.transform.position.x, this.transform.position.y)
-                    ,ball.transform.position) <= distance)
-                    ball.HitBall((int)power, angle);
-
-                chargeTime = 0;
-                power = 0;
-            }
-        }
-    }
-
+  
     IEnumerator Flash()
     {
         Color color = this.gameObject.GetComponent<SpriteRenderer>().color;
