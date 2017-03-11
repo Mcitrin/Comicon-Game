@@ -4,25 +4,71 @@ using InControl;
 
 public class InputMan : MonoBehaviour {
 
-    private InputDevice joystick;
+    private InputDevice joystick1;
+    private InputDevice joystick2;
 
-	// Use this for initialization
-	void Awake () {
-        joystick = InputManager.ActiveDevice;
-	}
+
+    // Use this for initialization
+    void Awake () {
+    }
 	
 	// Update is called once per frame
 	void Update () {
-        if (joystick == null) { joystick = InputManager.ActiveDevice; }
-	}
+        if(InputManager.Devices.Count > 0)joystick1 = InputManager.Devices[0];
+        if (InputManager.Devices.Count > 1) joystick2 = InputManager.Devices[1];
+    }
 
-    public bool Jump()
+    public bool Jump1()
     {
-        if (joystick.LeftTrigger)
-            return joystick.LeftTrigger;
+        if (joystick2 != null)
+            return joystick2.LeftTrigger;
         else if (Input.GetKeyDown("space"))
             return Input.GetKeyDown("space");
         else
             return false;
+    }
+
+    public float Move1()
+    {
+        float result = 0;
+        if (joystick2 != null)
+        {
+            result += joystick2.LeftStickX;
+        }
+        result += Input.GetAxis("K_Horizontal");
+
+        return Mathf.Clamp(result, -1, 1);
+    }
+
+    public Vector2 Aim1()
+    {
+        Vector2 vec = Vector2.zero;
+
+        if(joystick2!=null)
+        vec = new Vector2(joystick2.RightStickX, joystick2.RightStickY).normalized;  
+        else
+        {
+            vec =  (Input.mousePosition - GameObject.Find("player1").transform.position).normalized;
+        }
+
+        return vec;
+        
+    }
+
+    public bool Jump2()
+    {
+        return joystick1.LeftTrigger;
+    }
+
+    public float Move2()
+    {
+        float result = 0;
+        result += joystick1.LeftStickX;
+        return Mathf.Clamp(result, -1, 1);
+    }
+
+    public Vector2 Aim2()
+    {
+           return new Vector2(joystick1.RightStickX, joystick1.RightStickY).normalized;
     }
 }
