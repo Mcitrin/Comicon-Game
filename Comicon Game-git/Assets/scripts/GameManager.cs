@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour {
     void Awake () {
         DontDestroyOnLoad(gameObject);
         if(gameManager == null) { gameManager = this; }
+
+        Random.seed = (int)System.DateTime.Now.Ticks;
     }
 	
 	// Update is called once per frame

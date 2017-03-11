@@ -16,6 +16,8 @@ public class InputMan : MonoBehaviour {
 	void Update () {
         if(InputManager.Devices.Count > 0)joystick1 = InputManager.Devices[0];
         if (InputManager.Devices.Count > 1) joystick2 = InputManager.Devices[1];
+
+        if (InputManager.Devices.Count == 1) joystick2 = null;
     }
 
     public bool Jump1()
@@ -57,11 +59,21 @@ public class InputMan : MonoBehaviour {
                 target = new Vector2(hit.point.x,hit.point.y);
                 vec = (target - GameObject.Find("player1").transform.position).normalized;
             }
-            Debug.Log(vec);
         }
 
         return vec;
         
+    }
+
+    public bool Charge1()
+    {
+        if(joystick2!=null)
+        {
+            return joystick2.RightTrigger;
+        }
+        else
+            return Input.GetMouseButton(0);
+
     }
 
     public bool Jump2()
@@ -79,5 +91,12 @@ public class InputMan : MonoBehaviour {
     public Vector2 Aim2()
     {
            return new Vector2(joystick1.RightStickX, joystick1.RightStickY).normalized;
+    }
+
+    public bool Charge2()
+    {
+        
+            return joystick1.RightTrigger;
+
     }
 }

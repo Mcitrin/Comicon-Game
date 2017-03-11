@@ -11,7 +11,8 @@ public class Move : MonoBehaviour {
     public Vector3 angle;
     public float power;
     public float chargeTime;
-    public GameObject ball;
+    public Ball ball;
+    float distance = 2;
 
     // Use this for initialization
     void Awake()
@@ -26,7 +27,8 @@ public class Move : MonoBehaviour {
             Input1();
         else
             Input2();
-	}
+
+    }
 
     bool IsGrounded()
     {
@@ -54,7 +56,7 @@ public class Move : MonoBehaviour {
 
 
         arrow.transform.position = angle + this.transform.position;
-
+        CalcPower1();
 
     }
     void Input2()
@@ -78,7 +80,89 @@ public class Move : MonoBehaviour {
 
 
         arrow.transform.position = angle + this.transform.position;
-
+        CalcPower2();
 
     }
+
+    void CalcPower1()
+    {
+        if (input.Charge1())
+        {
+            if (power == 0)
+                power = Time.time;
+        }
+
+        if (!input.Charge1())
+        {
+            if (power != 0)
+            {
+                chargeTime = (int)(Time.time - power);
+                if (chargeTime >= 1)
+                {
+                    power = 2;
+                    StartCoroutine(Flash());
+                }
+                else
+                {
+                    power = 1;
+                }
+
+                if (Vector3.Distance(new Vector2(this.transform.position.x,this.transform.position.y)
+                    ,ball.transform.position) <= distance)
+                {
+                    ball.HitBall((int)power, angle);
+                    Debug.Log(power);
+                }
+
+                chargeTime = 0;
+                power = 0;
+            }
+        }
+    }
+    void CalcPower2()
+    {
+        if (input.Charge2())
+        {
+            if (power == 0)
+                power = Time.time;
+        }
+
+        if (!input.Charge2())
+        {
+            if (power != 0)
+            {
+                chargeTime = (int)(Time.time - power);
+                if (chargeTime >= 1)
+                {
+                    power = 2;
+                    StartCoroutine(Flash());
+                }
+                else
+                {
+                    power = 1;
+                }
+
+                if (Vector3.Distance(new Vector3(this.transform.position.x, this.transform.position.y)
+                    ,ball.transform.position) <= distance)
+                    ball.HitBall((int)power, angle);
+
+                chargeTime = 0;
+                power = 0;
+            }
+        }
+    }
+
+    IEnumerator Flash()
+    {
+        Color color = this.gameObject.GetComponent<SpriteRenderer>().color;
+        for (int i = 0; i < 8; i++)
+        {
+            gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+            yield return new WaitForSeconds(.025f);
+            gameObject.GetComponent<SpriteRenderer>().color = color;
+            yield return new WaitForSeconds(.025f);
+        }
+    }
+
+
 }

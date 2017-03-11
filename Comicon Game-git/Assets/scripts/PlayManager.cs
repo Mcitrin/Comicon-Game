@@ -7,6 +7,7 @@ public class PlayManager : MonoBehaviour {
     public enum GameState
     {
         MainMenu,
+        waiting,
         PlayingGame,
         Restarting
     };
@@ -33,6 +34,9 @@ public class PlayManager : MonoBehaviour {
         {
             case GameState.MainMenu:
                 MainMenu();
+                break;
+            case GameState.waiting:
+
                 break;
             case GameState.PlayingGame:
 

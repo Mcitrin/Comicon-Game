@@ -21,7 +21,7 @@ public class ButtonActions : MonoBehaviour {
         if (manager.TimeIndex != 0 || manager.ScoreIndex != 0)
         {
             Application.LoadLevel("test");
-            manager.gameState = PlayManager.GameState.PlayingGame;
+            manager.gameState = PlayManager.GameState.waiting;
         }
 
     }
