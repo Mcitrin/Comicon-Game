@@ -23,7 +23,7 @@ public class ButtonActions : MonoBehaviour {
             if (!manager.inputMan.NoJoysticks)
             {
                 Application.LoadLevel("test");
-                manager.gameState = PlayManager.GameState.waiting;
+                manager.gameState = PlayManager.GameState.SetUp;
             }
         }
 

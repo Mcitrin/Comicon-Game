@@ -7,6 +7,7 @@ public class PlayManager : MonoBehaviour {
     public enum GameState
     {
         MainMenu,
+        SetUp,
         waiting,
         PlayingGame,
         Restarting
@@ -21,6 +22,13 @@ public class PlayManager : MonoBehaviour {
     public Text TimeLabel;
     public int ScoreIndex;
     public int TimeIndex;
+    GameObject P1Score;
+    GameObject P2Score;
+    GameObject Clock;
+    int P1ScoreCount;
+    int P2ScoreCount;
+    int ClockCount;
+
     int ScoreLimit;
     int TimeLimit;
     
@@ -37,6 +45,9 @@ public class PlayManager : MonoBehaviour {
             case GameState.MainMenu:
                 MainMenu();
                 break;
+            case GameState.SetUp:
+                SetUp();
+                break;
             case GameState.waiting:
 
                 break;
@@ -49,6 +60,7 @@ public class PlayManager : MonoBehaviour {
         }
 
     }
+
     void MainMenu()
     {
         if(ScoreIndex == 0 && TimeIndex == 0)
@@ -116,5 +128,24 @@ public class PlayManager : MonoBehaviour {
                 TimeLimit = 20*60;
                 break;
         }
+    }
+
+    void SetUp()
+    {
+        Clock = GameObject.Find("Clock");
+        P1Score = GameObject.Find("P1Score");
+        P2Score = GameObject.Find("P2Score");
+
+        if(Clock !=null && P1Score != null && P2Score !=null)
+        {
+            Clock. GetComponent<Text>().text = (TimeLimit / 60) + ":00";
+            gameState = GameState.waiting;
+        }
+    }
+
+    public void IncrementScore(int player)
+    {
+        //if(player == 1)
+        //if(player == 2)
     }
 }
