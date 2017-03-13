@@ -30,7 +30,7 @@ public class Ball : MonoBehaviour
     void Update()
     {
         if (HeldBy)
-            transform.position = new Vector3(HeldBy.transform.localPosition.x, HeldBy.transform.localPosition.y + .5f, -.5f);
+            transform.position = new Vector3(HeldBy.transform.localPosition.x, HeldBy.transform.localPosition.y + 2f, -.5f);
 
     }
 

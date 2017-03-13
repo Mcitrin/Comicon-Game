@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Move : MonoBehaviour {
+public class Move : MonoBehaviour
+{
 
     InputMan inputMan;
     float distToGround;
 
+    public Animator animator;
     public int PlayerNumber;
     public GameObject arrow;
     public Vector3 angle;
@@ -20,11 +22,12 @@ public class Move : MonoBehaviour {
         inputMan = GameManager.gameManager.GetComponent<InputMan>();
         distToGround = GetComponent<BoxCollider>().bounds.extents.y;
     }
-    
-    // Update is called once per frame
-    void Update () {
-            Input();
 
+    // Update is called once per frame
+    void Update()
+    {
+        Input();
+        Animate();
     }
 
     bool IsGrounded()
@@ -52,11 +55,35 @@ public class Move : MonoBehaviour {
 
 
 
-        arrow.transform.position = angle + this.transform.position;
+        arrow.transform.position = angle*1.5f + this.transform.position;
         CalcPower();
 
     }
 
+    void Animate()
+    {
+        if (inputMan.Move(PlayerNumber) < 0)
+        {
+            animator.SetBool("Backward", true);
+            animator.SetBool("Forward", false);
+            animator.SetBool("Still", false);
+        }
+        else if(inputMan.Move(PlayerNumber) > 0)
+        {
+            animator.SetBool("Backward", false);
+            animator.SetBool("Forward", true);
+            animator.SetBool("Still", false);
+        }
+        else
+        {
+            animator.SetBool("Backward", false);
+            animator.SetBool("Forward", false);
+            animator.SetBool("Still", true);
+        }
+        animator.SetBool("Jump", !IsGrounded());
+
+        Debug.Log(!IsGrounded());
+    }
 
     void CalcPower()
     {
@@ -81,18 +108,20 @@ public class Move : MonoBehaviour {
                     power = 1;
                 }
 
-                if (Vector3.Distance(new Vector2(this.transform.position.x,this.transform.position.y)
-                    ,ball.transform.position) <= distance)
+                if (Vector3.Distance(new Vector2(this.transform.position.x, this.transform.position.y)
+                    , ball.transform.position) <= distance || ball.HeldBy == gameObject)
                 {
-                    ball.HitBall((int)power, angle , PlayerNumber);
+                    ball.HitBall((int)power, angle, PlayerNumber);
                 }
+
+                
 
                 chargeTime = 0;
                 power = 0;
             }
         }
     }
-  
+
     IEnumerator Flash()
     {
         Color color = this.gameObject.GetComponent<SpriteRenderer>().color;
