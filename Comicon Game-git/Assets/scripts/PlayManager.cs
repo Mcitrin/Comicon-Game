@@ -22,16 +22,20 @@ public class PlayManager : MonoBehaviour {
     public Text TimeLabel;
     public int ScoreIndex;
     public int TimeIndex;
-    GameObject P1Score;
-    GameObject P2Score;
-    GameObject Clock;
+    GameObject P1ScoreDisplay;
+    GameObject P2ScoreDisplay;
+    GameObject ClockDisplay;
     int P1ScoreCount;
     int P2ScoreCount;
     int ClockCount;
 
     int ScoreLimit;
     int TimeLimit;
-    
+
+    int interval;
+    float nextTime;
+    int seconds;
+
 
     // Use this for initialization
     void Awake () {
@@ -52,6 +56,7 @@ public class PlayManager : MonoBehaviour {
 
                 break;
             case GameState.PlayingGame:
+                PlayingGame();
 
                 break;
             case GameState.Restarting:
@@ -132,20 +137,61 @@ public class PlayManager : MonoBehaviour {
 
     void SetUp()
     {
-        Clock = GameObject.Find("Clock");
-        P1Score = GameObject.Find("P1Score");
-        P2Score = GameObject.Find("P2Score");
+        ClockDisplay = GameObject.Find("Clock");
+        P1ScoreDisplay = GameObject.Find("P1Score");
+        P2ScoreDisplay = GameObject.Find("P2Score");
 
-        if(Clock !=null && P1Score != null && P2Score !=null)
+        interval = 1;
+        nextTime = 0;
+        seconds = 0;
+
+        if (ClockDisplay != null && P1ScoreDisplay != null && P2ScoreDisplay != null)
         {
-            Clock. GetComponent<Text>().text = (TimeLimit / 60) + ":00";
+            ClockCount = TimeLimit;
+            ClockDisplay.GetComponent<Text>().text = (ClockCount / 60) + ":" + "00";
             gameState = GameState.waiting;
+        }
+    }
+
+    void PlayingGame()
+    {
+        if(ClockCount !=0)
+        Count();
+
+        if (ClockCount <= 0)
+            Debug.Log("GameOver : Time");
+
+        if(P1ScoreCount == ScoreLimit|| P2ScoreCount == ScoreLimit)
+            Debug.Log("GameOver : score");
+    }
+
+    void Count()
+    {
+        if (Time.time >= nextTime)
+        {
+            ClockCount--;
+            seconds--;
+            if (seconds < 0) { seconds = 59; }
+            if (seconds >= 10)
+                ClockDisplay.GetComponent<Text>().text = (ClockCount / 60) + ":" + seconds;
+            else
+                ClockDisplay.GetComponent<Text>().text = (ClockCount / 60) + ":0" + seconds;
+
+            nextTime = (int)Time.time + interval;
         }
     }
 
     public void IncrementScore(int player)
     {
-        //if(player == 1)
-        //if(player == 2)
+        if(player == 1)
+        {
+            P1ScoreCount++;
+            P1ScoreDisplay.GetComponent<Text>().text = "" + P1ScoreCount;
+        }
+        if(player == 2)
+        {
+            P2ScoreCount++;
+            P2ScoreDisplay.GetComponent<Text>().text = "" + P2ScoreCount;
+        }
     }
 }

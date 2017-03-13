@@ -84,7 +84,7 @@ public class Move : MonoBehaviour {
                 if (Vector3.Distance(new Vector2(this.transform.position.x,this.transform.position.y)
                     ,ball.transform.position) <= distance)
                 {
-                    ball.HitBall((int)power, angle);
+                    ball.HitBall((int)power, angle , PlayerNumber);
                 }
 
                 chargeTime = 0;
