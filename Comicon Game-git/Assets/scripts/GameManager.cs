@@ -7,9 +7,8 @@ public class GameManager : MonoBehaviour {
 
     // Use this for initialization
     void Awake () {
-        DontDestroyOnLoad(gameObject);
         if(gameManager == null) { gameManager = this; }
-
+        DontDestroyOnLoad(gameObject);
         Random.seed = (int)System.DateTime.Now.Ticks;
     }
 	

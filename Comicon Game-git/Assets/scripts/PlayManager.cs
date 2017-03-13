@@ -9,8 +9,7 @@ public class PlayManager : MonoBehaviour {
         MainMenu,
         SetUp,
         waiting,
-        PlayingGame,
-        Restarting
+        PlayingGame
     };
 
     public InputMan inputMan;
@@ -57,9 +56,6 @@ public class PlayManager : MonoBehaviour {
                 break;
             case GameState.PlayingGame:
                 PlayingGame();
-
-                break;
-            case GameState.Restarting:
 
                 break;
         }
@@ -158,11 +154,24 @@ public class PlayManager : MonoBehaviour {
         if(ClockCount !=0)
         Count();
 
-        if (ClockCount <= 0)
-            Debug.Log("GameOver : Time");
+        if (ClockCount <= 0 && TimeLimit != 0)
+        CalculateWinner();
+    }
 
-        if(P1ScoreCount == ScoreLimit|| P2ScoreCount == ScoreLimit)
-            Debug.Log("GameOver : score");
+  
+
+    void CalculateWinner()
+    {
+        if(P1ScoreCount > P2ScoreCount)
+        {
+            Debug.Log("Player1 wins!");
+        }
+        else
+        {
+            Debug.Log("Player2 wins!");
+        }
+        Application.LoadLevel("Menu");
+        Destroy(gameObject);
     }
 
     void Count()
@@ -192,6 +201,14 @@ public class PlayManager : MonoBehaviour {
         {
             P2ScoreCount++;
             P2ScoreDisplay.GetComponent<Text>().text = "" + P2ScoreCount;
+        }
+
+        if (ScoreLimit != 0)
+        {
+            if (P1ScoreCount == ScoreLimit || P2ScoreCount == ScoreLimit)
+            {
+                CalculateWinner();
+            }
         }
     }
 }
