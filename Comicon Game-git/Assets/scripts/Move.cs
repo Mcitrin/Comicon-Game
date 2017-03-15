@@ -81,8 +81,6 @@ public class Move : MonoBehaviour
             animator.SetBool("Still", true);
         }
         animator.SetBool("Jump", !IsGrounded());
-
-        Debug.Log(!IsGrounded());
     }
 
     void CalcPower()

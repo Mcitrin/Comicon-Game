@@ -24,6 +24,8 @@ public class PlayManager : MonoBehaviour {
     GameObject P1ScoreDisplay;
     GameObject P2ScoreDisplay;
     GameObject ClockDisplay;
+    GameObject Crown;
+ 
     int P1ScoreCount;
     int P2ScoreCount;
     int ClockCount;
@@ -35,9 +37,13 @@ public class PlayManager : MonoBehaviour {
     float nextTime;
     int seconds;
 
+    bool crowned = false;
+   public int winner;
+     
+
 
     // Use this for initialization
-    void Awake () {
+   void Awake () {
         inputMan = GameManager.gameManager.GetComponent<InputMan>();
     }
 
@@ -52,6 +58,11 @@ public class PlayManager : MonoBehaviour {
                 SetUp();
                 break;
             case GameState.waiting:
+                if (crowned)
+                {
+                    Crown.transform.position = GameObject.Find("player" + winner).transform.position + Vector3.up * 1.75f;
+                    Crown.transform.Rotate(Vector3.up, .3f);
+                }
 
                 break;
             case GameState.PlayingGame:
@@ -136,12 +147,18 @@ public class PlayManager : MonoBehaviour {
         ClockDisplay = GameObject.Find("Clock");
         P1ScoreDisplay = GameObject.Find("P1Score");
         P2ScoreDisplay = GameObject.Find("P2Score");
+        Crown = GameObject.Find("Crown");
+
 
         interval = 1;
         nextTime = 0;
         seconds = 0;
 
-        if (ClockDisplay != null && P1ScoreDisplay != null && P2ScoreDisplay != null)
+        if (ClockDisplay != null &&
+            P1ScoreDisplay != null &&
+            P2ScoreDisplay != null &&
+            Crown != null
+            )
         {
             ClockCount = TimeLimit;
             ClockDisplay.GetComponent<Text>().text = (ClockCount / 60) + ":" + "00";
@@ -158,18 +175,32 @@ public class PlayManager : MonoBehaviour {
         CalculateWinner();
     }
 
-  
-
     void CalculateWinner()
     {
         if(P1ScoreCount > P2ScoreCount)
         {
-            Debug.Log("Player1 wins!");
+            winner = 1;
+        }
+        else if (P1ScoreCount < P2ScoreCount)
+        {
+            winner = 2;
         }
         else
         {
-            Debug.Log("Player2 wins!");
+            winner = 0; // Draw
         }
+        StartCoroutine(WaitBeforReset(winner));
+       
+    }
+
+    IEnumerator WaitBeforReset(int winner)
+    {
+        if (winner != 0)
+        {
+            crowned = true;
+        }
+       
+        yield return new WaitForSeconds(10);
         Application.LoadLevel("Menu");
         Destroy(gameObject);
     }
