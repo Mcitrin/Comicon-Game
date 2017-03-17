@@ -18,7 +18,7 @@ public class Move : MonoBehaviour
     public float power;
     public float chargeTime;
     public Ball ball;
-    float distance = 2;
+    float distance = 3;
 
     bool setting = false;
     bool chargeing = false;
@@ -43,14 +43,14 @@ public class Move : MonoBehaviour
         Input();
         Animate();
 
-        if (angle.x >= -.5 && angle.x <= .5 && angle.y >= .8)
+        if (angle.x >= -1 && angle.x <= 1 && angle.y >= .3f)
         {
             setting = true;
         }
         else
             setting = false;
 
-        
+        Debug.Log(angle);
     }
 
     bool IsGrounded()
@@ -162,7 +162,7 @@ public class Move : MonoBehaviour
                 if (Vector3.Distance(new Vector2(this.transform.position.x, this.transform.position.y)
                     , ball.transform.position) <= distance || ball.HeldBy == gameObject)
                 {
-                    ball.HitBall((int)power, angle, PlayerNumber);
+                    ball.HitBall((int)power, angle, PlayerNumber, setting);
                 }
 
                 if (!setting)

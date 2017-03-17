@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class Ball : MonoBehaviour
 {
 
+    public Animator animator;
     public GameObject HeldBy = null;
     GameObject LastHit; // last player to hit the ball
     public List<GameObject> Players = new List<GameObject>();
@@ -34,10 +35,28 @@ public class Ball : MonoBehaviour
     {
         Debug.Log(manager.winner);
         if (HeldBy && !wait && manager.winner == -1) // -1 = is default value
-            transform.position = new Vector3(HeldBy.transform.localPosition.x, HeldBy.transform.localPosition.y + 2f, -.5f);
+            transform.position = new Vector3(HeldBy.transform.localPosition.x, HeldBy.transform.localPosition.y,1f);
+        
+        Animate();
     }
 
-    public void HitBall(int power, Vector3 angle, int PlayerNum)
+    void Animate()
+    {
+        if(HeldBy)
+        {
+            animator.SetBool("Right", false);
+            animator.SetBool("Left", false);
+            animator.SetBool("Move", false);
+            animator.SetBool("Held", true);
+        }
+        else if (!HeldBy && !rigidbody.isKinematic)
+        {
+            animator.SetBool("Move", true);
+            animator.SetBool("Held", false);
+        }
+    }
+
+    public void HitBall(int power, Vector3 angle, int PlayerNum, bool setting)
     {
         
         if (!wait && manager.winner == -1)
@@ -54,6 +73,14 @@ public class Ball : MonoBehaviour
             rigidbody.isKinematic = false;
             if (power == 2)
             {
+                if (!setting)
+                {
+                    if (PlayerNum == 2)
+                        animator.SetBool("Left", true);
+                    else
+                        animator.SetBool("Right", true);
+                }
+
                 rigidbody.velocity = angle * 13.0f;//12
             }
             else if (power == 1)
@@ -70,7 +97,7 @@ public class Ball : MonoBehaviour
         if (Player2ScoreAreas.Contains(collision.gameObject) || Player1ScoreAreas.Contains(collision.gameObject))
         {
             rigidbody.isKinematic = true;// stop ball
-            transform.position += new Vector3(0,-.5f,0);
+            //transform.position += new Vector3(0,-.5f,0);
 
             if (Player1ScoreAreas[0] == collision.gameObject)//player 1 hit ball in player 2's in
             {
@@ -101,6 +128,10 @@ public class Ball : MonoBehaviour
 
     IEnumerator ResetBall(int playerNum)
     {
+        animator.SetBool("Right", false);
+        animator.SetBool("Left", false);
+        animator.SetBool("Move", false);
+        animator.SetBool("Held", true);
         sand.gameObject.SetActive(true);
         wait= true;
         manager.gameState = PlayManager.GameState.waiting;
