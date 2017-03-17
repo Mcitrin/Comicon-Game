@@ -35,7 +35,7 @@ public class Ball : MonoBehaviour
     {
         Debug.Log(manager.winner);
         if (HeldBy && !wait && manager.winner == -1) // -1 = is default value
-            transform.position = new Vector3(HeldBy.transform.localPosition.x, HeldBy.transform.localPosition.y,1f);
+            transform.position = new Vector3(HeldBy.transform.localPosition.x, HeldBy.transform.localPosition.y + .25f,1.2f);
         
         Animate();
     }

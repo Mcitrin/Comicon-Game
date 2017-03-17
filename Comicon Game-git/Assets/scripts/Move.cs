@@ -88,28 +88,46 @@ public class Move : MonoBehaviour
 
     void Animate()
     {
-        // lowerBody
         lowerBody.SetBool("Jump", !IsGrounded());
+        uperBody.SetBool("Jump", !IsGrounded());
 
         if (inputMan.Move(PlayerNumber) < 0)
         {
             lowerBody.SetBool("Backward", true);
             lowerBody.SetBool("Forward", false);
             lowerBody.SetBool("Still", false);
+            // uper
+            uperBody.SetBool("Move", true);
         }
         else if(inputMan.Move(PlayerNumber) > 0)
         {
             lowerBody.SetBool("Backward", false);
             lowerBody.SetBool("Forward", true);
             lowerBody.SetBool("Still", false);
+            // uper
+            uperBody.SetBool("Move", true);
         }
         else
         {
             lowerBody.SetBool("Backward", false);
             lowerBody.SetBool("Forward", false);
             lowerBody.SetBool("Still", true);
+            // uper
+            uperBody.SetBool("Move", false);
+            uperBody.SetBool("Still", !chargeing);
+
         }
-        // uperBody
+        
+        if(inputMan.Move(PlayerNumber) != 0 && IsGrounded())
+        {
+            uperBody.SetBool("Still", false);
+        }
+
+        if(!IsGrounded())
+        {
+            uperBody.SetBool("Still", !chargeing);
+            uperBody.SetBool("Move", false);
+        }
 
         if (!setting)
         {
@@ -122,7 +140,7 @@ public class Move : MonoBehaviour
             uperBody.SetBool("ChargeSmack", false);
         }
 
-        uperBody.SetBool("Still", !chargeing);
+        
 
 
 
