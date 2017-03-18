@@ -81,11 +81,11 @@ public class Ball : MonoBehaviour
                         animator.SetBool("Right", true);
                 }
 
-                rigidbody.velocity = angle * 13.0f;//12
+                rigidbody.velocity = angle * 13;
             }
             else if (power == 1)
             {
-                rigidbody.velocity = angle * 10.0f;//9
+                rigidbody.velocity = angle * 10;
             }
 
             LastHit = Players[PlayerNum];
