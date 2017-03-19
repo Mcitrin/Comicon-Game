@@ -56,7 +56,7 @@ public class Ball : MonoBehaviour
         }
     }
 
-    public void HitBall(int power, Vector3 angle, int PlayerNum, bool setting)
+    public void HitBall(int power, Vector3 angle, int PlayerNum, bool spike)
     {
         
         if (!wait && manager.winner == -1)
@@ -73,19 +73,30 @@ public class Ball : MonoBehaviour
             rigidbody.isKinematic = false;
             if (power == 2)
             {
-                if (!setting)
+                if (spike)
                 {
                     if (PlayerNum == 2)
-                        animator.SetBool("Left", true);
-                    else
-                        animator.SetBool("Right", true);
-                }
 
+                    {
+                        animator.SetBool("Left", true);
+                        animator.SetBool("Right", false);
+                    }
+                    else
+                    {
+                        animator.SetBool("Right", true);
+                        animator.SetBool("Left", false);
+                    }
+                }
                 rigidbody.velocity = angle * 13;
             }
             else if (power == 1)
             {
-                rigidbody.velocity = angle * 10;
+             
+             
+              animator.SetBool("Left", false);
+              animator.SetBool("Right", false);
+              animator.SetBool("Move", true);
+              rigidbody.velocity = angle * 10;
             }
 
             LastHit = Players[PlayerNum];

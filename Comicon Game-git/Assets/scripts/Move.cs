@@ -20,7 +20,7 @@ public class Move : MonoBehaviour
     public Ball ball;
     float distance = 3;
 
-    bool setting = false;
+    //bool setting = false;
     bool chargeing = false;
     Color[] colors = new Color[3];
 
@@ -42,15 +42,7 @@ public class Move : MonoBehaviour
     {
         Input();
         Animate();
-
-        if (angle.x >= -1 && angle.x <= 1 && angle.y >= .3f)
-        {
-            setting = true;
-        }
-        else
-            setting = false;
-
-        Debug.Log(angle);
+        Debug.Log(inputMan.Charge(PlayerNumber));
     }
 
     bool IsGrounded()
@@ -83,7 +75,7 @@ public class Move : MonoBehaviour
         }
         
         arrow.transform.position = angle*1.5f + this.transform.position;
-        CalcPower();
+        HitBall();
     }
 
     void Animate()
@@ -98,6 +90,7 @@ public class Move : MonoBehaviour
             lowerBody.SetBool("Still", false);
             // uper
             uperBody.SetBool("Move", true);
+            uperBody.SetBool("Still", false);
         }
         else if(inputMan.Move(PlayerNumber) > 0)
         {
@@ -106,6 +99,7 @@ public class Move : MonoBehaviour
             lowerBody.SetBool("Still", false);
             // uper
             uperBody.SetBool("Move", true);
+            uperBody.SetBool("Still", false);
         }
         else
         {
@@ -114,87 +108,36 @@ public class Move : MonoBehaviour
             lowerBody.SetBool("Still", true);
             // uper
             uperBody.SetBool("Move", false);
-            uperBody.SetBool("Still", !chargeing);
+            uperBody.SetBool("Still", true);
 
         }
-        
-        if(inputMan.Move(PlayerNumber) != 0 && IsGrounded())
-        {
-            uperBody.SetBool("Still", false);
-        }
-
-        if(!IsGrounded())
-        {
-            uperBody.SetBool("Still", !chargeing);
-            uperBody.SetBool("Move", false);
-        }
-
-        if (!setting)
-        {
-            uperBody.SetBool("ChargeSmack", chargeing);
-            uperBody.SetBool("ChargeSet", false);
-        }
-        else
-        {
-            uperBody.SetBool("ChargeSet", chargeing);
-            uperBody.SetBool("ChargeSmack", false);
-        }
-
-        
-
-
-
     }
 
-    void CalcPower()
+    void HitBall()
     {
         if (inputMan.Charge(PlayerNumber))
         {
-            if (power == 0)
-                power = Time.time;
-            chargeTime = (Time.time - power);
-        }
-
-        if (chargeTime >= .25f)
-        {
-
-            chargeing = true;
-        }
-        else { chargeing = false; }
-
-        if (!inputMan.Charge(PlayerNumber))
-        {
-            if (power != 0)
+            if (!IsGrounded()) // jumping and spikeing
             {
-                
-                if (chargeTime >= 1)
-                {
-                    power = 2;
-                    StartCoroutine(Flash());
-                }
-                else
-                {
-                    power = 1;
-                }
+                animationManager.SetBool(uperBody, "Smack", smack.length);
+                uperBody.SetBool("Set", false);
 
                 if (Vector3.Distance(new Vector2(this.transform.position.x, this.transform.position.y)
-                    , ball.transform.position) <= distance || ball.HeldBy == gameObject)
+                , ball.transform.position) <= distance || ball.HeldBy == gameObject)
                 {
-                    ball.HitBall((int)power, angle, PlayerNumber, setting);
+                    ball.HitBall(2, angle, PlayerNumber, true);
+                   StartCoroutine(Flash());
                 }
-
-                if (!setting)
+            }
+            else              // standing and setting
+            {
+                animationManager.SetBool(uperBody, "Set", set.length);
+                uperBody.SetBool("Smack", false);
+                if (Vector3.Distance(new Vector2(this.transform.position.x, this.transform.position.y)
+                , ball.transform.position) <= distance || ball.HeldBy == gameObject)
                 {
-                    animationManager.SetBool(uperBody, "Smack", smack.length);
-                    uperBody.SetBool("Set", false);
+                    ball.HitBall(1, angle, PlayerNumber, false);
                 }
-                else
-                {
-                    animationManager.SetBool(uperBody, "Set", set.length);
-                    uperBody.SetBool("Smack", false);
-                }
-                chargeTime = 0;
-                power = 0;
             }
         }
     }
