@@ -84,7 +84,7 @@ public class InputMan : MonoBehaviour {
                 if (Physics.Raycast(ray, out hit, 100))
                 {
                     target = new Vector2(hit.point.x, hit.point.y);
-                    vec = (target - GameObject.Find("player1").transform.position).normalized;
+                    vec = (target - GameObject.Find("Player1").transform.position).normalized;
                 }
             }
         }

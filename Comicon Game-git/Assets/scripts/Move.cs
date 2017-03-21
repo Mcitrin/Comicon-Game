@@ -14,10 +14,14 @@ public class Move : MonoBehaviour
     public AnimationClip set;
     public int PlayerNumber;
     public GameObject arrow;
+    public SpriteRenderer Hair;
+    public SpriteRenderer Shorts;
+    public SpriteRenderer Stripe;
     public Vector3 angle;
     public float power;
     public float chargeTime;
     public Ball ball;
+
     float distance = 3;
 
     //bool setting = false;
@@ -42,7 +46,6 @@ public class Move : MonoBehaviour
     {
         Input();
         Animate();
-        Debug.Log(inputMan.Charge(PlayerNumber));
     }
 
     bool IsGrounded()
@@ -109,7 +112,6 @@ public class Move : MonoBehaviour
             // uper
             uperBody.SetBool("Move", false);
             uperBody.SetBool("Still", true);
-
         }
     }
 
@@ -121,7 +123,6 @@ public class Move : MonoBehaviour
             {
                 animationManager.SetBool(uperBody, "Smack", smack.length);
                 uperBody.SetBool("Set", false);
-
                 if (Vector3.Distance(new Vector2(this.transform.position.x, this.transform.position.y)
                 , ball.transform.position) <= distance || ball.HeldBy == gameObject)
                 {

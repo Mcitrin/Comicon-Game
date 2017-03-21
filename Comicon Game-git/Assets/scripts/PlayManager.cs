@@ -60,7 +60,7 @@ public class PlayManager : MonoBehaviour {
             case GameState.waiting:
                 if (crowned)
                 {
-                    Crown.transform.position = GameObject.Find("player" + winner).transform.position + Vector3.up * 1.75f;
+                    Crown.transform.position = GameObject.Find("Player" + winner).transform.position + Vector3.up * 1.75f;
                     Crown.transform.Rotate(Vector3.up, .3f);
                 }
 

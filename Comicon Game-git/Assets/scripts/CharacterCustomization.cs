@@ -32,8 +32,10 @@ public class CharacterCustomization : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-	
-	}
+        HairButton.GetComponent<Image>().color = Color.yellow;
+        ShortsButton.GetComponent<Image>().color = Color.white;
+        StripeButton.GetComponent<Image>().color = Color.white;
+    }
 
     public void Hair()
     {
@@ -41,6 +43,10 @@ public class CharacterCustomization : MonoBehaviour {
         Red.value = HairColor.r;
         Blue.value = HairColor.b;
         Green.value = HairColor.g;
+
+        HairButton.GetComponent<Image>().color = Color.yellow;
+        ShortsButton.GetComponent<Image>().color = Color.white;
+        StripeButton.GetComponent<Image>().color = Color.white;
     }
 
     public void Shorts()
@@ -49,6 +55,10 @@ public class CharacterCustomization : MonoBehaviour {
         Red.value = ShortsColor.r;
         Blue.value = ShortsColor.b;
         Green.value = ShortsColor.g;
+
+        HairButton.GetComponent<Image>().color = Color.white;
+        ShortsButton.GetComponent<Image>().color = Color.yellow;
+        StripeButton.GetComponent<Image>().color = Color.white;
     }
 
     public void Stripe()
@@ -57,12 +67,20 @@ public class CharacterCustomization : MonoBehaviour {
         Red.value = StripeColor.r;
         Blue.value = StripeColor.b;
         Green.value = StripeColor.g;
+
+        HairButton.GetComponent<Image>().color = Color.white;
+        ShortsButton.GetComponent<Image>().color = Color.white;
+        StripeButton.GetComponent<Image>().color = Color.yellow;
     }
 
 	// Update is called once per frame
 	void Update () {
+        HairImage.color = HairColor;
+        ShortsImage.color = ShortsColor;
+        StripeImage.color = StripeColor;
 
-        switch(state)
+
+        switch (state)
         {
             case State.Hair:
                 HairColor = new Color(Red.value, Green.value, Blue.value);

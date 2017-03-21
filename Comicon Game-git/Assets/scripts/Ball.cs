@@ -33,7 +33,6 @@ public class Ball : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(manager.winner);
         if (HeldBy && !wait && manager.winner == -1) // -1 = is default value
             transform.position = new Vector3(HeldBy.transform.localPosition.x, HeldBy.transform.localPosition.y + .25f,1.2f);
         
