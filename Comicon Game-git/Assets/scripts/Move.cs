@@ -46,6 +46,8 @@ public class Move : MonoBehaviour
     {
         Input();
         Animate();
+
+        Debug.Log(angle);
     }
 
     bool IsGrounded()
@@ -78,7 +80,8 @@ public class Move : MonoBehaviour
         }
         
         arrow.transform.position = angle*1.5f + this.transform.position;
-        HitBall();
+        //HitBall();
+        CalcPower();
     }
 
     void Animate()
@@ -111,7 +114,25 @@ public class Move : MonoBehaviour
             lowerBody.SetBool("Still", true);
             // uper
             uperBody.SetBool("Move", false);
-            uperBody.SetBool("Still", true);
+            uperBody.SetBool("Still", !chargeing);
+        }
+
+        if (inputMan.Move(PlayerNumber) != 0 && IsGrounded())
+        {
+            uperBody.SetBool("Still", false);
+        }
+
+        if (!IsGrounded())
+        {
+            uperBody.SetBool("Still", !chargeing);
+            uperBody.SetBool("Move", false);
+            uperBody.SetBool("ChargeSmack", chargeing);
+            uperBody.SetBool("ChargeSet", false);
+        }
+        else
+        {
+            uperBody.SetBool("ChargeSet", chargeing);
+            uperBody.SetBool("ChargeSmack", false);
         }
     }
 
@@ -143,6 +164,58 @@ public class Move : MonoBehaviour
         }
     }
 
+    void CalcPower()
+    {
+        if (inputMan.Charge(PlayerNumber))
+        {
+            if (power == 0)
+                power = Time.time;
+            chargeTime = (Time.time - power);
+        }
+
+        if (chargeTime >= .25f)
+        {
+
+            chargeing = true;
+        }
+        else { chargeing = false; }
+
+        if (!inputMan.Charge(PlayerNumber))
+        {
+            if (power != 0)
+            {
+
+                if (chargeTime >= 1)
+                {
+                    power = 2;
+                    StartCoroutine(Flash());
+                }
+                else
+                {
+                    power = 1;
+                }
+
+                if (Vector3.Distance(new Vector2(this.transform.position.x, this.transform.position.y)
+                    , ball.transform.position) <= distance || ball.HeldBy == gameObject)
+                {
+                    ball.HitBall((int)power, angle, PlayerNumber, !IsGrounded());
+                }
+
+                if (!IsGrounded())
+                {
+                    animationManager.SetBool(uperBody, "Smack", smack.length);
+                    uperBody.SetBool("Set", false);
+                }
+                else
+                {
+                    animationManager.SetBool(uperBody, "Set", set.length);
+                    uperBody.SetBool("Smack", false);
+                }
+                chargeTime = 0;
+                power = 0;
+            }
+        }
+    }
     IEnumerator Flash()
     {
         for (int i = 0; i < 8; i++)

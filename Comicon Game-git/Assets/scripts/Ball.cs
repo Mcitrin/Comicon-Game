@@ -72,7 +72,7 @@ public class Ball : MonoBehaviour
             rigidbody.isKinematic = false;
             if (power == 2)
             {
-                if (spike)
+                if (spike && angle.y <= 0)
                 {
                     if (PlayerNum == 2)
 
