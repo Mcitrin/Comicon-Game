@@ -46,8 +46,9 @@ public class Move : MonoBehaviour
     {
         Input();
         Animate();
+       if(!IsGrounded())
+       this.GetComponent<Rigidbody>().velocity += Vector3.down *.1f;
 
-        Debug.Log(angle);
     }
 
     bool IsGrounded()
@@ -59,7 +60,7 @@ public class Move : MonoBehaviour
     {
         if (inputMan.Jump(PlayerNumber) && IsGrounded())
         {
-            this.GetComponent<Rigidbody>().velocity = new Vector3(0, 10.0f, 0);//7.5f;
+            this.GetComponent<Rigidbody>().velocity = new Vector3(0, 12, 0);//7.5f;
         }
 
         Vector3 curVel = this.GetComponent<Rigidbody>().velocity;
@@ -173,7 +174,7 @@ public class Move : MonoBehaviour
             chargeTime = (Time.time - power);
         }
 
-        if (chargeTime >= .25f)
+        if (chargeTime >= .2f)
         {
 
             chargeing = true;
@@ -185,7 +186,7 @@ public class Move : MonoBehaviour
             if (power != 0)
             {
 
-                if (chargeTime >= 1)
+                if (chargeTime >= .75)
                 {
                     power = 2;
                     StartCoroutine(Flash());
@@ -195,12 +196,10 @@ public class Move : MonoBehaviour
                     power = 1;
                 }
 
-                if (Vector3.Distance(new Vector2(this.transform.position.x, this.transform.position.y)
-                    , ball.transform.position) <= distance || ball.HeldBy == gameObject)
-                {
-                    ball.HitBall((int)power, angle, PlayerNumber, !IsGrounded());
-                }
+                //if (Vector3.Distance(new Vector2(this.transform.position.x, this.transform.position.y)
+                //    , ball.transform.position) <= distance || ball.HeldBy == gameObject)
 
+              
                 if (!IsGrounded())
                 {
                     animationManager.SetBool(uperBody, "Smack", smack.length);
@@ -211,6 +210,11 @@ public class Move : MonoBehaviour
                     animationManager.SetBool(uperBody, "Set", set.length);
                     uperBody.SetBool("Smack", false);
                 }
+                  if(ball.CollidingPlayer == gameObject)
+                {
+                    ball.HitBall((int)power, angle, PlayerNumber, !IsGrounded());
+                }
+
                 chargeTime = 0;
                 power = 0;
             }

@@ -17,6 +17,7 @@ public class Ball : MonoBehaviour
     Rigidbody rigidbody;
     bool wait = false; // when the ball lands we wait unitl it has ben reset to hit again
     public ParticleSystem sand;
+    public GameObject CollidingPlayer;
  
     // Use this for initialization
     void Start()
@@ -47,6 +48,8 @@ public class Ball : MonoBehaviour
             animator.SetBool("Left", false);
             animator.SetBool("Move", false);
             animator.SetBool("Held", true);
+
+            CollidingPlayer = HeldBy;
         }
         else if (!HeldBy && !rigidbody.isKinematic)
         {
@@ -62,7 +65,7 @@ public class Ball : MonoBehaviour
         {
             
 
-            if (HeldBy != null)
+            if (HeldBy != null) // if ball is held
             {
                 HeldBy = null;
                 if (manager.gameState == PlayManager.GameState.waiting)
@@ -101,14 +104,39 @@ public class Ball : MonoBehaviour
             LastHit = Players[PlayerNum];
         }
     }
+    private void OnTriggerExit(Collider other)
+    {
+        CollidingPlayer = null;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (Players.Contains(other.gameObject))
+        {
+            CollidingPlayer = other.gameObject;
+        }
+        else
+        {
+            CollidingPlayer = null;
+        }
+    }
 
     void OnCollisionEnter(Collision collision)
     {
+        Debug.Log(collision.gameObject.name);
+
+      
+
+       // if (Players[1] == collision.gameObject)
+       // {
+       //     HitBall(1, collision.gameObject.GetComponent<Move>().angle, 1, true);
+       //     
+       // }
+
         if (Player2ScoreAreas.Contains(collision.gameObject) || Player1ScoreAreas.Contains(collision.gameObject))
         {
             rigidbody.isKinematic = true;// stop ball
             //transform.position += new Vector3(0,-.5f,0);
-
             if (Player1ScoreAreas[0] == collision.gameObject)//player 1 hit ball in player 2's in
             {
                 StartCoroutine(ResetBall(1));
