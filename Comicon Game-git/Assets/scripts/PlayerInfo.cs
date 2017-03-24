@@ -79,12 +79,12 @@ public class PlayerInfo : MonoBehaviour {
     void SetPlayersColors() // sets the colors of the players themselfs
     {
         //p1
-        GameObject.Find("Player1").GetComponent<Move>().Hair.color = HairColor_P1;
-        GameObject.Find("Player1").GetComponent<Move>().Shorts.color = ShortsColor_P1;
-        GameObject.Find("Player1").GetComponent<Move>().Stripe.color = StripeColor_P1;
+        GameObject.Find("Player1").GetComponent<Move>().HairSprite.color = HairColor_P1;
+        GameObject.Find("Player1").GetComponent<Move>().ShortsSprite.color = ShortsColor_P1;
+        GameObject.Find("Player1").GetComponent<Move>().StripeSprite.color = StripeColor_P1;
         //p2
-        GameObject.Find("Player2").GetComponent<Move>().Hair.color = HairColor_P2;
-        GameObject.Find("Player2").GetComponent<Move>().Shorts.color = ShortsColor_P2;
-        GameObject.Find("Player2").GetComponent<Move>().Stripe.color = StripeColor_P2;
+        GameObject.Find("Player2").GetComponent<Move>().HairSprite.color = HairColor_P2;
+        GameObject.Find("Player2").GetComponent<Move>().ShortsSprite.color = ShortsColor_P2;
+        GameObject.Find("Player2").GetComponent<Move>().StripeSprite.color = StripeColor_P2;
     }
 }

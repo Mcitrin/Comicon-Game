@@ -36,7 +36,10 @@ public class Ball : MonoBehaviour
     {
         if (HeldBy && !wait && manager.winner == -1) // -1 = is default value
             transform.position = new Vector3(HeldBy.transform.localPosition.x, HeldBy.transform.localPosition.y + .25f,1.2f);
-        
+
+       //if (HeldBy == null)
+       //this.GetComponent<Rigidbody>().velocity += Vector3.down * .3f;
+
         Animate();
     }
 
@@ -98,7 +101,7 @@ public class Ball : MonoBehaviour
               animator.SetBool("Left", false);
               animator.SetBool("Right", false);
               animator.SetBool("Move", true);
-              rigidbody.velocity = angle * 10;
+                rigidbody.velocity = angle * 10;
             }
 
             LastHit = Players[PlayerNum];
@@ -123,7 +126,7 @@ public class Ball : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        Debug.Log(collision.gameObject.name);
+        //Debug.Log(collision.gameObject.name);
 
       
 
@@ -178,7 +181,6 @@ public class Ball : MonoBehaviour
         manager.IncrementScore(playerNum);
         HeldBy = Players[playerNum];
         wait = false;
-
     }
 
    // IEnumerator Wait()

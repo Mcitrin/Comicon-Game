@@ -22,7 +22,6 @@ public class AnimationManager : MonoBehaviour {
 
     IEnumerator PlayAnimation(Animator anim, string name, float time)
     {
-        //Debug.Log(Time.time);
         yield return new WaitForSeconds(time);
         anim.SetBool(name, false);
     }

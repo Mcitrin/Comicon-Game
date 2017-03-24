@@ -1,0 +1,755 @@
+fileFormatVersion: 2
+guid: 149050da3e7465849816ec2786e408f4
+timeCreated: 1490309081
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: ST_walk1
+    21300002: ST_walk2
+    21300004: ST_walk3
+    21300006: ST_jump
+    21300008: H_Walk2
+    21300010: H_Walk3
+    21300012: SpikeinIT 1_6
+    21300014: SH_walk1
+    21300016: SH_walk2
+    21300018: SH_walk3
+    21300020: SH_jump
+    21300022: H_Walk1
+    21300024: L_walk1
+    21300026: L_walk2
+    21300028: L_walk3
+    21300030: L_jump
+    21300032: H_EndSmack
+    21300034: SpikeinIT 1_17
+    21300036: SpikeinIT 1_18
+    21300038: B_walk2
+    21300040: B_walk3
+    21300042: B_walk1
+    21300044: B_Smack
+    21300046: B_victory
+    21300048: B_set
+    21300050: B_endSmack
+    21300052: hairSet
+    21300054: SpikeinIT 1_27
+    21300056: SpikeinIT 1_28
+    21300058: SpikeinIT 1_32
+    21300060: SpikeinIT 1_33
+    21300062: SpikeinIT 1_45
+    21300064: SpikeinIT 1_46
+    21300066: SpikeinIT 1_29
+    21300068: SpikeinIT 1_30
+    21300070: SpikeinIT 1_31
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: 0
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: ST_walk1
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 899
+        width: 39
+        height: 32
+      alignment: 9
+      pivot: {x: 0.46, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -17.940002, y: 16}
+        - {x: -17.940002, y: -16}
+        - {x: 18.059998, y: -16}
+        - {x: 21.059998, y: -11}
+        - {x: 21.059998, y: 16}
+    - name: ST_walk2
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 899
+        width: 48
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -23, y: 16}
+        - {x: -24, y: 7}
+        - {x: -24, y: -16}
+        - {x: 23, y: -16}
+        - {x: 24, y: -15}
+        - {x: 24, y: 6}
+        - {x: 22, y: 16}
+    - name: ST_walk3
+      rect:
+        serializedVersion: 2
+        x: 607
+        y: 899
+        width: 40
+        height: 32
+      alignment: 9
+      pivot: {x: 0.45, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -18, y: 16}
+        - {x: -18, y: -10}
+        - {x: -15, y: -16}
+        - {x: 8, y: -16}
+        - {x: 22, y: -5}
+        - {x: 22, y: 16}
+    - name: ST_jump
+      rect:
+        serializedVersion: 2
+        x: 728
+        y: 888
+        width: 53
+        height: 39
+      alignment: 9
+      pivot: {x: 0.42, y: 0.57}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -21.26001, y: 16.77002}
+        - {x: -22.26001, y: 6.7700195}
+        - {x: -22.26001, y: -18.22998}
+        - {x: -12.26001, y: -22.22998}
+        - {x: 26.73999, y: -22.22998}
+        - {x: 30.73999, y: -21.22998}
+        - {x: 30.73999, y: -0.22998047}
+        - {x: 23.73999, y: 16.77002}
+    - name: H_Walk2
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 759
+        width: 80
+        height: 115
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -12, y: 53.5}
+        - {x: -12, y: 32.5}
+        - {x: 26, y: 32.5}
+        - {x: 27, y: 36.5}
+        - {x: 27, y: 52.5}
+        - {x: 26, y: 53.5}
+    - name: H_Walk3
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 766
+        width: 66
+        height: 109
+      alignment: 9
+      pivot: {x: 0.45, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -1.699997, y: 51.5}
+        - {x: -5.699997, y: 47.5}
+        - {x: -5.699997, y: 30.5}
+        - {x: 33.300003, y: 30.5}
+        - {x: 33.300003, y: 48.5}
+        - {x: 29.300003, y: 51.5}
+    - name: SH_walk1
+      rect:
+        serializedVersion: 2
+        x: 835
+        y: 727
+        width: 39
+        height: 32
+      alignment: 9
+      pivot: {x: 0.46, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -11.940002, y: -16}
+        - {x: -11.940002, y: 16}
+        - {x: -17.940002, y: 16}
+        - {x: -17.940002, y: -16}
+      - - {x: -10.940002, y: 16}
+        - {x: -10.940002, y: -14}
+        - {x: -1.9400024, y: -16}
+        - {x: 20.059998, y: -16}
+        - {x: 21.059998, y: -13}
+        - {x: 21.059998, y: 16}
+    - name: SH_walk2
+      rect:
+        serializedVersion: 2
+        x: 931
+        y: 727
+        width: 48
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -24, y: 16}
+        - {x: -24, y: -16}
+        - {x: 24, y: -16}
+        - {x: 24, y: 16}
+    - name: SH_walk3
+      rect:
+        serializedVersion: 2
+        x: 1050
+        y: 727
+        width: 40
+        height: 32
+      alignment: 9
+      pivot: {x: 0.45, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -18, y: 16}
+        - {x: -18, y: -16}
+        - {x: 8, y: -16}
+        - {x: 22, y: -5}
+        - {x: 22, y: 16}
+    - name: SH_jump
+      rect:
+        serializedVersion: 2
+        x: 1171
+        y: 716
+        width: 53
+        height: 39
+      alignment: 9
+      pivot: {x: 0.42, y: 0.57}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -22.26001, y: -15.22998}
+        - {x: -8.26001, y: -22.22998}
+        - {x: 30.73999, y: -22.22998}
+        - {x: 30.73999, y: 7.7700195}
+        - {x: 28.73999, y: 16.77002}
+        - {x: -20.26001, y: 16.77002}
+        - {x: -22.26001, y: 4.7700195}
+    - name: H_Walk1
+      rect:
+        serializedVersion: 2
+        x: 22
+        y: 492
+        width: 75
+        height: 114
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -4.5, y: 54}
+        - {x: -4.5, y: 33}
+        - {x: 31.5, y: 33}
+        - {x: 34.5, y: 34}
+        - {x: 34.5, y: 54}
+    - name: L_walk1
+      rect:
+        serializedVersion: 2
+        x: 395
+        y: 544
+        width: 53
+        height: 107
+      alignment: 9
+      pivot: {x: 0.6, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -29.799988, y: 53.5}
+        - {x: -31.799988, y: 34.5}
+        - {x: -31.799988, y: -53.5}
+        - {x: 7.200012, y: -53.5}
+        - {x: 14.200012, y: -45.5}
+        - {x: 21.200012, y: -19.5}
+        - {x: 21.200012, y: 53.5}
+    - name: L_walk2
+      rect:
+        serializedVersion: 2
+        x: 483
+        y: 544
+        width: 92
+        height: 107
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 46, y: -53.5}
+        - {x: 46, y: 7.5}
+        - {x: 21, y: 53.5}
+        - {x: -31, y: 53.5}
+        - {x: -37, y: 44.5}
+        - {x: -46, y: 11.5}
+        - {x: -46, y: -51.5}
+        - {x: -45, y: -53.5}
+        - {x: -18, y: -53.5}
+        - {x: -1, y: -13.5}
+        - {x: 11, y: -49.5}
+        - {x: 18, y: -53.5}
+    - name: L_walk3
+      rect:
+        serializedVersion: 2
+        x: 606
+        y: 544
+        width: 71
+        height: 107
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -32.5, y: 53.5}
+        - {x: -35.5, y: 31.5}
+        - {x: -35.5, y: -45.5}
+        - {x: -17.5, y: -53.5}
+        - {x: 35.5, y: -53.5}
+        - {x: 35.5, y: -17.5}
+        - {x: 23.5, y: 53.5}
+    - name: L_jump
+      rect:
+        serializedVersion: 2
+        x: 709
+        y: 538
+        width: 97
+        height: 109
+      alignment: 9
+      pivot: {x: 0.6, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 38.799988, y: 14.5}
+        - {x: 34.799988, y: 29.5}
+        - {x: 28.799988, y: 42.5}
+        - {x: 22.799988, y: 54.5}
+        - {x: -48.200012, y: 54.5}
+        - {x: -58.200012, y: 23.5}
+        - {x: -58.200012, y: -40.5}
+        - {x: -31.200012, y: -50.5}
+        - {x: -14.200012, y: -54.5}
+        - {x: 28.799988, y: -54.5}
+        - {x: 22.799988, y: -41.5}
+        - {x: 20.799988, y: -39.5}
+        - {x: 38.799988, y: -13.5}
+    - name: H_EndSmack
+      rect:
+        serializedVersion: 2
+        x: 28
+        y: 72
+        width: 96
+        height: 97
+      alignment: 9
+      pivot: {x: 0.25, y: 0.45}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 0, y: 50.350006}
+        - {x: 0, y: 20.350006}
+        - {x: 18, y: 20.350006}
+        - {x: 40, y: 31.350006}
+        - {x: 40, y: 47.350006}
+        - {x: 38, y: 50.350006}
+    - name: SpikeinIT 1_17
+      rect:
+        serializedVersion: 2
+        x: 1029
+        y: 376
+        width: 31
+        height: 18
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: SpikeinIT 1_18
+      rect:
+        serializedVersion: 2
+        x: 61
+        y: 322
+        width: 35
+        height: 17
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: B_walk2
+      rect:
+        serializedVersion: 2
+        x: 274
+        y: 233
+        width: 108
+        height: 115
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -54, y: -57.5}
+        - {x: 54, y: -57.5}
+        - {x: 54, y: -2.5}
+        - {x: 30, y: 57.5}
+        - {x: -31, y: 57.5}
+        - {x: -34, y: 56.5}
+        - {x: -54, y: 12.5}
+    - name: B_walk3
+      rect:
+        serializedVersion: 2
+        x: 390
+        y: 232
+        width: 66
+        height: 109
+      alignment: 9
+      pivot: {x: 0.45, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -27.700012, y: 54.5}
+        - {x: -29.700012, y: 38.5}
+        - {x: -29.700012, y: -54.5}
+        - {x: 22.299988, y: -54.5}
+        - {x: 27.299988, y: -49.5}
+        - {x: 36.299988, y: 17.5}
+        - {x: 36.299988, y: 54.5}
+    - name: B_walk1
+      rect:
+        serializedVersion: 2
+        x: 457
+        y: 225
+        width: 75
+        height: 114
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -8.5, y: 57}
+        - {x: -37.5, y: 9}
+        - {x: -37.5, y: -45}
+        - {x: -19.5, y: -57}
+        - {x: 17.5, y: -57}
+        - {x: 37.5, y: -48}
+        - {x: 37.5, y: 52}
+        - {x: 32.5, y: 57}
+    - name: B_Smack
+      rect:
+        serializedVersion: 2
+        x: 557
+        y: 216
+        width: 122
+        height: 118
+      alignment: 9
+      pivot: {x: 0.55, y: 0.45}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 20.900024, y: 64.899994}
+        - {x: -7.0999756, y: 58.899994}
+        - {x: -16.099976, y: 47.899994}
+        - {x: -29.099976, y: 63.899994}
+        - {x: -33.099976, y: 64.899994}
+        - {x: -58.099976, y: 64.899994}
+        - {x: -65.099976, y: 54.899994}
+        - {x: -67.099976, y: 41.899994}
+        - {x: -67.099976, y: -10.100006}
+        - {x: -33.099976, y: -48.100006}
+        - {x: 4.9000244, y: -53.100006}
+        - {x: 53.900024, y: -53.100006}
+        - {x: 54.900024, y: -51.100006}
+        - {x: 54.900024, y: -3.100006}
+        - {x: 28.900024, y: 64.899994}
+    - name: B_victory
+      rect:
+        serializedVersion: 2
+        x: 896
+        y: 202
+        width: 70
+        height: 163
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -35, y: 81.5}
+        - {x: -35, y: -61.5}
+        - {x: 7, y: -81.5}
+        - {x: 35, y: -81.5}
+        - {x: 35, y: 62.5}
+        - {x: -1, y: 81.5}
+    - name: B_set
+      rect:
+        serializedVersion: 2
+        x: 688
+        y: 212
+        width: 75
+        height: 110
+      alignment: 9
+      pivot: {x: 0.33, y: 0.51}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -2.75, y: 53.899994}
+        - {x: -10.75, y: 51.899994}
+        - {x: -24.75, y: 7.899994}
+        - {x: -24.75, y: -45.100006}
+        - {x: 9.25, y: -56.100006}
+        - {x: 50.25, y: -56.100006}
+        - {x: 50.25, y: 37.899994}
+        - {x: 46.25, y: 53.899994}
+    - name: B_endSmack
+      rect:
+        serializedVersion: 2
+        x: 776
+        y: 220
+        width: 96
+        height: 97
+      alignment: 9
+      pivot: {x: 0.25, y: 0.45}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -1, y: 53.350006}
+        - {x: -24, y: 1.3500061}
+        - {x: -24, y: -43.649994}
+        - {x: 72, y: -43.649994}
+        - {x: 72, y: -12.649994}
+        - {x: 54, y: 53.350006}
+    - name: SpikeinIT 1_27
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 153
+        width: 61
+        height: 61
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -26.5, y: 30.5}
+        - {x: -30.5, y: 21.5}
+        - {x: -30.5, y: -25.5}
+        - {x: -21.5, y: -30.5}
+        - {x: 16.5, y: -30.5}
+        - {x: 30.5, y: -20.5}
+        - {x: 30.5, y: 20.5}
+        - {x: 26.5, y: 30.5}
+    - name: SpikeinIT 1_28
+      rect:
+        serializedVersion: 2
+        x: 337
+        y: 154
+        width: 61
+        height: 61
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -26.5, y: 30.5}
+        - {x: -30.5, y: 21.5}
+        - {x: -30.5, y: -25.5}
+        - {x: -21.5, y: -30.5}
+        - {x: 16.5, y: -30.5}
+        - {x: 30.5, y: -20.5}
+        - {x: 30.5, y: 20.5}
+        - {x: 26.5, y: 30.5}
+    - name: SpikeinIT 1_32
+      rect:
+        serializedVersion: 2
+        x: 261
+        y: 82
+        width: 66
+        height: 65
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -23, y: 32.5}
+        - {x: -33, y: 3.5}
+        - {x: -33, y: -32.5}
+        - {x: 14, y: -32.5}
+        - {x: 33, y: -14.5}
+        - {x: 33, y: 32.5}
+    - name: SpikeinIT 1_33
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 83
+        width: 66
+        height: 65
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 6, y: 32.5}
+        - {x: -33, y: 32.5}
+        - {x: -33, y: -12.5}
+        - {x: -12, y: -32.5}
+        - {x: 33, y: -32.5}
+        - {x: 33, y: 11.5}
+        - {x: 13, y: 29.5}
+    - name: SpikeinIT 1_45
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 15
+        width: 62
+        height: 61
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -20, y: 30.5}
+        - {x: -31, y: 27.5}
+        - {x: -31, y: -14.5}
+        - {x: -20, y: -30.5}
+        - {x: 18, y: -30.5}
+        - {x: 31, y: -24.5}
+        - {x: 31, y: 23.5}
+        - {x: 23, y: 30.5}
+    - name: SpikeinIT 1_46
+      rect:
+        serializedVersion: 2
+        x: 364
+        y: 16
+        width: 62
+        height: 61
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -25, y: 30.5}
+        - {x: -31, y: 19.5}
+        - {x: -31, y: -25.5}
+        - {x: -22, y: -30.5}
+        - {x: 28, y: -30.5}
+        - {x: 31, y: -25.5}
+        - {x: 31, y: 23.5}
+        - {x: 26, y: 30.5}
+    - name: SpikeinIT 1_29
+      rect:
+        serializedVersion: 2
+        x: 457
+        y: 69
+        width: 155
+        height: 99
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -64.5, y: 12.5}
+        - {x: -64.5, y: -26.5}
+        - {x: -32.5, y: -26.5}
+        - {x: -31.5, y: -23.5}
+        - {x: -31.5, y: 12.5}
+      - - {x: 48.5, y: 12.5}
+        - {x: 46.5, y: 10.5}
+        - {x: 46.5, y: -24.5}
+        - {x: 48.5, y: -26.5}
+        - {x: 68.5, y: -26.5}
+        - {x: 68.5, y: 12.5}
+      - - {x: -22.5, y: 30.5}
+        - {x: -25.5, y: 29.5}
+        - {x: -28.5, y: 20.5}
+        - {x: -28.5, y: -8.5}
+        - {x: 6.5, y: -8.5}
+        - {x: 6.5, y: 27.5}
+        - {x: 3.5, y: 30.5}
+      - - {x: 8.5, y: 30.5}
+        - {x: 6.5, y: 28.5}
+        - {x: 6.5, y: -8.5}
+        - {x: 35.5, y: -8.5}
+        - {x: 41.5, y: -7.5}
+        - {x: 41.5, y: 26.5}
+        - {x: 37.5, y: 30.5}
+    - name: SpikeinIT 1_30
+      rect:
+        serializedVersion: 2
+        x: 628
+        y: 81
+        width: 175
+        height: 90
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -85.5, y: 9}
+        - {x: -85.5, y: -22}
+        - {x: -79.5, y: -30}
+        - {x: -54.5, y: -30}
+        - {x: -50.5, y: -24}
+        - {x: -50.5, y: 9}
+      - - {x: 59.5, y: 9}
+        - {x: 59.5, y: -30}
+        - {x: 81.5, y: -30}
+        - {x: 81.5, y: 9}
+      - - {x: -15.5, y: 27}
+        - {x: -50.5, y: 27}
+        - {x: -50.5, y: -13}
+        - {x: -15.5, y: -13}
+      - - {x: 51.5, y: 27}
+        - {x: 21.5, y: 27}
+        - {x: 20.5, y: 25}
+        - {x: 20.5, y: -11}
+        - {x: 22.5, y: -13}
+        - {x: 42.5, y: -13}
+        - {x: 53.5, y: -10}
+        - {x: 54.5, y: -7}
+        - {x: 54.5, y: 26}
+      - - {x: -8.5, y: 44}
+        - {x: -14.5, y: 32}
+        - {x: -14.5, y: 5}
+        - {x: 19.5, y: 5}
+        - {x: 19.5, y: 41}
+        - {x: 12.5, y: 44}
+    - name: SpikeinIT 1_31
+      rect:
+        serializedVersion: 2
+        x: 816
+        y: 78
+        width: 195
+        height: 94
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 61.5, y: 6}
+        - {x: 61.5, y: -33}
+        - {x: 83.5, y: -33}
+        - {x: 83.5, y: 6}
+      - - {x: -86.5, y: 20}
+        - {x: -86.5, y: -26}
+        - {x: -54.5, y: -26}
+        - {x: -43.5, y: -25}
+        - {x: -13.5, y: 1}
+        - {x: -13.5, y: 31}
+        - {x: -62.5, y: 31}
+        - {x: -82.5, y: 28}
+      - - {x: -12.5, y: 41}
+        - {x: -12.5, y: 3}
+        - {x: -11.5, y: 0}
+        - {x: 18.5, y: -13}
+        - {x: 58.5, y: -13}
+        - {x: 58.5, y: 41}
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
