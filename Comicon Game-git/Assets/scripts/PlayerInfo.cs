@@ -82,9 +82,11 @@ public class PlayerInfo : MonoBehaviour {
         GameObject.Find("Player1").GetComponent<Move>().HairSprite.color = HairColor_P1;
         GameObject.Find("Player1").GetComponent<Move>().ShortsSprite.color = ShortsColor_P1;
         GameObject.Find("Player1").GetComponent<Move>().StripeSprite.color = StripeColor_P1;
+        GameObject.Find("Player1").GetComponent<Move>().arrow.GetComponent<SpriteRenderer>().color = ShortsColor_P1;
         //p2
         GameObject.Find("Player2").GetComponent<Move>().HairSprite.color = HairColor_P2;
         GameObject.Find("Player2").GetComponent<Move>().ShortsSprite.color = ShortsColor_P2;
         GameObject.Find("Player2").GetComponent<Move>().StripeSprite.color = StripeColor_P2;
+        GameObject.Find("Player2").GetComponent<Move>().arrow.GetComponent<SpriteRenderer>().color = ShortsColor_P2;
     }
 }

@@ -35,7 +35,7 @@ public class Ball : MonoBehaviour
     void Update()
     {
         if (HeldBy && !wait && manager.winner == -1) // -1 = is default value
-            transform.position = new Vector3(HeldBy.transform.localPosition.x, HeldBy.transform.localPosition.y + .25f,1.2f);
+            transform.position = new Vector3(HeldBy.transform.localPosition.x, HeldBy.transform.localPosition.y + 2.5f,1.2f);
 
        //if (HeldBy == null)
        //this.GetComponent<Rigidbody>().velocity += Vector3.down * .3f;

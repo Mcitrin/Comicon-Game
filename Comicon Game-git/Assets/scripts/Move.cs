@@ -23,7 +23,7 @@ public class Move : MonoBehaviour
 
     //bool setting = false;
     bool chargeing = false;
-    Color[] colors = new Color[3];
+    Color[] colors = new Color[6];
 
     // Use this for initialization
     void Awake()
@@ -31,11 +31,14 @@ public class Move : MonoBehaviour
         inputMan = GameManager.gameManager.GetComponent<InputMan>();
         animationManager = GameManager.gameManager.GetComponent<AnimationManager>();
         distToGround = GetComponent<BoxCollider>().bounds.extents.y;
+    }
 
-        
-        colors[0] = gameObject.GetComponentsInChildren<SpriteRenderer>()[0].color;
-        colors[1] = gameObject.GetComponentsInChildren<SpriteRenderer>()[1].color;
-        colors[2] = gameObject.GetComponentsInChildren<SpriteRenderer>()[2].color;
+     void Start()
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            colors[i] = gameObject.GetComponentsInChildren<SpriteRenderer>()[i].color;
+        }
     }
 
     // Update is called once per frame
@@ -45,10 +48,9 @@ public class Move : MonoBehaviour
         Input();
         
       if(!IsGrounded())
-      this.GetComponent<Rigidbody>().velocity += Vector3.down *.2f;
+      this.GetComponent<Rigidbody>().velocity += Vector3.down *.15f;
 
-        //Debug.Log((int)inputMan.Move(PlayerNumber));
-
+       // Debug.Log(angle.x);
     }
 
     bool IsGrounded()
@@ -66,21 +68,27 @@ public class Move : MonoBehaviour
         Vector3 curVel = this.GetComponent<Rigidbody>().velocity;
         if (!IsGrounded() || chargeing)
         {
-            curVel.x = inputMan.Move(PlayerNumber) * 2.5f;
+            curVel.x = inputMan.Move(PlayerNumber) * 5.0f;//2.5f;
         }
         else
         {
-            curVel.x = inputMan.Move(PlayerNumber) * 7.5f;//5
+            curVel.x = inputMan.Move(PlayerNumber) * 9.0f;//5
         }
 
         this.GetComponent<Rigidbody>().velocity = curVel;
 
         if (inputMan.Aim(PlayerNumber) != Vector2.zero)
         {
+            
+
+            if (PlayerNumber == 1 && inputMan.Aim(PlayerNumber).x >=0 && inputMan.Aim(PlayerNumber).x <= 1)
+            angle = inputMan.Aim(PlayerNumber);
+            else if (PlayerNumber == 2 && inputMan.Aim(PlayerNumber).x <= 0 && inputMan.Aim(PlayerNumber).x >= -1)
             angle = inputMan.Aim(PlayerNumber);
         }
         
-        arrow.transform.position = angle*1.5f + this.transform.position;
+        
+        arrow.transform.position = angle * 2 + this.transform.position;
 
         CalcPower();
     }
@@ -166,13 +174,15 @@ public class Move : MonoBehaviour
     {
         for (int i = 0; i < 8; i++)
         {
-            gameObject.GetComponentsInChildren<SpriteRenderer>()[0].color = Color.red;
-            gameObject.GetComponentsInChildren<SpriteRenderer>()[1].color = Color.red;
-            gameObject.GetComponentsInChildren<SpriteRenderer>()[2].color = Color.red;
+            for (int j = 0; j < 6; j++)
+            {
+               gameObject.GetComponentsInChildren<SpriteRenderer>()[j].color = Color.red;
+            }
             yield return new WaitForSeconds(.025f);
-            gameObject.GetComponentsInChildren<SpriteRenderer>()[0].color = colors[0];
-            gameObject.GetComponentsInChildren<SpriteRenderer>()[1].color = colors[1];
-            gameObject.GetComponentsInChildren<SpriteRenderer>()[2].color = colors[2];
+            for (int k = 0; k < 6; k++)
+            {
+                gameObject.GetComponentsInChildren<SpriteRenderer>()[k].color = colors[k];
+            }
             yield return new WaitForSeconds(.025f);
         }
     }
