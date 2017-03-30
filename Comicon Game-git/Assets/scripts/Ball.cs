@@ -7,7 +7,7 @@ public class Ball : MonoBehaviour
 
     public Animator animator;
     public GameObject HeldBy = null;
-    GameObject LastHit; // last player to hit the ball
+
     public List<GameObject> Players = new List<GameObject>();
     [Tooltip("If the ball lands here player 1 scores a point [0] is in [1] is out")]
     public List<GameObject> Player1ScoreAreas = new List<GameObject>();
@@ -17,8 +17,8 @@ public class Ball : MonoBehaviour
     Rigidbody rigidbody;
     bool wait = false; // when the ball lands we wait unitl it has ben reset to hit again
     public ParticleSystem sand;
-    public GameObject CollidingPlayer;
- 
+    Vector3 forward;
+
     // Use this for initialization
     void Start()
     {
@@ -28,31 +28,29 @@ public class Ball : MonoBehaviour
             HeldBy = Players[1];
         else
             HeldBy = Players[2];
-       
+
     }
 
     // Update is called once per frame
     void Update()
     {
         if (HeldBy && !wait && manager.winner == -1) // -1 = is default value
-            transform.position = new Vector3(HeldBy.transform.localPosition.x, HeldBy.transform.localPosition.y + 2.5f,1.2f);
+            transform.position = HeldBy.GetComponent<Move>().hand.transform.position;
 
-       //if (HeldBy == null)
-       //this.GetComponent<Rigidbody>().velocity += Vector3.down * .3f;
+        //if (HeldBy == null)
+        //this.GetComponent<Rigidbody>().velocity += Vector3.down * .3f;
 
         Animate();
     }
 
     void Animate()
     {
-        if(HeldBy)
+        if (HeldBy)
         {
             animator.SetBool("Right", false);
             animator.SetBool("Left", false);
             animator.SetBool("Move", false);
             animator.SetBool("Held", true);
-
-            CollidingPlayer = HeldBy;
         }
         else if (!HeldBy && !rigidbody.isKinematic)
         {
@@ -63,16 +61,16 @@ public class Ball : MonoBehaviour
 
     public void HitBall(int power, Vector3 angle, int PlayerNum, bool spike)
     {
-        
+
         if (!wait && manager.winner == -1)
         {
-            
+
 
             if (HeldBy != null) // if ball is held
             {
                 HeldBy = null;
                 if (manager.gameState == PlayManager.GameState.waiting)
-                manager.gameState = PlayManager.GameState.PlayingGame;
+                    manager.gameState = PlayManager.GameState.PlayingGame;
             }
 
             rigidbody.isKinematic = false;
@@ -96,73 +94,87 @@ public class Ball : MonoBehaviour
             }
             else if (power == 1)
             {
-             
-             
-              animator.SetBool("Left", false);
-              animator.SetBool("Right", false);
-              animator.SetBool("Move", true);
+                animator.SetBool("Left", false);
+                animator.SetBool("Right", false);
+                animator.SetBool("Move", true);
                 rigidbody.velocity = angle * 10;
             }
-
-            LastHit = Players[PlayerNum];
-        }
-    }
-    private void OnTriggerExit(Collider other)
-    {
-        CollidingPlayer = null;
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (Players.Contains(other.gameObject))
-        {
-            CollidingPlayer = other.gameObject;
-        }
-        else
-        {
-            CollidingPlayer = null;
+            else if(power == 0)
+            {
+                rigidbody.velocity = angle * 5;
+            }
         }
     }
 
-    void OnCollisionEnter(Collision collision)
+    private void OnTriggerStay(Collider collision)
     {
-        //Debug.Log(collision.gameObject.name);
+        checkPlayer(collision);
+    }
 
-      
-
-       // if (Players[1] == collision.gameObject)
-       // {
-       //     HitBall(1, collision.gameObject.GetComponent<Move>().angle, 1, true);
-       //     
-       // }
-
+    private void OnTriggerEnter(Collider collision)
+    {
+        checkPlayer(collision);
         if (Player2ScoreAreas.Contains(collision.gameObject) || Player1ScoreAreas.Contains(collision.gameObject))
         {
             rigidbody.isKinematic = true;// stop ball
             //transform.position += new Vector3(0,-.5f,0);
-            if (Player1ScoreAreas[0] == collision.gameObject)//player 1 hit ball in player 2's in
+            if (Player1ScoreAreas.Contains(collision.gameObject))//ball is in player 1's out or 2's in
             {
                 StartCoroutine(ResetBall(1));
             }
-            else if (Player1ScoreAreas[1] == collision.gameObject && LastHit != Players[1])//player 2 hit ball in player 1's out
-            {
-                StartCoroutine(ResetBall(1));
-            }
-            else if (Player1ScoreAreas[1] == collision.gameObject && LastHit == Players[1])//player 1 hit ball in player 1's out
+            else if (Player2ScoreAreas.Contains(collision.gameObject))//player 2 hit ball in player 1's out
             {
                 StartCoroutine(ResetBall(2));
             }
-            if (Player2ScoreAreas[0] == collision.gameObject)//player 2 hit ball in player 1's in
+
+        }
+    }
+
+     private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Net")
+        {
+            if (collision.gameObject.name == "netTop")// ball moveing down
             {
-                StartCoroutine(ResetBall(2));
+                Vector3 point = collision.contacts[0].point;
+                Vector3 dir = -collision.contacts[0].normal;
+
+                point -= dir;
+                RaycastHit hitInfo;
+
+                if (collision.collider.Raycast(new Ray(point, dir), out hitInfo, 2))
+                {
+                    Vector3 normal = hitInfo.normal;
+                    float angle = Vector3.Angle(-rigidbody.velocity, normal);
+                    Quaternion rotate = Quaternion.Euler(0, 0, angle);
+                    HitBall(0, rotate * normal, 0, false);
+
+                }
             }
-            else if (Player2ScoreAreas[1] == collision.gameObject && LastHit != Players[2])//player 1 hit ball in player 2's out
+            else
             {
-                StartCoroutine(ResetBall(2));
+                HitBall(0, collision.contacts[0].normal, 0, false);
             }
-            else if (Player2ScoreAreas[1] == collision.gameObject && LastHit == Players[2])//player 2 hit ball in player 2's in
+            if(rigidbody.velocity.y == 0)
             {
-                StartCoroutine(ResetBall(1));
+                HitBall(0, collision.contacts[0].normal, 0, false);
+            }
+
+                // Vector3 angle = collision.contacts[0].normal;
+                 
+                // Debug.Log("hit");
+        }
+    }
+
+    void checkPlayer(Collider collision)
+    {
+        if (collision.gameObject.tag == "Player")
+        {
+            Move Player = collision.gameObject.GetComponentInParent<Move>();
+            Debug.Log(Player.power);
+            if (Player.power == 1 || Player.power == 2)
+            {
+                HitBall(Player.power, Player.angle, Player.PlayerNumber, Player.IsGrounded());
             }
         }
     }
@@ -174,7 +186,7 @@ public class Ball : MonoBehaviour
         animator.SetBool("Move", false);
         animator.SetBool("Held", true);
         sand.gameObject.SetActive(true);
-        wait= true;
+        wait = true;
         manager.gameState = PlayManager.GameState.waiting;
         yield return new WaitForSeconds(2);
         sand.gameObject.SetActive(false);
@@ -183,10 +195,10 @@ public class Ball : MonoBehaviour
         wait = false;
     }
 
-   // IEnumerator Wait()
-   // {
-   //     yield return new WaitForSeconds(2);
-   //     Debug.Log("wait");
-   //     yield return new WaitForSeconds(2);
-   // }
+    // IEnumerator Wait()
+    // {
+    //     yield return new WaitForSeconds(2);
+    //     Debug.Log("wait");
+    //     yield return new WaitForSeconds(2);
+    // }
 }

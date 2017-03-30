@@ -11,11 +11,13 @@ public class Move : MonoBehaviour
     public Animator animator;
     public int PlayerNumber;
     public GameObject arrow;
+    public GameObject hand;
     public SpriteRenderer HairSprite;
     public SpriteRenderer ShortsSprite;
     public SpriteRenderer StripeSprite;
     public Vector3 angle;
-    public float power;
+    float startTime;
+    public int power;
     public float chargeTime;
     public Ball ball;
 
@@ -53,7 +55,7 @@ public class Move : MonoBehaviour
        // Debug.Log(angle.x);
     }
 
-    bool IsGrounded()
+    public bool IsGrounded()
     {
         return Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.2f);
     }
@@ -80,11 +82,24 @@ public class Move : MonoBehaviour
         if (inputMan.Aim(PlayerNumber) != Vector2.zero)
         {
             
+            
+            angle = inputMan.Aim(PlayerNumber);
 
-            if (PlayerNumber == 1 && inputMan.Aim(PlayerNumber).x >=0 && inputMan.Aim(PlayerNumber).x <= 1)
-            angle = inputMan.Aim(PlayerNumber);
-            else if (PlayerNumber == 2 && inputMan.Aim(PlayerNumber).x <= 0 && inputMan.Aim(PlayerNumber).x >= -1)
-            angle = inputMan.Aim(PlayerNumber);
+            // lock to front 180
+            if(PlayerNumber == 1)
+            {
+                if (angle.x < 0 && angle.y >= 0)
+                    angle = new Vector3(0,1);
+                if (angle.x < 0 && angle.y <= 0)
+                    angle = new Vector3(0, -1);
+            }
+            if (PlayerNumber == 2)
+            {
+                if (angle.x > 0 && angle.y >= 0)
+                    angle = new Vector3(0, 1);
+                if (angle.x > 0 && angle.y <= 0)
+                    angle = new Vector3(0, -1);
+            }
         }
         
         
@@ -117,9 +132,12 @@ public class Move : MonoBehaviour
     {
         if (inputMan.Charge(PlayerNumber))
         {
-            if (power == 0)
-                power = Time.time;
-            chargeTime = (Time.time - power);
+
+            if (startTime == 0)
+            {
+                startTime = Time.time;
+            }
+                chargeTime = (Time.time - startTime);
         }
 
         if (chargeTime >= .2f)
@@ -131,26 +149,9 @@ public class Move : MonoBehaviour
 
         if (!inputMan.Charge(PlayerNumber))
         {
-            if (power != 0)
+            if (startTime != 0)// if the button was pressed befor were reading it is released
             {
-
-                if (chargeTime >= .75)
-                {
-                    power = 2;
-                    StartCoroutine(Flash());
-                }
-                else
-                {
-                    power = 1;
-                }
-
-              if (Vector3.Distance(new Vector2(this.transform.position.x, this.transform.position.y)
-                  , ball.transform.position) <= distance || ball.HeldBy == gameObject)
-               {
-                   ball.HitBall((int)power, angle, PlayerNumber, !IsGrounded());
-               }
-
-
+               
                 if (!IsGrounded())
                 {
                     animator.SetTrigger("Smack");
@@ -160,31 +161,58 @@ public class Move : MonoBehaviour
                     animator.SetTrigger("Set");
                 }
 
+                if (chargeTime >= .75)
+                {
+                    power = 2;
+                }
+                else
+                {
+                    power = 1;
+                }
+                    StartCoroutine(Flash(power));
+
+             //if (Vector3.Distance(new Vector2(this.transform.position.x, this.transform.position.y)
+             //    , ball.transform.position) <= distance || ball.HeldBy == gameObject)
+             // {
+             //     ball.HitBall((int)power, angle, PlayerNumber, !IsGrounded());
+             // }
+
+
+             
+
                //   if(ball.CollidingPlayer == gameObject)
                // {
                //     ball.HitBall((int)power, angle, PlayerNumber, !IsGrounded());
                // }
 
                 chargeTime = 0;
-                power = 0;
+                startTime = 0;
+                
             }
         }
     }
-    IEnumerator Flash()
+    IEnumerator Flash(int pow)
     {
-        for (int i = 0; i < 8; i++)
+        if (pow == 2)
         {
-            for (int j = 0; j < 6; j++)
+            for (int i = 0; i < 8; i++)
             {
-               gameObject.GetComponentsInChildren<SpriteRenderer>()[j].color = Color.red;
+                for (int j = 0; j < 6; j++)
+                {
+                    gameObject.GetComponentsInChildren<SpriteRenderer>()[j].color = Color.red;
+                }
+                yield return new WaitForSeconds(.025f);
+                for (int k = 0; k < 6; k++)
+                {
+                    gameObject.GetComponentsInChildren<SpriteRenderer>()[k].color = colors[k];
+                }
+                yield return new WaitForSeconds(.025f);
             }
-            yield return new WaitForSeconds(.025f);
-            for (int k = 0; k < 6; k++)
-            {
-                gameObject.GetComponentsInChildren<SpriteRenderer>()[k].color = colors[k];
-            }
-            yield return new WaitForSeconds(.025f);
         }
+       
+        yield return new WaitForSeconds(.25f);
+        power = 0;
+        
     }
 
 
