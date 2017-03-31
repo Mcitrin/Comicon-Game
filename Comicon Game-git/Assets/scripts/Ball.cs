@@ -34,18 +34,31 @@ public class Ball : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (HeldBy && !wait && manager.winner == -1) // -1 = is default value
-            transform.position = HeldBy.GetComponent<Move>().hand.transform.position;
-
-        //if (HeldBy == null)
-        //this.GetComponent<Rigidbody>().velocity += Vector3.down * .3f;
-
         Animate();
+
+        if (!manager.paused)
+        {
+            if (rigidbody.isKinematic && !wait) // if the game was paused and not if the ball hit the ground
+                rigidbody.isKinematic = false;
+
+            if (HeldBy && !wait && manager.winner == -1) // -1 = is default value
+                transform.position = HeldBy.GetComponent<Move>().hand.transform.position;
+
+            //if (HeldBy == null)
+            //this.GetComponent<Rigidbody>().velocity += Vector3.down * .3f;
+        }
+        else
+        {
+            if (!rigidbody.isKinematic)
+                rigidbody.isKinematic = true;
+        }
+
+        
     }
 
     void Animate()
     {
-        if (HeldBy)
+        if (HeldBy || rigidbody.isKinematic)
         {
             animator.SetBool("Right", false);
             animator.SetBool("Left", false);
@@ -57,6 +70,9 @@ public class Ball : MonoBehaviour
             animator.SetBool("Move", true);
             animator.SetBool("Held", false);
         }
+        
+
+
     }
 
     public void HitBall(int power, Vector3 angle, int PlayerNum, bool spike)
@@ -116,6 +132,8 @@ public class Ball : MonoBehaviour
         checkPlayer(collision);
         if (Player2ScoreAreas.Contains(collision.gameObject) || Player1ScoreAreas.Contains(collision.gameObject))
         {
+
+            wait = true;
             rigidbody.isKinematic = true;// stop ball
             //transform.position += new Vector3(0,-.5f,0);
             if (Player1ScoreAreas.Contains(collision.gameObject))//ball is in player 1's out or 2's in
@@ -159,10 +177,6 @@ public class Ball : MonoBehaviour
             {
                 HitBall(0, collision.contacts[0].normal, 0, false);
             }
-
-                // Vector3 angle = collision.contacts[0].normal;
-                 
-                // Debug.Log("hit");
         }
     }
 
@@ -180,12 +194,7 @@ public class Ball : MonoBehaviour
 
     IEnumerator ResetBall(int playerNum)
     {
-        animator.SetBool("Right", false);
-        animator.SetBool("Left", false);
-        animator.SetBool("Move", false);
-        animator.SetBool("Held", true);
         sand.gameObject.SetActive(true);
-        wait = true;
         manager.gameState = PlayManager.GameState.waiting;
         yield return new WaitForSeconds(2);
         sand.gameObject.SetActive(false);

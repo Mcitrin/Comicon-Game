@@ -28,6 +28,12 @@ public class ButtonActions : MonoBehaviour {
         }
 
     }
+
+    public void B_Menu()
+    {
+        Application.LoadLevel("Menu");
+        Destroy(manager.gameObject);
+    }
     public void B_Quit()
     {
         Application.Quit();

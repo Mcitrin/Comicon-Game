@@ -136,4 +136,15 @@ public class InputMan : MonoBehaviour {
         return false;
     }
 
+    public bool Pause(int playerNum)
+    {
+        if (playerNum == 1)
+        {
+            if (GotTwoJoysticks) { return joystick2.MenuWasPressed; }
+            else { return Input.GetKeyDown(KeyCode.Escape); }
+        }
+        if (playerNum == 2 && joystick1 != null) { return joystick1.MenuWasPressed; }
+        return false;
+    }
+
 }

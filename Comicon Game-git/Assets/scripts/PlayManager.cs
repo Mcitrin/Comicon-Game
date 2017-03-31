@@ -2,7 +2,8 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class PlayManager : MonoBehaviour {
+public class PlayManager : MonoBehaviour
+{
 
     public enum GameState
     {
@@ -25,7 +26,8 @@ public class PlayManager : MonoBehaviour {
     GameObject P2ScoreDisplay;
     GameObject ClockDisplay;
     GameObject Crown;
- 
+    GameObject PauseMenu;
+
     int P1ScoreCount;
     int P2ScoreCount;
     int ClockCount;
@@ -38,44 +40,56 @@ public class PlayManager : MonoBehaviour {
     int seconds;
 
     bool crowned = false;
-   public int winner;
-     
+    public int winner;
+    public bool paused;
 
 
     // Use this for initialization
-   void Awake () {
+    void Awake()
+    {
         inputMan = GameManager.gameManager.GetComponent<InputMan>();
     }
 
     // Update is called once per frame
-    void Update() {
-        switch (gameState)
+    void Update()
+    {
+        if (!paused)
         {
-            case GameState.MainMenu:
-                MainMenu();
-                break;
-            case GameState.SetUp:
-                SetUp();
-                break;
-            case GameState.waiting:
-                if (crowned)
-                {
-                    Crown.transform.position = GameObject.Find("Player" + winner).transform.position + Vector3.up * 1.75f;
-                    Crown.transform.Rotate(Vector3.up, .3f);
-                }
+            if (gameState != GameState.MainMenu && gameState != GameState.SetUp && PauseMenu.activeInHierarchy == true) { PauseMenu.SetActive(false);} // if we have handle on pause panel and player is not pausing disable pannel
 
-                break;
-            case GameState.PlayingGame:
-                PlayingGame();
+            switch (gameState)
+            {
+                case GameState.MainMenu:
+                    MainMenu();
+                    break;
+                case GameState.SetUp:
+                    SetUp();
+                    break;
+                case GameState.waiting:
+                    if (crowned)
+                    {
+                        Crown.transform.position = GameObject.Find("Player" + winner).transform.position + Vector3.up * 1.75f;
+                        Crown.transform.Rotate(Vector3.up, .3f);
+                    }
 
-                break;
+                    break;
+                case GameState.PlayingGame:
+                    PlayingGame();
+
+                    break;
+            }
         }
+        else
+        {
+            if (PauseMenu.activeInHierarchy == false) { PauseMenu.SetActive(true); } // else in enalbe pannel if player is pausing
+        }
+
 
     }
 
     void MainMenu()
     {
-        if(ScoreIndex == 0 && TimeIndex == 0)
+        if (ScoreIndex == 0 && TimeIndex == 0)
         {
             TimeScoreWarning.SetActive(true);
         }
@@ -125,19 +139,19 @@ public class PlayManager : MonoBehaviour {
                 break;
             case 1:
                 TimeLabel.text = "5:00";
-                TimeLimit = 5*60;
+                TimeLimit = 5 * 60;
                 break;
             case 2:
                 TimeLabel.text = "10:00";
-                TimeLimit = 10*60;
+                TimeLimit = 10 * 60;
                 break;
             case 3:
                 TimeLabel.text = "15:00";
-                TimeLimit = 15*60;
+                TimeLimit = 15 * 60;
                 break;
             case 4:
                 TimeLabel.text = "20:00";
-                TimeLimit = 20*60;
+                TimeLimit = 20 * 60;
                 break;
         }
     }
@@ -148,7 +162,7 @@ public class PlayManager : MonoBehaviour {
         P1ScoreDisplay = GameObject.Find("P1Score");
         P2ScoreDisplay = GameObject.Find("P2Score");
         Crown = GameObject.Find("Crown");
-
+        PauseMenu = GameObject.Find("PauseMenu");
 
         interval = 1;
         nextTime = 0;
@@ -157,27 +171,29 @@ public class PlayManager : MonoBehaviour {
         if (ClockDisplay != null &&
             P1ScoreDisplay != null &&
             P2ScoreDisplay != null &&
-            Crown != null
+            Crown != null &&
+            PauseMenu != null
             )
         {
             ClockCount = TimeLimit;
             ClockDisplay.GetComponent<Text>().text = (ClockCount / 60) + ":" + "00";
+            PauseMenu.SetActive(false);
             gameState = GameState.waiting;
         }
     }
 
     void PlayingGame()
     {
-        if(ClockCount !=0)
-        Count();
+        if (ClockCount != 0)
+            Count();
 
         if (ClockCount <= 0 && TimeLimit != 0)
-        CalculateWinner();
+            CalculateWinner();
     }
 
     void CalculateWinner()
     {
-        if(P1ScoreCount > P2ScoreCount)
+        if (P1ScoreCount > P2ScoreCount)
         {
             winner = 1;
         }
@@ -190,7 +206,7 @@ public class PlayManager : MonoBehaviour {
             winner = 0; // Draw
         }
         StartCoroutine(WaitBeforReset(winner));
-       
+
     }
 
     IEnumerator WaitBeforReset(int winner)
@@ -199,7 +215,7 @@ public class PlayManager : MonoBehaviour {
         {
             crowned = true;
         }
-       
+
         yield return new WaitForSeconds(10);
         Application.LoadLevel("Menu");
         Destroy(gameObject);
@@ -223,12 +239,12 @@ public class PlayManager : MonoBehaviour {
 
     public void IncrementScore(int player)
     {
-        if(player == 1)
+        if (player == 1)
         {
             P1ScoreCount++;
             P1ScoreDisplay.GetComponent<Text>().text = "" + P1ScoreCount;
         }
-        if(player == 2)
+        if (player == 2)
         {
             P2ScoreCount++;
             P2ScoreDisplay.GetComponent<Text>().text = "" + P2ScoreCount;

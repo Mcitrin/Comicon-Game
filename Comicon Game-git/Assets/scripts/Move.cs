@@ -5,7 +5,7 @@ public class Move : MonoBehaviour
 {
 
     InputMan inputMan;
-    AnimationManager animationManager;
+    PlayManager manager;
     float distToGround;
 
     public Animator animator;
@@ -21,15 +21,18 @@ public class Move : MonoBehaviour
     public float chargeTime;
     public Ball ball;
 
-    //bool setting = false;
+    
     bool chargeing = false;
     Color[] colors = new Color[6];
+    Rigidbody rigidbody;
 
     // Use this for initialization
     void Awake()
     {
         inputMan = GameManager.gameManager.GetComponent<InputMan>();
+        manager = GameManager.gameManager.GetComponent<PlayManager>();
         distToGround = GetComponent<BoxCollider>().bounds.extents.y;
+        rigidbody = GetComponent<Rigidbody>();
     }
 
      void Start()
@@ -43,13 +46,35 @@ public class Move : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Animate();
-        Input();
-        
-      if(!IsGrounded())
-      this.GetComponent<Rigidbody>().velocity += Vector3.down *.15f;
+        if(PlayerNumber == 1)
+        Debug.Log(angle);
 
-       // Debug.Log(angle.x);
+        // pause check
+        if (inputMan.Pause(PlayerNumber) && !manager.paused)
+        {
+            manager.paused = true;
+        }
+        else if (inputMan.Pause(PlayerNumber) && manager.paused)
+        {
+            manager.paused = false;
+        }
+
+
+        if (!manager.paused)
+        {
+            if (rigidbody.isKinematic)
+            rigidbody.isKinematic = false;
+
+            Animate();
+            Input();
+            if (!IsGrounded()) // fall faster
+                this.GetComponent<Rigidbody>().velocity += Vector3.down * .15f;
+        }
+        else
+        {
+            if(!rigidbody.isKinematic)
+            rigidbody.isKinematic = true;
+        }
     }
 
     public bool IsGrounded()
@@ -98,8 +123,7 @@ public class Move : MonoBehaviour
                     angle = new Vector3(0, -1);
             }
         }
-        
-        
+       
         arrow.transform.position = angle * 2 + this.transform.position;
 
         CalcPower();
