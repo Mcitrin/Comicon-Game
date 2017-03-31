@@ -28,6 +28,10 @@ public class ButtonActions : MonoBehaviour {
         }
 
     }
+    public void B_Quit()
+    {
+        Application.Quit();
+    }
     public void B_TimeL()
     {
         if (manager.TimeIndex != 0)

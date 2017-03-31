@@ -21,8 +21,6 @@ public class Move : MonoBehaviour
     public float chargeTime;
     public Ball ball;
 
-    float distance = 3;
-
     //bool setting = false;
     bool chargeing = false;
     Color[] colors = new Color[6];
@@ -31,7 +29,6 @@ public class Move : MonoBehaviour
     void Awake()
     {
         inputMan = GameManager.gameManager.GetComponent<InputMan>();
-        animationManager = GameManager.gameManager.GetComponent<AnimationManager>();
         distToGround = GetComponent<BoxCollider>().bounds.extents.y;
     }
 

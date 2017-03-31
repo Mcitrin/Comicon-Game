@@ -171,10 +171,9 @@ public class Ball : MonoBehaviour
         if (collision.gameObject.tag == "Player")
         {
             Move Player = collision.gameObject.GetComponentInParent<Move>();
-            Debug.Log(Player.power);
             if (Player.power == 1 || Player.power == 2)
             {
-                HitBall(Player.power, Player.angle, Player.PlayerNumber, Player.IsGrounded());
+                HitBall(Player.power, Player.angle, Player.PlayerNumber, !Player.IsGrounded());
             }
         }
     }

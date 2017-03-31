@@ -4,8 +4,8 @@ using InControl;
 
 public class InputMan : MonoBehaviour {
 
-    private InputDevice joystick1;
-    private InputDevice joystick2;
+    public InputDevice joystick1; // player 2
+    public InputDevice joystick2; // player 1 is joystick2 becaus it is only !null if 2 controles are pluged in
     public bool GotTwoJoysticks;
     public bool NoJoysticks;
 
@@ -66,6 +66,24 @@ public class InputMan : MonoBehaviour {
            return Mathf.Clamp(result, -1, 1);
     }
 
+    public Vector3 MoveVec(int playerNum)
+    {
+        Vector3 result = Vector3.zero;
+        
+        if (playerNum == 1 && joystick2 != null)
+        {
+            result.x += joystick2.LeftStickX;
+            result.y += joystick2.LeftStickY;
+        }
+        if (playerNum == 2 && joystick1 != null)
+        {
+            result.x += joystick1.LeftStickX;
+            result.y += joystick1.LeftStickY;
+        }
+        return result;
+
+    }
+
     public Vector2 Aim(int PlayerNum)
     {
         Vector2 vec = Vector2.zero;
@@ -103,7 +121,18 @@ public class InputMan : MonoBehaviour {
             if (GotTwoJoysticks){ return joystick2.RightTrigger; }
             else { return Input.GetMouseButton(0); }   
         }
-        if(playerNum == 2) { return joystick1.RightTrigger; }
+        if(playerNum == 2 && joystick1 != null) { return joystick1.RightTrigger; }
+        return false;
+    }
+
+    public bool Enter(int playerNum)
+    {
+        if (playerNum == 1 && joystick2 != null)
+         return joystick2.Action1;
+
+        if (playerNum == 2 && joystick1 != null)
+        return joystick1.Action1;
+
         return false;
     }
 
