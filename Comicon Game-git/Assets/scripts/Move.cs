@@ -47,7 +47,7 @@ public class Move : MonoBehaviour
     void Update()
     {
         if(PlayerNumber == 1)
-        Debug.Log(angle);
+        Debug.Log(IsGrounded());
 
         // pause check
         if (inputMan.Pause(PlayerNumber) && !manager.paused)
@@ -79,7 +79,9 @@ public class Move : MonoBehaviour
 
     public bool IsGrounded()
     {
-        return Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.2f);
+        //RaycastHit hitInfo;
+        return Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.2f,11);
+        
     }
 
     void Input()

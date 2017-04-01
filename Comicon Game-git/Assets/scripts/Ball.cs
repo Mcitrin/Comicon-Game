@@ -89,7 +89,7 @@ public class Ball : MonoBehaviour
                     manager.gameState = PlayManager.GameState.PlayingGame;
             }
 
-            rigidbody.isKinematic = false;
+            
             if (power == 2)
             {
                 if (spike && angle.y <= 0)
@@ -119,6 +119,7 @@ public class Ball : MonoBehaviour
             {
                 rigidbody.velocity = angle * 5;
             }
+            rigidbody.isKinematic = false;
         }
     }
 
@@ -135,7 +136,7 @@ public class Ball : MonoBehaviour
 
             wait = true;
             rigidbody.isKinematic = true;// stop ball
-            //transform.position += new Vector3(0,-.5f,0);
+
             if (Player1ScoreAreas.Contains(collision.gameObject))//ball is in player 1's out or 2's in
             {
                 StartCoroutine(ResetBall(1));
@@ -150,34 +151,30 @@ public class Ball : MonoBehaviour
 
      private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag == "Net")
-        {
-            if (collision.gameObject.name == "netTop")// ball moveing down
-            {
-                Vector3 point = collision.contacts[0].point;
-                Vector3 dir = -collision.contacts[0].normal;
-
-                point -= dir;
-                RaycastHit hitInfo;
-
-                if (collision.collider.Raycast(new Ray(point, dir), out hitInfo, 2))
-                {
-                    Vector3 normal = hitInfo.normal;
-                    float angle = Vector3.Angle(-rigidbody.velocity, normal);
-                    Quaternion rotate = Quaternion.Euler(0, 0, angle);
-                    HitBall(0, rotate * normal, 0, false);
-
-                }
-            }
-            else
-            {
-                HitBall(0, collision.contacts[0].normal, 0, false);
-            }
-            if(rigidbody.velocity.y == 0)
-            {
-                HitBall(0, collision.contacts[0].normal, 0, false);
-            }
-        }
+       if (collision.gameObject.tag == "Net")
+       {
+           if (collision.gameObject.name == "netTop")// ball moveing down
+           {
+               Vector3 point = collision.contacts[0].point;
+               Vector3 dir = -collision.contacts[0].normal;
+       
+               point -= dir;
+               RaycastHit hitInfo;
+       
+               if (collision.collider.Raycast(new Ray(point, dir), out hitInfo, 2))
+               {
+                   Vector3 normal = hitInfo.normal;
+                   float angle = Vector3.Angle(-rigidbody.velocity, normal);
+                   Quaternion rotate = Quaternion.Euler(0, 0, angle);
+                   HitBall(0, rotate * normal, 0, false);
+       
+               }
+           }
+           else
+           {
+               HitBall(0, collision.contacts[0].normal, 0, false);
+           }
+       }
     }
 
     void checkPlayer(Collider collision)
