@@ -46,8 +46,8 @@ public class Move : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(PlayerNumber == 1)
-        Debug.Log(IsGrounded());
+        //if(PlayerNumber == 1)
+        //Debug.Log(IsGrounded());
 
         // pause check
         if (inputMan.Pause(PlayerNumber) && !manager.paused)

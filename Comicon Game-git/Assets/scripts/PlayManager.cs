@@ -14,10 +14,13 @@ public class PlayManager : MonoBehaviour
     };
 
     public InputMan inputMan;
+    public PlayerInfo playerInfo;
     public GameState gameState = GameState.MainMenu;
 
     public GameObject TimeScoreWarning;
     public GameObject ControllerWarning;
+    public Text P1WinsLabel;
+    public Text P2WinsLabel;
     public Text ScoreLabel;
     public Text TimeLabel;
     public int ScoreIndex;
@@ -27,7 +30,7 @@ public class PlayManager : MonoBehaviour
     GameObject ClockDisplay;
     GameObject Crown;
     GameObject PauseMenu;
-
+   public GameObject WhoScores;
     int P1ScoreCount;
     int P2ScoreCount;
     int ClockCount;
@@ -48,6 +51,7 @@ public class PlayManager : MonoBehaviour
     void Awake()
     {
         inputMan = GameManager.gameManager.GetComponent<InputMan>();
+        playerInfo = GameObject.Find("PlayerInfo").GetComponent<PlayerInfo>();
     }
 
     // Update is called once per frame
@@ -89,6 +93,9 @@ public class PlayManager : MonoBehaviour
 
     void MainMenu()
     {
+        P1WinsLabel.text = "Wins: " + playerInfo.P1Wins;
+        P2WinsLabel.text = "Wins: " + playerInfo.P2Wins;
+
         if (ScoreIndex == 0 && TimeIndex == 0)
         {
             TimeScoreWarning.SetActive(true);
@@ -163,6 +170,7 @@ public class PlayManager : MonoBehaviour
         P2ScoreDisplay = GameObject.Find("P2Score");
         Crown = GameObject.Find("Crown");
         PauseMenu = GameObject.Find("PauseMenu");
+        WhoScores = GameObject.Find("WhoScores");
 
         interval = 1;
         nextTime = 0;
@@ -172,12 +180,14 @@ public class PlayManager : MonoBehaviour
             P1ScoreDisplay != null &&
             P2ScoreDisplay != null &&
             Crown != null &&
-            PauseMenu != null
+            PauseMenu != null &&
+            WhoScores != null
             )
         {
             ClockCount = TimeLimit;
             ClockDisplay.GetComponent<Text>().text = (ClockCount / 60) + ":" + "00";
             PauseMenu.SetActive(false);
+            WhoScores.SetActive(false);
             gameState = GameState.waiting;
         }
     }
@@ -193,17 +203,24 @@ public class PlayManager : MonoBehaviour
 
     void CalculateWinner()
     {
+
+        WhoScores.SetActive(true);
         if (P1ScoreCount > P2ScoreCount)
         {
             winner = 1;
+            playerInfo.P1Wins++;
+            WhoScores.GetComponentInChildren<Text>().text = "  Player 1 Wins!";
         }
         else if (P1ScoreCount < P2ScoreCount)
         {
             winner = 2;
+            playerInfo.P2Wins++;
+            WhoScores.GetComponentInChildren<Text>().text = "  Player 2 Wins!";
         }
         else
         {
             winner = 0; // Draw
+            WhoScores.GetComponentInChildren<Text>().text = "Draw";
         }
         StartCoroutine(WaitBeforReset(winner));
 

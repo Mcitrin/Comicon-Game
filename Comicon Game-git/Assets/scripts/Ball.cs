@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -192,9 +193,12 @@ public class Ball : MonoBehaviour
     IEnumerator ResetBall(int playerNum)
     {
         sand.gameObject.SetActive(true);
+        manager.WhoScores.SetActive(true);
+        manager.WhoScores.GetComponentInChildren<Text>().text = "Player " + playerNum + " Scores!";
         manager.gameState = PlayManager.GameState.waiting;
         yield return new WaitForSeconds(2);
         sand.gameObject.SetActive(false);
+        manager.WhoScores.SetActive(false);
         manager.IncrementScore(playerNum);
         HeldBy = Players[playerNum];
         wait = false;

@@ -10,6 +10,9 @@ public class PlayerInfo : MonoBehaviour {
    public Color ShortsColor_P2;
    public Color StripeColor_P2;
 
+    public int P1Wins = 0;
+    public int P2Wins = 0;
+
     public int number;
 
     private void Awake()
@@ -25,10 +28,7 @@ public class PlayerInfo : MonoBehaviour {
     void OnLevelWasLoaded()
     {
         if (GameObject.Find("Player1_UI") != null && GameObject.Find("Player2_UI") != null)
-        {
-            Debug.Log(HairColor_P1);
-            SetCustomizerColors();
-        }
+        SetCustomizerColors();
         if(GameObject.Find("Player1") != null && GameObject.Find("Player2") != null)
         SetPlayersColors();
     }
