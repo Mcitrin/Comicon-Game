@@ -45,6 +45,10 @@ public class Ball : MonoBehaviour
             if (HeldBy && !wait && manager.winner == -1) // -1 = is default value
                 transform.position = HeldBy.GetComponent<Move>().hand.transform.position;
 
+            if (transform.position.y <= .5f)
+                transform.position = new Vector3(transform.position.x, .6f, 0);
+
+
             //if (HeldBy == null)
             //this.GetComponent<Rigidbody>().velocity += Vector3.down * .3f;
         }
@@ -152,7 +156,7 @@ public class Ball : MonoBehaviour
 
      private void OnCollisionEnter(Collision collision)
     {
-       if (collision.gameObject.tag == "Net")
+       if (collision.gameObject.tag == "Net" && HeldBy == null)
        {
            if (collision.gameObject.name == "netTop")// ball moveing down
            {
