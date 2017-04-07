@@ -18,7 +18,8 @@ public class Ball : MonoBehaviour
     Rigidbody rigidbody;
     bool wait = false; // when the ball lands we wait unitl it has ben reset to hit again
     public ParticleSystem sand;
-    Vector3 forward;
+
+    float LastHitTime;
 
     // Use this for initialization
     void Start()
@@ -58,7 +59,7 @@ public class Ball : MonoBehaviour
                 rigidbody.isKinematic = true;
         }
 
-        
+
     }
 
     void Animate()
@@ -75,14 +76,10 @@ public class Ball : MonoBehaviour
             animator.SetBool("Move", true);
             animator.SetBool("Held", false);
         }
-        
-
-
     }
 
     public void HitBall(int power, Vector3 angle, int PlayerNum, bool spike)
     {
-
         if (!wait && manager.winner == -1)
         {
 
@@ -94,13 +91,12 @@ public class Ball : MonoBehaviour
                     manager.gameState = PlayManager.GameState.PlayingGame;
             }
 
-            
+
             if (power == 2)
             {
                 if (spike && angle.y <= 0)
                 {
                     if (PlayerNum == 2)
-
                     {
                         animator.SetBool("Left", true);
                         animator.SetBool("Right", false);
@@ -112,6 +108,7 @@ public class Ball : MonoBehaviour
                     }
                 }
                 rigidbody.velocity = angle * 13;
+                LastHitTime = Time.time;
             }
             else if (power == 1)
             {
@@ -119,12 +116,14 @@ public class Ball : MonoBehaviour
                 animator.SetBool("Right", false);
                 animator.SetBool("Move", true);
                 rigidbody.velocity = angle * 10;
+                LastHitTime = Time.time;
             }
-            else if(power == 0)
+            else if (power == 0)
             {
                 rigidbody.velocity = angle * 5;
             }
             rigidbody.isKinematic = false;
+            //Debug.Log(rigidbody.velocity);
         }
     }
 
@@ -135,7 +134,7 @@ public class Ball : MonoBehaviour
 
     private void OnTriggerEnter(Collider collision)
     {
-        checkPlayer(collision);
+        //checkPlayer(collision);
         if (Player2ScoreAreas.Contains(collision.gameObject) || Player1ScoreAreas.Contains(collision.gameObject))
         {
 
@@ -154,32 +153,32 @@ public class Ball : MonoBehaviour
         }
     }
 
-     private void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(Collision collision)
     {
-       if (collision.gameObject.tag == "Net" && HeldBy == null)
-       {
-           if (collision.gameObject.name == "netTop")// ball moveing down
-           {
-               Vector3 point = collision.contacts[0].point;
-               Vector3 dir = -collision.contacts[0].normal;
-       
-               point -= dir;
-               RaycastHit hitInfo;
-       
-               if (collision.collider.Raycast(new Ray(point, dir), out hitInfo, 2))
-               {
-                   Vector3 normal = hitInfo.normal;
-                   float angle = Vector3.Angle(-rigidbody.velocity, normal);
-                   Quaternion rotate = Quaternion.Euler(0, 0, angle);
-                   HitBall(0, rotate * normal, 0, false);
-       
-               }
-           }
-           else
-           {
-               HitBall(0, collision.contacts[0].normal, 0, false);
-           }
-       }
+        if (collision.gameObject.tag == "Net" && HeldBy == null)
+        {
+            if (collision.gameObject.name == "netTop")// ball moveing down
+            {
+                Vector3 point = collision.contacts[0].point;
+                Vector3 dir = -collision.contacts[0].normal;
+
+                point -= dir;
+                RaycastHit hitInfo;
+
+                if (collision.collider.Raycast(new Ray(point, dir), out hitInfo, 2))
+                {
+                    Vector3 normal = hitInfo.normal;
+                    float angle = Vector3.Angle(-rigidbody.velocity, normal);
+                    Quaternion rotate = Quaternion.Euler(0, 0, angle);
+                        HitBall(0, rotate * normal, 0, false);
+
+                }
+            }
+            else
+            {
+                    HitBall(0, collision.contacts[0].normal, 0, false);
+            }
+        }
     }
 
     void checkPlayer(Collider collision)
@@ -189,13 +188,15 @@ public class Ball : MonoBehaviour
             Move Player = collision.gameObject.GetComponentInParent<Move>();
             if (Player.power == 1 || Player.power == 2)
             {
-                HitBall(Player.power, Player.angle, Player.PlayerNumber, !Player.IsGrounded());
+                if (Time.time - LastHitTime >= .25f)
+                    HitBall(Player.power, Player.angle, Player.PlayerNumber, !Player.IsGrounded());
             }
         }
     }
 
     IEnumerator ResetBall(int playerNum)
     {
+        rigidbody.velocity = Vector3.zero;
         sand.gameObject.SetActive(true);
         manager.WhoScores.SetActive(true);
         manager.WhoScores.GetComponentInChildren<Text>().text = "Player " + playerNum + " Scores!";

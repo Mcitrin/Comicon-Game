@@ -87,6 +87,7 @@ public class InputMan : MonoBehaviour {
     public Vector2 Aim(int PlayerNum)
     {
         Vector2 vec = Vector2.zero;
+        Vector2 velocity = Vector2.zero;
         if (PlayerNum == 1)
         {
             if (GotTwoJoysticks)
@@ -110,7 +111,8 @@ public class InputMan : MonoBehaviour {
         {
             vec = new Vector2(joystick1.RightStickX, joystick1.RightStickY).normalized;
         }
-            return vec;
+        return vec;
+        
         
     }
 

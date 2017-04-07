@@ -47,7 +47,7 @@ public class Move : MonoBehaviour
     void Update()
     {
         //if(PlayerNumber == 1)
-        //Debug.Log(IsGrounded());
+        //Debug.Log(angle);
 
         // pause check
         if (inputMan.Pause(PlayerNumber) && !manager.paused)
@@ -68,7 +68,7 @@ public class Move : MonoBehaviour
             Animate();
             Input();
             if (!IsGrounded()) // fall faster
-                this.GetComponent<Rigidbody>().velocity += Vector3.down * .15f;
+                this.GetComponent<Rigidbody>().velocity += Vector3.down * .1f;//.15f;
         }
         else
         {
@@ -105,7 +105,6 @@ public class Move : MonoBehaviour
 
         if (inputMan.Aim(PlayerNumber) != Vector2.zero)
         {
-            
             
             angle = inputMan.Aim(PlayerNumber);
 
@@ -184,7 +183,7 @@ public class Move : MonoBehaviour
                     animator.SetTrigger("Set");
                 }
 
-                if (chargeTime >= .75)
+                if (chargeTime >= .65)
                 {
                     power = 2;
                 }
