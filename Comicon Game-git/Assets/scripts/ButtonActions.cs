@@ -6,6 +6,7 @@ public class ButtonActions : MonoBehaviour {
 
     
     PlayManager manager;
+   public PlayerInfo playInfo;
 
 	// Use this for initialization
 	void Awake () {
@@ -14,14 +15,15 @@ public class ButtonActions : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
-	}
+        if (playInfo == null) { playInfo = manager.playerInfo; }
+    }
     public void B_Play()
     {
         if (manager.TimeIndex != 0 || manager.ScoreIndex != 0)
         {
             if (!manager.inputMan.NoJoysticks)
             {
+                playInfo.SetPlayerInfoColors();
                 Application.LoadLevel("test");
                 manager.gameState = PlayManager.GameState.SetUp;
             }

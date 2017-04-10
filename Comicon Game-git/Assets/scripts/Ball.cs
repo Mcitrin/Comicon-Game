@@ -16,7 +16,7 @@ public class Ball : MonoBehaviour
     public List<GameObject> Player2ScoreAreas = new List<GameObject>();
     PlayManager manager;
     Rigidbody rigidbody;
-    bool wait = false; // when the ball lands we wait unitl it has ben reset to hit again
+    public bool wait = false; // when the ball lands we wait unitl it has ben reset to hit again
     public ParticleSystem sand;
 
     float LastHitTime;

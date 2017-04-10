@@ -73,6 +73,11 @@ public class Pointer : MonoBehaviour
     void Move()
     {
         if (!inputMan.NoJoysticks)
+        {
+            if (!pressed)
+            transform.position += inputMan.MoveVec(PlayerNumber) * 7;
+        else
             transform.position += inputMan.MoveVec(PlayerNumber) * 5;
+        }
     }
 }

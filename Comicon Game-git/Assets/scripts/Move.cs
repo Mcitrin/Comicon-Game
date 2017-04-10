@@ -52,6 +52,7 @@ public class Move : MonoBehaviour
         // pause check
         if (inputMan.Pause(PlayerNumber) && !manager.paused)
         {
+            animator.SetFloat("Speed", 0);
             manager.paused = true;
         }
         else if (inputMan.Pause(PlayerNumber) && manager.paused)
