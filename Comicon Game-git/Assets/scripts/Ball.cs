@@ -21,6 +21,8 @@ public class Ball : MonoBehaviour
 
     float LastHitTime;
 
+    public GameObject collidingPlayer;
+
     // Use this for initialization
     void Start()
     {
@@ -49,6 +51,14 @@ public class Ball : MonoBehaviour
             if (transform.position.y <= .5f)
                 transform.position = new Vector3(transform.position.x, .6f, 0);
 
+            if(collidingPlayer)
+            {
+                checkPlayer(collidingPlayer);
+            }
+            if(HeldBy)
+            {
+                collidingPlayer = HeldBy;
+            }
 
             //if (HeldBy == null)
             //this.GetComponent<Rigidbody>().velocity += Vector3.down * .3f;
@@ -129,13 +139,22 @@ public class Ball : MonoBehaviour
 
     private void OnTriggerStay(Collider collision)
     {
-        checkPlayer(collision);
+        //Debug.Log("on trigger stay");
+        //checkPlayer(collision);
+
     }
 
     private void OnTriggerEnter(Collider collision)
     {
-        //checkPlayer(collision);
-        if (Player2ScoreAreas.Contains(collision.gameObject) || Player1ScoreAreas.Contains(collision.gameObject))
+
+        if (collision.gameObject.tag == "Player")
+        {
+            collidingPlayer = collision.gameObject;
+        }
+
+
+
+            if (Player2ScoreAreas.Contains(collision.gameObject) || Player1ScoreAreas.Contains(collision.gameObject))
         {
 
             wait = true;
@@ -151,6 +170,15 @@ public class Ball : MonoBehaviour
             }
 
         }
+    }
+
+    private void OnTriggerExit(Collider collision)
+    {
+        if (collision.gameObject.tag == "Player")
+        {
+            collidingPlayer = null;
+        }
+
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -181,15 +209,20 @@ public class Ball : MonoBehaviour
         }
     }
 
-    void checkPlayer(Collider collision)
+    void checkPlayer(GameObject collision)
     {
+        //Debug.Log("checked player");
         if (collision.gameObject.tag == "Player")
         {
+
             Move Player = collision.gameObject.GetComponentInParent<Move>();
             if (Player.power == 1 || Player.power == 2)
             {
+                //Debug.Log(Player.power);
                 if (Time.time - LastHitTime >= .25f)
+                {
                     HitBall(Player.power, Player.angle, Player.PlayerNumber, !Player.IsGrounded());
+                }
             }
         }
     }
@@ -209,6 +242,7 @@ public class Ball : MonoBehaviour
         {
             HeldBy = Players[playerNum];
             wait = false;
+            transform.position = HeldBy.GetComponent<Move>().hand.transform.position;
         }
     }
 
