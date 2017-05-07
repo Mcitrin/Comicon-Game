@@ -16,10 +16,15 @@ public class PlayerInfo : MonoBehaviour
     public int P1Wins = 0;
     public int P2Wins = 0;
 
+    public int ScoreIndex;
+    public int TimeIndex;
+    // game setings
+
     public int number;
 
     private void Awake()
     {
+        Random.seed = (int)System.DateTime.Now.Ticks;
         number = GameObject.FindObjectsOfType<PlayerInfo>().Length;
         DontDestroyOnLoad(gameObject);
         if (number > 1)
@@ -34,12 +39,17 @@ public class PlayerInfo : MonoBehaviour
         {
             if (GameObject.Find("Player1_UI") != null && GameObject.Find("Player2_UI") != null)
             {
+                GameManager.gameManager.GetComponent<PlayManager>().setGameSettings(ScoreIndex, TimeIndex);
+                GameManager.gameManager.GetComponent<PlayManager>().ScoreIndex = ScoreIndex;
+                GameManager.gameManager.GetComponent<PlayManager>().TimeIndex = TimeIndex;
                 SetCustomizerColors();
                 Debug.Log("SetCustomizerColors();");
             }
 
             if (GameObject.Find("Player1") != null && GameObject.Find("Player2") != null)
             {
+                ScoreIndex = GameManager.gameManager.GetComponent<PlayManager>().ScoreIndex;
+                TimeIndex = GameManager.gameManager.GetComponent<PlayManager>().TimeIndex;
                 SetPlayersColors();
                 Debug.Log("SetPlayersColors();");
             }
@@ -140,4 +150,5 @@ public class PlayerInfo : MonoBehaviour
         }
             return false;
     }
+    
 }

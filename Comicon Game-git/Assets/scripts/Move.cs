@@ -46,8 +46,7 @@ public class Move : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if(PlayerNumber == 1)
-        //Debug.Log(angle);
+        if(PlayerNumber == 1)
 
         // pause check
         if (inputMan.Pause(PlayerNumber) && !manager.paused)
@@ -81,8 +80,8 @@ public class Move : MonoBehaviour
     public bool IsGrounded()
     {
         //RaycastHit hitInfo;
-        return Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.2f,11);
-        
+        return Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.2f, 1 << LayerMask.NameToLayer("Ground"));
+       
     }
 
     void Input()

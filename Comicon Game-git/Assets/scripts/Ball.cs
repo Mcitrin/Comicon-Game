@@ -205,8 +205,11 @@ public class Ball : MonoBehaviour
         sand.gameObject.SetActive(false);
         manager.WhoScores.SetActive(false);
         manager.IncrementScore(playerNum);
-        HeldBy = Players[playerNum];
-        wait = false;
+        if (manager.winner == -1)
+        {
+            HeldBy = Players[playerNum];
+            wait = false;
+        }
     }
 
     // IEnumerator Wait()

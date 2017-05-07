@@ -25,7 +25,7 @@ public class CharacterCustomization : MonoBehaviour {
     {
        Hair,
        Shorts,
-       Stripe
+       Stripe,
     };
      State state = State.Hair;
 
@@ -73,8 +73,42 @@ public class CharacterCustomization : MonoBehaviour {
         StripeButton.GetComponent<Image>().color = Color.yellow;
     }
 
-	// Update is called once per frame
-	void Update () {
+    public void RandomizeColors()
+    {
+
+        Vector3 hairColors = new Vector3(Random.value, Random.value, Random.value);
+        HairColor = new Color(hairColors.x, hairColors.y, hairColors.z);
+
+        Vector3 ShortColors = new Vector3(Random.value, Random.value, Random.value);
+        ShortsColor = new Color(ShortColors.x, ShortColors.y, ShortColors.z);
+
+        Vector3 stripeColors = new Vector3(Random.value, Random.value, Random.value);
+        StripeColor = new Color(stripeColors.x, stripeColors.y, stripeColors.z);
+
+        // hacky bullshit
+        switch (state)
+        {
+            case State.Hair:
+                Red.value = hairColors.x;
+                Blue.value = hairColors.y;
+                Green.value = hairColors.z;
+                break;
+            case State.Shorts:
+                Red.value = ShortColors.x;
+                Blue.value = ShortColors.y;
+                Green.value = ShortColors.z;
+                ShortsImage.color = ShortsColor;
+                break;
+            case State.Stripe:
+                Red.value = stripeColors.x;
+                Blue.value = stripeColors.y;
+                Green.value = stripeColors.z;
+                break;
+        }
+    }
+
+    // Update is called once per frame
+    void Update () {
         HairImage.color = HairColor;
         ShortsImage.color = ShortsColor;
         StripeImage.color = StripeColor;
