@@ -4,6 +4,7 @@ using System.Collections;
 public class GameManager : MonoBehaviour {
 
     public static GameManager gameManager;
+    public static bool paused;
 
     // Use this for initialization
     void Awake () {

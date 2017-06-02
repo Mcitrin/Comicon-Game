@@ -19,7 +19,6 @@ public class Move : MonoBehaviour
     float startTime;
     public int power;
     public float chargeTime;
-    public Ball ball;
 
     
     bool chargeing = false;
@@ -46,7 +45,8 @@ public class Move : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if(PlayerNumber == 1)
+        if (PlayerNumber == 2)
+            Debug.Log(angle);
 
         // pause check
         if (inputMan.Pause(PlayerNumber) && !manager.paused)

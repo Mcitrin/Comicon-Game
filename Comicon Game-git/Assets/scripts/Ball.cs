@@ -40,7 +40,7 @@ public class Ball : MonoBehaviour
     {
         Animate();
 
-        if (!manager.paused)
+        if (!GameManager.paused)
         {
             if (rigidbody.isKinematic && !wait) // if the game was paused and not if the ball hit the ground
                 rigidbody.isKinematic = false;
@@ -69,7 +69,7 @@ public class Ball : MonoBehaviour
                 rigidbody.isKinematic = true;
         }
 
-
+        Debug.Log(transform.position);
     }
 
     void Animate()
@@ -88,7 +88,7 @@ public class Ball : MonoBehaviour
         }
     }
 
-    public void HitBall(int power, Vector3 angle, int PlayerNum, bool spike)
+    public void HitBall(int power, Vector3 angle)
     {
         if (!wait && manager.winner == -1)
         {
@@ -104,14 +104,14 @@ public class Ball : MonoBehaviour
 
             if (power == 2)
             {
-                if (spike && angle.y <= 0)
+                if (angle.y <= 0)
                 {
-                    if (PlayerNum == 2)
+                    if (angle.x < 0)
                     {
                         animator.SetBool("Left", true);
                         animator.SetBool("Right", false);
                     }
-                    else
+                    else if (angle.x > 0)
                     {
                         animator.SetBool("Right", true);
                         animator.SetBool("Left", false);
@@ -185,7 +185,7 @@ public class Ball : MonoBehaviour
     {
         if (collision.gameObject.tag == "Net" && HeldBy == null)
         {
-            if (collision.gameObject.name == "netTop")// ball moveing down
+           /* if (collision.gameObject.name == "netTop")// ball moveing down
             {
                 Vector3 point = collision.contacts[0].point;
                 Vector3 dir = -collision.contacts[0].normal;
@@ -203,9 +203,12 @@ public class Ball : MonoBehaviour
                 }
             }
             else
-            {
-                    HitBall(0, collision.contacts[0].normal, 0, false);
-            }
+            {*/
+            HitBall(0, collision.contacts[0].normal);
+            animator.SetBool("Right", false);
+            animator.SetBool("Left", false);
+            animator.SetBool("Move", true);
+            //}
         }
     }
 
@@ -221,7 +224,7 @@ public class Ball : MonoBehaviour
                 //Debug.Log(Player.power);
                 if (Time.time - LastHitTime >= .25f)
                 {
-                    HitBall(Player.power, Player.angle, Player.PlayerNumber, !Player.IsGrounded());
+                    HitBall(Player.power, Player.angle);
                 }
             }
         }
