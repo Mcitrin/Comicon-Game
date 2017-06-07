@@ -3,7 +3,6 @@ using System.Collections;
 
 public class CharacterController : MonoBehaviour {
 
-    public Animator animator;
     public int power;
     public Vector3 angle;
     public GameObject arrow;

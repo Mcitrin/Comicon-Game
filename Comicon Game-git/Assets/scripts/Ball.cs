@@ -23,6 +23,8 @@ public class Ball : MonoBehaviour
 
     public GameObject collidingPlayer;
 
+    Vector3 inverseAngle;
+
     // Use this for initialization
     void Start()
     {
@@ -38,7 +40,9 @@ public class Ball : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        inverseAngle = -transform.forward;
         Animate();
+        Debug.Log(transform.forward);
 
         if (!GameManager.paused)
         {
@@ -90,6 +94,7 @@ public class Ball : MonoBehaviour
 
     public void HitBall(int power, Vector3 angle)
     {
+        int hitPow = 0;
         if (!wait && manager.winner == -1)
         {
 
@@ -117,7 +122,7 @@ public class Ball : MonoBehaviour
                         animator.SetBool("Left", false);
                     }
                 }
-                rigidbody.velocity = angle * 13;
+                hitPow = 13;
                 LastHitTime = Time.time;
             }
             else if (power == 1)
@@ -125,13 +130,17 @@ public class Ball : MonoBehaviour
                 animator.SetBool("Left", false);
                 animator.SetBool("Right", false);
                 animator.SetBool("Move", true);
-                rigidbody.velocity = angle * 10;
+                hitPow = 10;
                 LastHitTime = Time.time;
             }
             else if (power == 0)
             {
-                rigidbody.velocity = angle * 5;
+                hitPow = 5;
             }
+
+
+            
+            rigidbody.velocity = angle * hitPow;
             rigidbody.isKinematic = false;
             //Debug.Log(rigidbody.velocity);
         }

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AnimationManager : MonoBehaviour {
+public class AnimationController : MonoBehaviour {
 
     public Animator Animator;
     public bool isGrounded;
@@ -10,16 +10,19 @@ public class AnimationManager : MonoBehaviour {
 
 
     // Use this for initialization
-    void Start() {
+    void Start()
+    {
 
     }
 
     // Update is called once per frame
-    void Update() {
+    void Update()
+    {
         Animate();
     }
 
-    void Animate() {
+    void Animate()
+    {
         Animator.SetBool("Jump", !isGrounded);
 
         Animator.SetFloat("Speed", speed);
@@ -36,10 +39,11 @@ public class AnimationManager : MonoBehaviour {
         }
 
     }
-    
-    public void setTrigger(string trigger) { 
+
+    public void setTrigger(string trigger)
+    {
         Animator.SetTrigger(trigger);
     }
 
-        
+
 }

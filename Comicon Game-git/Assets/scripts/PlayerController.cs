@@ -13,6 +13,8 @@ public class PlayerController : MonoBehaviour {
     Vector3 angle;
     int power;
     public CharacterController characterController;
+    public AnimationController animationController;
+    public Appearance appearance;
 
     // Use this for initialization
     void Awake () {
@@ -71,6 +73,13 @@ public class PlayerController : MonoBehaviour {
         CalcPower();
     }
 
+    void Animate()
+    {
+        animationController.speed = Mathf.Abs(inputMan.Move(PlayerNumber));
+        animationController.isGrounded = IsGrounded();
+        animationController.chargeing = chargeing;
+    }
+
     void CalcPower()
     {
         if (inputMan.Charge(PlayerNumber))
@@ -97,11 +106,11 @@ public class PlayerController : MonoBehaviour {
 
                 if (!IsGrounded())
                 {
-                    //animator.SetTrigger("Smack");
+                    animationController.setTrigger("Smack");
                 }
                 else
                 {
-                    //animator.SetTrigger("Set");
+                    animationController.setTrigger("Set");
                 }
 
                 if (chargeTime >= .65)
@@ -113,7 +122,7 @@ public class PlayerController : MonoBehaviour {
                     power = 1;
                 }
                 StartCoroutine(characterController.setPower(power));
-                //StartCoroutine(Flash(power));
+                StartCoroutine(appearance.Flash(power));
                 chargeTime = 0;
                 startTime = 0;
             }
@@ -136,8 +145,7 @@ public class PlayerController : MonoBehaviour {
         if(!GameManager.paused)
         {
             Input();
+            Animate();
         }
-
-        Debug.Log(IsGrounded());
     }
 }
