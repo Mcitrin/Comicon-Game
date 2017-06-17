@@ -10,6 +10,12 @@ public class CharacterController : MonoBehaviour {
     Rigidbody rigidbody;
     int arrowDistance = 2;
 
+    float jumpVel = 15.5f;
+    bool jumped = false;
+
+    float fallMultiplier = 4.5f;
+    Vector3 velocity;
+
     // Use this for initialization
     void Awake () {
         rigidbody = GetComponent<Rigidbody>();
@@ -17,13 +23,15 @@ public class CharacterController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-       
+
+        Debug.Log(jumped);
         // pause check
         if (!GameManager.paused)
         {
             if (rigidbody.isKinematic)
             rigidbody.isKinematic = false;
             arrow.transform.position = angle * arrowDistance + this.transform.position;
+            rigidbody.velocity = velocity;
         }
         else
         {
@@ -31,8 +39,6 @@ public class CharacterController : MonoBehaviour {
             rigidbody.isKinematic = true;
             rigidbody.velocity = Vector3.zero;
         }
-
-        
     }
 
     public void Aim(Vector3 arrowAngle)
@@ -40,14 +46,40 @@ public class CharacterController : MonoBehaviour {
         angle = arrowAngle; 
     }
 
-    public void Move(Vector3 velocity)
+    public void Move(float vel)
     {
-    rigidbody.velocity = velocity;
+      velocity.x = vel;
     }
 
-    public void jump(Vector3 jumpVelocity)
+    public void jump(bool jump, bool grounded)
     {
-    rigidbody.velocity += jumpVelocity;
+        
+
+        if (jump && !jumped)
+        {
+            velocity.y = jumpVel;
+        }
+        else if(grounded)
+        {
+            velocity.y = 0;
+            jumped = false;
+        }
+
+        if(!jump && !grounded)
+        {
+            jumped = true;
+        }
+
+        // jump calculations
+        if (rigidbody.velocity.y < 0 && !grounded)
+        {
+            velocity.y += Physics.gravity.y * (fallMultiplier - 1 *  1.5f) * Time.deltaTime;
+        }
+        else if (rigidbody.velocity.y > 0 && !jump)
+        {
+            velocity.y += Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
+            
+        }
     }
 
     public IEnumerator setPower(int pow)

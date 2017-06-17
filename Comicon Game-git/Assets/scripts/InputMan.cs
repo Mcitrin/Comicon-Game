@@ -48,7 +48,7 @@ public class InputMan : MonoBehaviour {
         if (PlayerNum == 1)
         {
             if (GotTwoJoysticks) { return joystick2.LeftTrigger; } // if their are two joysticks
-            if (Input.GetKeyDown("space")) { return Input.GetKeyDown("space"); }
+            if (Input.GetKey("space")) { return Input.GetKey("space"); }
         }
         if (PlayerNum == 2) { return joystick1.LeftTrigger; }
         return false;

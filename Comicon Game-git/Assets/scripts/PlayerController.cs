@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : MonoBehaviour
+{
 
     InputMan inputMan;
     public int PlayerNumber;
@@ -16,38 +17,90 @@ public class PlayerController : MonoBehaviour {
     public AnimationController animationController;
     public Appearance appearance;
 
+    bool canJump;
+    float maxJumpHeight = 7f;
+
+    public int dash = 0;
+    float dashTime;
+    float dashCoolDown = .25f;
+
+
+    Vector2 DoubleTapCount;
+    float DoubleTapCoolDown = 0.5f;
+    bool DoubleTapReset = false;
+    
     // Use this for initialization
-    void Awake () {
+    void Start()
+    {
         inputMan = GameManager.gameManager.GetComponent<InputMan>();
         distToGround = GetComponent<BoxCollider>().bounds.extents.y;
     }
 
     public bool IsGrounded()
     {
-        //RaycastHit hitInfo;
-        return Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.2f, 1 << LayerMask.NameToLayer("Ground"));
-
+        return Physics.Raycast(transform.position, -Vector3.up, distToGround + .03f, 1 << LayerMask.NameToLayer("Ground"));
     }
 
     void Input()
     {
-        currentVelocity = this.GetComponent<Rigidbody>().velocity;
-        if (inputMan.Jump(PlayerNumber) && IsGrounded())
+        Move();
+        Aiming();
+        CalcPower();
+        CalcJump();
+        if (dash == 0)
         {
-            //characterController.jump(new Vector3(0, 15, 0));
-            currentVelocity.y = 15;
-        }
-        if (!IsGrounded() || chargeing)
-        {
-            currentVelocity.x = inputMan.Move(PlayerNumber) * 5.0f;//2.5f;
+            CheckForDoubleTap();
         }
         else
         {
-            currentVelocity.x = inputMan.Move(PlayerNumber) * 9.0f;//5
+            HandleDash();
+        }
+        
+    }
+
+    void Animate()
+    {
+        animationController.speed = Mathf.Abs(inputMan.Move(PlayerNumber));
+        animationController.isGrounded = IsGrounded();
+        animationController.chargeing = chargeing;
+    }
+
+    void Move()
+    {
+        currentVelocity = this.GetComponent<Rigidbody>().velocity;
+
+        if (canJump && inputMan.Jump(PlayerNumber))
+        {
+            characterController.jump(true,IsGrounded());
+        }
+        else
+        {
+            characterController.jump(false,IsGrounded());
         }
 
-        characterController.Move(currentVelocity);
+        if (!IsGrounded() || chargeing)
+        {
+            currentVelocity.x = inputMan.Move(PlayerNumber) * 5.0f;
 
+        }
+        else
+        {
+            currentVelocity.x = inputMan.Move(PlayerNumber) * 9.0f;
+        }
+
+        if (dash == 0)
+        {
+            characterController.Move(currentVelocity.x);
+        }
+        else // figure this headache out later
+        {
+            characterController.Move(dash * 15f);
+        }
+
+    }
+
+    void Aiming()
+    {
         if (inputMan.Aim(PlayerNumber) != Vector2.zero)
         {
             angle = inputMan.Aim(PlayerNumber);
@@ -70,14 +123,6 @@ public class PlayerController : MonoBehaviour {
         }
 
         characterController.Aim(angle);
-        CalcPower();
-    }
-
-    void Animate()
-    {
-        animationController.speed = Mathf.Abs(inputMan.Move(PlayerNumber));
-        animationController.isGrounded = IsGrounded();
-        animationController.chargeing = chargeing;
     }
 
     void CalcPower()
@@ -129,9 +174,98 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
+    void CalcJump()
+    {
+        if (IsGrounded())
+        {
+            canJump = true;
+        }
+
+        if (transform.position.y >= maxJumpHeight)
+        {
+            canJump = false;
+        }
+    }
+
+   void CheckForDoubleTap()
+    {
+        int horrizontalInput = Mathf.Clamp((int)(inputMan.Move(PlayerNumber) * 10), -1, 1);
+        
+        if (DoubleTapCoolDown > 0)
+        {
+
+            DoubleTapCoolDown -= 1 * Time.deltaTime;
+
+        }
+        else
+        {
+            DoubleTapCount = Vector2.zero;
+            DoubleTapReset = false;
+        }
+
+        if (horrizontalInput == 1 ) // tap Right
+        {
+            if (DoubleTapCoolDown > 0 && DoubleTapCount.x == 1 && DoubleTapReset)
+            {
+                //Has double tapped
+                DoubleTapCoolDown = 0;
+                dash = 1;
+            }
+            else
+            {
+                // first tap
+                DoubleTapCount.x = 1;
+                DoubleTapCount.y = 0;
+                DoubleTapCoolDown = 0.5f;
+            }
+
+            DoubleTapReset = false;
+        }
+
+        if (horrizontalInput == -1) // tap Left
+        {
+            if (DoubleTapCoolDown > 0 && DoubleTapCount.y == 1 && DoubleTapReset)
+            {
+                //Has double tapped
+                DoubleTapCoolDown = 0;
+                dash = -1;
+            }
+            else
+            {
+                // first tap
+                DoubleTapCount.y = 1;
+                DoubleTapCount.x = 0;
+                DoubleTapCoolDown = 0.5f;
+            }
+
+            DoubleTapReset = false;
+        }
+        else if (horrizontalInput == 0)
+        {
+            if(DoubleTapCount.y > 0 || DoubleTapCount.x > 0)
+            {
+                DoubleTapReset = true;
+            }
+        }
+    }
+
+    void HandleDash()
+    {
+        if (dashTime == 0)
+        {
+            dashTime = Time.time + dashCoolDown;
+        }
+        else if (dashTime <= Time.time)
+        {
+            dash = 0;
+            dashTime = 0;
+        }
+    }
+
 
     // Update is called once per frame
-    void Update () {
+    void Update()
+    {
         // pause check
         if (inputMan.Pause(PlayerNumber) && !GameManager.paused)
         {
@@ -142,7 +276,7 @@ public class PlayerController : MonoBehaviour {
             GameManager.paused = false;
         }
 
-        if(!GameManager.paused)
+        if (!GameManager.paused)
         {
             Input();
             Animate();
