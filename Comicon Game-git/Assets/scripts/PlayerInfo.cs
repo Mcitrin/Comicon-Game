@@ -104,15 +104,15 @@ public class PlayerInfo : MonoBehaviour
         if (GameObject.Find("Player1") != null && GameObject.Find("Player2") != null)
         {
             //p1
-            GameObject.Find("Player1").GetComponent<Move>().HairSprite.color = HairColor_P1;
-            GameObject.Find("Player1").GetComponent<Move>().ShortsSprite.color = ShortsColor_P1;
-            GameObject.Find("Player1").GetComponent<Move>().StripeSprite.color = StripeColor_P1;
-            GameObject.Find("Player1").GetComponent<Move>().arrow.GetComponent<SpriteRenderer>().color = ShortsColor_P1;
+            GameObject.Find("Player1").GetComponent<Appearance>().HairSprite.color = HairColor_P1;
+            GameObject.Find("Player1").GetComponent<Appearance>().ShortsSprite.color = ShortsColor_P1;
+            GameObject.Find("Player1").GetComponent<Appearance>().StripeSprite.color = StripeColor_P1;
+            GameObject.Find("Player1").GetComponent<Appearance>().arrow.color = ShortsColor_P1;
             //p2
-            GameObject.Find("Player2").GetComponent<Move>().HairSprite.color = HairColor_P2;
-            GameObject.Find("Player2").GetComponent<Move>().ShortsSprite.color = ShortsColor_P2;
-            GameObject.Find("Player2").GetComponent<Move>().StripeSprite.color = StripeColor_P2;
-            GameObject.Find("Player2").GetComponent<Move>().arrow.GetComponent<SpriteRenderer>().color = ShortsColor_P2;
+            GameObject.Find("Player2").GetComponent<Appearance>().HairSprite.color = HairColor_P2;
+            GameObject.Find("Player2").GetComponent<Appearance>().ShortsSprite.color = ShortsColor_P2;
+            GameObject.Find("Player2").GetComponent<Appearance>().StripeSprite.color = StripeColor_P2;
+            GameObject.Find("Player2").GetComponent<Appearance>().arrow.color = ShortsColor_P2;
         }
     }
 

@@ -24,7 +24,7 @@ public class CharacterController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-        Debug.Log(jumped);
+        //Debug.Log(jumped);
         // pause check
         if (!GameManager.paused)
         {

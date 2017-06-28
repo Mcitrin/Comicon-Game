@@ -20,14 +20,16 @@ public class PlayerController : MonoBehaviour
     bool canJump;
     float maxJumpHeight = 7f;
 
-    public int dash = 0;
-    float dashTime;
-    float dashCoolDown = .25f;
+    public int dive = 0;
+    float diveTime;
+    float diveCoolDown = .25f;
 
 
     Vector2 DoubleTapCount;
     float DoubleTapCoolDown = 0.5f;
     bool DoubleTapReset = false;
+
+    bool running = false;
     
     // Use this for initialization
     void Start()
@@ -47,13 +49,13 @@ public class PlayerController : MonoBehaviour
         Aiming();
         CalcPower();
         CalcJump();
-        if (dash == 0)
+        if (dive == 0)
         {
             CheckForDoubleTap();
         }
         else
         {
-            HandleDash();
+            HandleDive();
         }
         
     }
@@ -72,6 +74,7 @@ public class PlayerController : MonoBehaviour
         if (canJump && inputMan.Jump(PlayerNumber))
         {
             characterController.jump(true,IsGrounded());
+            running = false;
         }
         else
         {
@@ -81,20 +84,26 @@ public class PlayerController : MonoBehaviour
         if (!IsGrounded() || chargeing)
         {
             currentVelocity.x = inputMan.Move(PlayerNumber) * 5.0f;
-
+            
         }
         else
         {
             currentVelocity.x = inputMan.Move(PlayerNumber) * 9.0f;
         }
 
-        if (dash == 0)
-        {
-            characterController.Move(currentVelocity.x);
+        if (dive == 0)
+        {   if (!running)
+            {
+                characterController.Move(currentVelocity.x);
+            }
+            else
+            {
+                characterController.Move(currentVelocity.x * 1.75f);
+            }
         }
         else // figure this headache out later
         {
-            characterController.Move(dash * 15f);
+            characterController.Move(dive * 15f);
         }
 
     }
@@ -209,7 +218,7 @@ public class PlayerController : MonoBehaviour
             {
                 //Has double tapped
                 DoubleTapCoolDown = 0;
-                dash = 1;
+                running = true;
             }
             else
             {
@@ -228,14 +237,14 @@ public class PlayerController : MonoBehaviour
             {
                 //Has double tapped
                 DoubleTapCoolDown = 0;
-                dash = -1;
+                running = true;
             }
             else
             {
                 // first tap
                 DoubleTapCount.y = 1;
                 DoubleTapCount.x = 0;
-                DoubleTapCoolDown = 0.5f;
+                DoubleTapCoolDown = 0.25f;
             }
 
             DoubleTapReset = false;
@@ -249,16 +258,16 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void HandleDash()
+    void HandleDive()
     {
-        if (dashTime == 0)
+        if (diveTime == 0)
         {
-            dashTime = Time.time + dashCoolDown;
+            diveTime = Time.time + diveCoolDown;
         }
-        else if (dashTime <= Time.time)
+        else if (diveTime <= Time.time)
         {
-            dash = 0;
-            dashTime = 0;
+            dive = 0;
+            diveTime = 0;
         }
     }
 
@@ -266,6 +275,9 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (PlayerNumber == 1)
+            Debug.Log(running);
+
         // pause check
         if (inputMan.Pause(PlayerNumber) && !GameManager.paused)
         {
@@ -280,6 +292,10 @@ public class PlayerController : MonoBehaviour
         {
             Input();
             Animate();
+        }
+        else
+        {
+            animationController.speed = 0;
         }
     }
 }

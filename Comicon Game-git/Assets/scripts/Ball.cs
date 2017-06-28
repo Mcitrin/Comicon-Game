@@ -42,7 +42,6 @@ public class Ball : MonoBehaviour
     {
         inverseAngle = -transform.forward;
         Animate();
-        Debug.Log(transform.forward);
 
         if (!GameManager.paused)
         {
@@ -50,7 +49,7 @@ public class Ball : MonoBehaviour
                 rigidbody.isKinematic = false;
 
             if (HeldBy && !wait && manager.winner == -1) // -1 = is default value
-                transform.position = HeldBy.GetComponent<Move>().hand.transform.position;
+                transform.position = HeldBy.GetComponent<CharacterController>().hand.transform.position;
 
             if (transform.position.y <= .5f)
                 transform.position = new Vector3(transform.position.x, .6f, 0);
@@ -72,8 +71,6 @@ public class Ball : MonoBehaviour
             if (!rigidbody.isKinematic)
                 rigidbody.isKinematic = true;
         }
-
-        Debug.Log(transform.position);
     }
 
     void Animate()
@@ -227,7 +224,7 @@ public class Ball : MonoBehaviour
         if (collision.gameObject.tag == "Player")
         {
 
-            Move Player = collision.gameObject.GetComponentInParent<Move>();
+            CharacterController Player = collision.gameObject.GetComponentInParent<CharacterController>();
             if (Player.power == 1 || Player.power == 2)
             {
                 //Debug.Log(Player.power);
@@ -254,7 +251,7 @@ public class Ball : MonoBehaviour
         {
             HeldBy = Players[playerNum];
             wait = false;
-            transform.position = HeldBy.GetComponent<Move>().hand.transform.position;
+            transform.position = HeldBy.GetComponent<CharacterController>().hand.transform.position;
         }
     }
 

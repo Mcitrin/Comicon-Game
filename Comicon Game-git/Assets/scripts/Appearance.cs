@@ -6,6 +6,7 @@ public class Appearance : MonoBehaviour {
     public SpriteRenderer HairSprite;
     public SpriteRenderer ShortsSprite;
     public SpriteRenderer StripeSprite;
+    public SpriteRenderer arrow;
 
     Color[] colors = new Color[6];
 

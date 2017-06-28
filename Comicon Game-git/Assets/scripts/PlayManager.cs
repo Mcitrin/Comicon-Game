@@ -44,7 +44,7 @@ public class PlayManager : MonoBehaviour
 
     bool crowned = false;
     public int winner;
-    public bool paused;
+    //public bool paused;
 
 
     // Use this for initialization
@@ -57,7 +57,7 @@ public class PlayManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!paused)
+        if (!GameManager.paused)
         {
             if (gameState != GameState.MainMenu && gameState != GameState.SetUp && PauseMenu.activeInHierarchy == true) { PauseMenu.SetActive(false);} // if we have handle on pause panel and player is not pausing disable pannel
 
@@ -85,7 +85,7 @@ public class PlayManager : MonoBehaviour
         }
         else
         {
-            if (PauseMenu.activeInHierarchy == false) { PauseMenu.SetActive(true); } // else in enalbe pannel if player is pausing
+            if (PauseMenu.activeInHierarchy == false && gameState != GameState.MainMenu) { PauseMenu.SetActive(true); } // else in enalbe pannel if player is pausing
         }
 
 

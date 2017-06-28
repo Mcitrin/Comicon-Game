@@ -49,18 +49,18 @@ public class Move : MonoBehaviour
             Debug.Log(angle);
 
         // pause check
-        if (inputMan.Pause(PlayerNumber) && !manager.paused)
+        if (inputMan.Pause(PlayerNumber) && !GameManager.paused)
         {
             animator.SetFloat("Speed", 0);
-            manager.paused = true;
+            GameManager.paused = true;
         }
-        else if (inputMan.Pause(PlayerNumber) && manager.paused)
+        else if (inputMan.Pause(PlayerNumber) && GameManager.paused)
         {
-            manager.paused = false;
+            GameManager.paused = false;
         }
 
 
-        if (!manager.paused)
+        if (GameManager.paused)
         {
             if (rigidbody.isKinematic)
             rigidbody.isKinematic = false;
