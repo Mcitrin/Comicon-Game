@@ -20,27 +20,22 @@ public class PlayerController : MonoBehaviour
     bool canJump;
     float maxJumpHeight = 7f;
 
-    public int dive = 0;
+    bool dive;
     float diveTime;
     float diveCoolDown = .25f;
-
-
-    Vector2 DoubleTapCount;
-    float DoubleTapCoolDown = 0.5f;
-    bool DoubleTapReset = false;
-
-    bool running = false;
     
     // Use this for initialization
-    void Start()
+    void OnEnable()
     {
         inputMan = GameManager.gameManager.GetComponent<InputMan>();
-        distToGround = GetComponent<BoxCollider>().bounds.extents.y;
+        distToGround = GetComponent<BoxCollider2D>().bounds.extents.y + 0.03f;
     }
 
     public bool IsGrounded()
     {
-        return Physics.Raycast(transform.position, -Vector3.up, distToGround + .03f, 1 << LayerMask.NameToLayer("Ground"));
+        Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x,transform.position.y) -Vector2.up * distToGround, Color.red);
+        return Physics2D.Raycast(transform.position, -Vector2.up, distToGround, 1 << LayerMask.NameToLayer("Ground"));
+       
     }
 
     void Input()
@@ -49,11 +44,7 @@ public class PlayerController : MonoBehaviour
         Aiming();
         CalcPower();
         CalcJump();
-        if (dive == 0)
-        {
-            CheckForDoubleTap();
-        }
-        else
+        if (dive)
         {
             HandleDive();
         }
@@ -69,12 +60,11 @@ public class PlayerController : MonoBehaviour
 
     void Move()
     {
-        currentVelocity = this.GetComponent<Rigidbody>().velocity;
-
+        //currentVelocity = this.GetComponent<Rigidbody>().velocity;
+        Debug.Log(IsGrounded());
         if (canJump && inputMan.Jump(PlayerNumber))
         {
             characterController.jump(true,IsGrounded());
-            running = false;
         }
         else
         {
@@ -83,27 +73,21 @@ public class PlayerController : MonoBehaviour
 
         if (!IsGrounded() || chargeing)
         {
-            currentVelocity.x = inputMan.Move(PlayerNumber) * 5.0f;
+            currentVelocity.x = inputMan.Move(PlayerNumber) * 15.0f;
             
         }
         else
         {
-            currentVelocity.x = inputMan.Move(PlayerNumber) * 9.0f;
+            currentVelocity.x = inputMan.Move(PlayerNumber) * 40.0f;
         }
 
-        if (dive == 0)
-        {   if (!running)
-            {
-                characterController.Move(currentVelocity.x);
-            }
-            else
-            {
-                characterController.Move(currentVelocity.x * 1.75f);
-            }
+        if (!dive)
+        {   
+            characterController.Move(currentVelocity.x);
         }
         else // figure this headache out later
         {
-            characterController.Move(dive * 15f);
+            characterController.Move(1 * 15f);
         }
 
     }
@@ -196,68 +180,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-   void CheckForDoubleTap()
-    {
-        int horrizontalInput = Mathf.Clamp((int)(inputMan.Move(PlayerNumber) * 10), -1, 1);
-        
-        if (DoubleTapCoolDown > 0)
-        {
-
-            DoubleTapCoolDown -= 1 * Time.deltaTime;
-
-        }
-        else
-        {
-            DoubleTapCount = Vector2.zero;
-            DoubleTapReset = false;
-        }
-
-        if (horrizontalInput == 1 ) // tap Right
-        {
-            if (DoubleTapCoolDown > 0 && DoubleTapCount.x == 1 && DoubleTapReset)
-            {
-                //Has double tapped
-                DoubleTapCoolDown = 0;
-                running = true;
-            }
-            else
-            {
-                // first tap
-                DoubleTapCount.x = 1;
-                DoubleTapCount.y = 0;
-                DoubleTapCoolDown = 0.5f;
-            }
-
-            DoubleTapReset = false;
-        }
-
-        if (horrizontalInput == -1) // tap Left
-        {
-            if (DoubleTapCoolDown > 0 && DoubleTapCount.y == 1 && DoubleTapReset)
-            {
-                //Has double tapped
-                DoubleTapCoolDown = 0;
-                running = true;
-            }
-            else
-            {
-                // first tap
-                DoubleTapCount.y = 1;
-                DoubleTapCount.x = 0;
-                DoubleTapCoolDown = 0.25f;
-            }
-
-            DoubleTapReset = false;
-        }
-        else if (horrizontalInput == 0)
-        {
-            if(DoubleTapCount.y > 0 || DoubleTapCount.x > 0)
-            {
-                DoubleTapReset = true;
-            }
-        }
-    }
-
     void HandleDive()
     {
         if (diveTime == 0)
@@ -266,7 +188,7 @@ public class PlayerController : MonoBehaviour
         }
         else if (diveTime <= Time.time)
         {
-            dive = 0;
+            dive = false;
             diveTime = 0;
         }
     }
@@ -276,7 +198,6 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         if (PlayerNumber == 1)
-            Debug.Log(running);
 
         // pause check
         if (inputMan.Pause(PlayerNumber) && !GameManager.paused)

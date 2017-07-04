@@ -7,18 +7,20 @@ public class CharacterController : MonoBehaviour {
     public Vector3 angle;
     public GameObject arrow;
     public GameObject hand;
-    Rigidbody rigidbody;
+    Rigidbody2D rigidbody;
     int arrowDistance = 2;
 
     float jumpVel = 15.5f;
     bool jumped = false;
 
     float fallMultiplier = 4.5f;
-    Vector3 velocity;
+    float yVelocity;
+
+    float maxVelocity = 7.5f;
 
     // Use this for initialization
-    void Awake () {
-        rigidbody = GetComponent<Rigidbody>();
+    void OnEnable () {
+        rigidbody = GetComponent<Rigidbody2D>();
     }
 	
 	// Update is called once per frame
@@ -31,7 +33,7 @@ public class CharacterController : MonoBehaviour {
             if (rigidbody.isKinematic)
             rigidbody.isKinematic = false;
             arrow.transform.position = angle * arrowDistance + this.transform.position;
-            rigidbody.velocity = velocity;
+            rigidbody.velocity = new Vector2(rigidbody.velocity.x,yVelocity);
         }
         else
         {
@@ -48,36 +50,31 @@ public class CharacterController : MonoBehaviour {
 
     public void Move(float vel)
     {
-      velocity.x = vel;
+        if(Mathf.Abs(rigidbody.velocity.x) < maxVelocity)
+        rigidbody.AddForce(new Vector2(vel,0.0f));
     }
 
     public void jump(bool jump, bool grounded)
     {
-        
 
-        if (jump && !jumped)
+        if (grounded)
         {
-            velocity.y = jumpVel;
+            yVelocity = 0;
         }
-        else if(grounded)
+        if (jump)
         {
-            velocity.y = 0;
-            jumped = false;
+            yVelocity = jumpVel;
         }
-
-        if(!jump && !grounded)
-        {
-            jumped = true;
-        }
+       
 
         // jump calculations
         if (rigidbody.velocity.y < 0 && !grounded)
         {
-            velocity.y += Physics.gravity.y * (fallMultiplier - 1 *  1.5f) * Time.deltaTime;
+            yVelocity += Physics.gravity.y * (fallMultiplier - 1 *  1.5f) * Time.deltaTime;
         }
-        else if (rigidbody.velocity.y > 0 && !jump)
+        else if (rigidbody.velocity.y > 0)
         {
-            velocity.y += Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
+            yVelocity += Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
             
         }
     }
@@ -87,5 +84,22 @@ public class CharacterController : MonoBehaviour {
         power = pow;
         yield return new WaitForSeconds(.25f);
         power = 0;
+    }
+
+
+
+    private void OnTriggerEnter(Collider collision)
+    {
+        if (collision.gameObject.tag == "Player")
+        {
+
+            CharacterController Player = collision.gameObject.GetComponentInParent<CharacterController>();
+            
+            if (Player.power == 1 || Player.power == 2)
+            {
+                Debug.Log(Player.gameObject.name);
+                this.gameObject.GetComponentInParent<Rigidbody>().AddForce((transform.position - collision.transform.position) * 100,ForceMode.Impulse);
+            }
+        }
     }
 }
