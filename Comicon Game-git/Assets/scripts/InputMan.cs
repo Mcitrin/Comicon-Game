@@ -2,19 +2,39 @@
 using System.Collections;
 using InControl;
 
+
+
+
+
+
+
+
+/*
+ 
+     
+fix this class to work with one play using a controler      
+     
+     
+*/
+
+
+
+
+
 public class InputMan : MonoBehaviour {
 
     public InputDevice joystick1; // player 2
     public InputDevice joystick2; // player 1 is joystick2 becaus it is only !null if 2 controles are pluged in
     public bool GotTwoJoysticks;
     public bool NoJoysticks;
+    public bool onePlayer;
 
     // Use this for initialization
-    void Awake () {
+    void Awake() {
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update()
     {
         CheckJoystickCount();
     }
@@ -50,7 +70,7 @@ public class InputMan : MonoBehaviour {
             if (GotTwoJoysticks) { return joystick2.LeftTrigger; } // if their are two joysticks
             if (Input.GetKey("space")) { return Input.GetKey("space"); }
         }
-        if (PlayerNum == 2) { return joystick1.LeftTrigger; }
+        if (PlayerNum == 2 || onePlayer) { return joystick1.LeftTrigger; }
         return false;
     }
 
@@ -62,20 +82,20 @@ public class InputMan : MonoBehaviour {
             if (GotTwoJoysticks) { result += joystick2.LeftStickX; }  // if their are two joysticks
             result += Input.GetAxis("K_Horizontal");
         }
-        if (PlayerNum == 2) { result += joystick1.LeftStickX; }
-           return Mathf.Clamp(result, -1, 1);
+        if (PlayerNum == 2 || onePlayer) { result += joystick1.LeftStickX; }
+        return Mathf.Clamp(result, -1, 1);
     }
 
     public Vector3 MoveVec(int playerNum)
     {
         Vector3 result = Vector3.zero;
-        
-        if (playerNum == 1 && joystick2 != null)
+
+        if (playerNum == 1 )
         {
             result.x += joystick2.LeftStickX;
             result.y += joystick2.LeftStickY;
         }
-        if (playerNum == 2 && joystick1 != null)
+        if (playerNum == 2 || onePlayer)
         {
             result.x += joystick1.LeftStickX;
             result.y += joystick1.LeftStickY;
@@ -107,7 +127,7 @@ public class InputMan : MonoBehaviour {
                 }
             }
         }
-        if (PlayerNum == 2)
+        if (PlayerNum == 2 || onePlayer)
         {
             vec = new Vector2(joystick1.RightStickX, joystick1.RightStickY).normalized;
         }
@@ -118,21 +138,22 @@ public class InputMan : MonoBehaviour {
 
     public bool Charge(int playerNum)
     {
+        if (playerNum == 2 || onePlayer) { return joystick1.RightTrigger; }
         if (playerNum == 1)
         {
             if (GotTwoJoysticks){ return joystick2.RightTrigger; }
             else { return Input.GetMouseButton(0); }   
         }
-        if(playerNum == 2 && joystick1 != null) { return joystick1.RightTrigger; }
+        
         return false;
     }
 
     public bool Enter(int playerNum)
     {
-        if (playerNum == 1 && joystick2 != null)
+        if (playerNum == 1)
          return joystick2.Action1;
 
-        if (playerNum == 2 && joystick1 != null)
+        if (playerNum == 2 || onePlayer)
         return joystick1.Action1;
 
         return false;
@@ -145,7 +166,7 @@ public class InputMan : MonoBehaviour {
             if (GotTwoJoysticks) { return joystick2.MenuWasPressed; }
             else { return Input.GetKeyDown(KeyCode.Escape); }
         }
-        if (playerNum == 2 && joystick1 != null) { return joystick1.MenuWasPressed; }
+        if (playerNum == 2 || onePlayer) { return joystick1.MenuWasPressed; }
         return false;
     }
 

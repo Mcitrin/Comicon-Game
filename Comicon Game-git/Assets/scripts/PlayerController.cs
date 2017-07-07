@@ -4,7 +4,7 @@ using System.Collections;
 public class PlayerController : MonoBehaviour
 {
 
-    InputMan inputMan;
+    public InputMan inputMan;
     public int PlayerNumber;
     float distToGround;
     float startTime;
@@ -60,8 +60,6 @@ public class PlayerController : MonoBehaviour
 
     void Move()
     {
-        //currentVelocity = this.GetComponent<Rigidbody>().velocity;
-        Debug.Log(IsGrounded());
         if (canJump && inputMan.Jump(PlayerNumber))
         {
             characterController.jump(true,IsGrounded());
@@ -83,11 +81,7 @@ public class PlayerController : MonoBehaviour
 
         if (!dive)
         {   
-            characterController.Move(currentVelocity.x);
-        }
-        else // figure this headache out later
-        {
-            characterController.Move(1 * 15f);
+            characterController.Move(currentVelocity.x,PlayerNumber);
         }
 
     }
@@ -195,9 +189,9 @@ public class PlayerController : MonoBehaviour
 
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        if (PlayerNumber == 1)
+        
 
         // pause check
         if (inputMan.Pause(PlayerNumber) && !GameManager.paused)
