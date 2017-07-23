@@ -23,10 +23,8 @@ public class Appearance : MonoBehaviour {
 	
 	}
 
-    public IEnumerator Flash(int pow)
+    public IEnumerator Flash()
     {
-        if (pow == 2)
-        {
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 6; j++)
@@ -40,7 +38,7 @@ public class Appearance : MonoBehaviour {
                 }
                 yield return new WaitForSeconds(.025f);
             }
-        }
+        
 
     }
 }

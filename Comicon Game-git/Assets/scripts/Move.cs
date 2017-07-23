@@ -86,10 +86,10 @@ public class Move : MonoBehaviour
 
     void Input()
     {
-        if (inputMan.Jump(PlayerNumber) && IsGrounded())
+        /*if (inputMan.Jump(PlayerNumber) && IsGrounded())
         {
             this.GetComponent<Rigidbody>().velocity = new Vector3(0, 15, 0);//7.5f;
-        }
+        }*/
 
         Vector3 curVel = this.GetComponent<Rigidbody>().velocity;
         if (!IsGrounded() || chargeing)

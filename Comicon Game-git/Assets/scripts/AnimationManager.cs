@@ -20,15 +20,19 @@ public class AnimationManager : MonoBehaviour {
     }
 
     void Animate() {
+        // if not grounded play jump animation
         Animator.SetBool("Jump", !isGrounded);
 
+        // if speed > 0 play walking animation
         Animator.SetFloat("Speed", speed);
 
+        // dont play smack animation if were on the ground
         if (isGrounded)
         {
             Animator.SetBool("ChargeSmack", false);
             Animator.SetBool("ChargeSet", chargeing);
         }
+        // dont play set animation if were in the air
         else
         {
             Animator.SetBool("ChargeSmack", chargeing);
