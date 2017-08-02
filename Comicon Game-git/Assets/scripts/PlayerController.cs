@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
     // the time your dive will stop at (time.time + diveLength)
     float diveEndTime;
     // how long your dive will last
-    float diveLength = .25f;
+    float diveLength = 1f;
 
     enum PlayerState
     {
@@ -142,11 +142,13 @@ public class PlayerController : MonoBehaviour
         {
             currentVelocityX = inputMan.Move(PlayerNumber) * 40.0f;
         }
-
-        // if were not diving pass out velocity to the character controller
-        if (!dive)
-        {
             characterController.Move(currentVelocityX, PlayerNumber);
+       
+
+        if (inputMan.Down(PlayerNumber) && inputMan.Charge(PlayerNumber) && !dive)
+        {
+            characterController.Dive();
+            dive = true;
         }
 
     }
@@ -283,7 +285,6 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(playerState);
 
         // pause check
         if (inputMan.Pause(PlayerNumber) && !GameManager.paused)

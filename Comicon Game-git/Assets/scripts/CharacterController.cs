@@ -25,6 +25,7 @@ public class CharacterController : MonoBehaviour {
     int arrowDistance = 2;
 
     float drag = .05f;
+    float diveDuration = .5f;
 
     // the velocity added to your gamebojcet when you jump
     float jumpVel = 15.5f;
@@ -55,7 +56,7 @@ public class CharacterController : MonoBehaviour {
         Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x, transform.position.y) + Vector2.left * xBounds, Color.red);
         Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x, transform.position.y) + Vector2.right * xBounds, Color.red);
 
-
+        
         
         // pause check
         if (!GameManager.paused)
@@ -188,7 +189,22 @@ public class CharacterController : MonoBehaviour {
         power = 0;
     }
 
+    public void Dive()
+    {
+        rigidbody.velocity = new Vector2(0, velocity.y);
+        float time = 1.0f;
+        while (time > 0)
+        {
+            if (transform.position.x + xBounds >= net.position.x)
+            {
+                rigidbody.velocity = new Vector2(0, velocity.y);
+                return;
+            }
 
+            time -= Time.deltaTime;
+            rigidbody.AddForce(Vector2.right * 20);
+        }
+    }
 
     private void OnTriggerEnter(Collider collision)
     {

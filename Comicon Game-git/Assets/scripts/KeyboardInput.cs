@@ -16,7 +16,7 @@ public class KeyboardInput : MonoBehaviour, IGameInput
 
     public bool Down()
     {
-        return Input.GetKey("down");
+        return Input.GetKey("s");
     }
 
     public float Move()
