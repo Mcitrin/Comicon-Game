@@ -2,18 +2,21 @@
 using System.Collections;
 using InControl;
 
-public class ControllerInput : MonoBehaviour, IGameInput {
+public class ControllerInput : MonoBehaviour, IGameInput
+{
 
     public
         InputDevice input;
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    // Use this for initialization
+    void Start()
+    {
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
     }
 
     public bool JumpPress()
@@ -29,7 +32,7 @@ public class ControllerInput : MonoBehaviour, IGameInput {
     public bool Down()
     {
         if (Mathf.Clamp(input.LeftStickY, -1, 0) < 0)
-        return true;
+            return true;
 
         return false;
     }
@@ -46,12 +49,20 @@ public class ControllerInput : MonoBehaviour, IGameInput {
 
     public Vector2 Aim()
     {
-        return new Vector2(input.RightStickX, input.RightStickY).normalized;
+        Vector2 vec = new Vector2(input.RightStickX, input.RightStickY);
+        if (vec.magnitude >= .99f)
+        {
+            return vec.normalized;
+        }
+        else
+        {
+            return Vector2.zero;
+        }
     }
 
     public bool Charge()
     {
-      return input.RightTrigger;
+        return input.RightTrigger;
     }
 
     public bool Enter()
@@ -61,8 +72,8 @@ public class ControllerInput : MonoBehaviour, IGameInput {
 
     public bool Pause()
     {
-       
-       return input.MenuWasPressed;
+
+        return input.MenuWasPressed;
     }
 
 }

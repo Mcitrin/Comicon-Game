@@ -135,6 +135,7 @@ public class InputMan : MonoBehaviour {
 
     public Vector2 Aim(int playerNum)
     {
+        //Debug.Log(GetInputDevice(playerNum).Aim());
         return GetInputDevice(playerNum).Aim();
     }
 

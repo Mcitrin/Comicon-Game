@@ -20,11 +20,9 @@ public class PlayerController : MonoBehaviour
     // werether or not your currently charging a shot
     bool chargeing = false;
 
-    // the x velocity were going to pass to the charactrt controler to move te gameobject
-    float currentVelocityX;
-
     // the angle your aming at to be passed to the character controller 
-    Vector3 angle;
+    Vector2 angle;
+    Vector2 prevAngle;
 
     // the power your hitting the ball with passed to the character controller 
     int power;
@@ -45,7 +43,7 @@ public class PlayerController : MonoBehaviour
 
     int numJumps = 0;
 
-    float maxJumpHeight = 7f;
+    float maxJumpHeight = 10f;
 
     // theses arnt implemented yet but they handel the player diveing for the ball
 
@@ -56,16 +54,19 @@ public class PlayerController : MonoBehaviour
     // how long your dive will last
     float diveLength = 1f;
 
-    enum PlayerState
+    float VelocityX;
+
+  public enum PlayerState
     {
         GROUNDED,
+        DIVEING,
         JUMP1,
         JUMP2,
         FLOATING,
         FLOATING2
     }
 
-     PlayerState playerState = PlayerState.GROUNDED;
+    public PlayerState playerState = PlayerState.FLOATING;
 
     // Use this for initialization
     void Start()
@@ -75,31 +76,27 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    // are we touching the ground
-    public bool IsGrounded()
-    {
-        Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x, transform.position.y) - Vector2.up * distToGround, Color.red);
-        return Physics2D.Raycast(transform.position, -Vector2.up, distToGround, 1 << LayerMask.NameToLayer("Ground"));
-    }
+   
 
     // calls all the function related to player input
     void Input()
     {
-        // handels moving
-        Move();
+        if(playerState != PlayerState.JUMP1)
+        grounded = characterController.IsGrounded();
+
         // handels aiming
         Aiming();
         // determins how hard your going to hit the ball ie if your charging
         CalcPower();
 
-
-        grounded = IsGrounded();
-        // changes payer state
-        ManageState();
         // if your diving run this
         if (dive)
         {
             HandleDive();
+        }
+        else
+        {
+            Move();
         }
 
     }
@@ -107,7 +104,6 @@ public class PlayerController : MonoBehaviour
     void Animate()
     {
         // send information to the animation manager so it knows wich animation to play
-
         animationController.speed = Mathf.Abs(inputMan.Move(PlayerNumber));
         animationController.isGrounded = grounded;
         animationController.chargeing = chargeing;
@@ -115,41 +111,48 @@ public class PlayerController : MonoBehaviour
 
     void Move()
     {
-        characterController.ApplyGravity(grounded);
+        //Debug.Log(transform.position.y);
         ManageState();
 
-        if(playerState == PlayerState.JUMP1)
+        if(playerState == PlayerState.JUMP1 && !dive)
         {
-            characterController.Jump();
+            characterController.Jump(maxJumpHeight);
         }
 
-        if(playerState == PlayerState.JUMP2)
+        else if(playerState == PlayerState.JUMP2 && !dive)
         {
-            characterController.Jump();
+            characterController.Jump2(maxJumpHeight);
             playerState = PlayerState.FLOATING2;
         }
 
+        else if(playerState == PlayerState.FLOATING || playerState == PlayerState.FLOATING2)
+        {
+            characterController.ApplyGravity();
+        }
 
         // if were in the air or chargin move slower
         if (!grounded || chargeing)
         {
-            // set velocity to the input recived from input manager
-            currentVelocityX = inputMan.Move(PlayerNumber) * 15.0f;
-
+             VelocityX = inputMan.Move(PlayerNumber) * 15.0f;
         }
         // else move normal
         else
         {
-            currentVelocityX = inputMan.Move(PlayerNumber) * 40.0f;
+             VelocityX = inputMan.Move(PlayerNumber) * 40.0f;
         }
-            characterController.Move(currentVelocityX, PlayerNumber);
+            characterController.Move(VelocityX, PlayerNumber);
        
-
-        if (inputMan.Down(PlayerNumber) && inputMan.Charge(PlayerNumber) && !dive)
+        if(playerState == PlayerState.GROUNDED)
         {
-            characterController.Dive();
-            dive = true;
+            if (characterController.lerper.lerping)
+                characterController.lerper.Stop();
         }
+
+
+        /*if (inputMan.Down(PlayerNumber) && inputMan.Charge(PlayerNumber) && !dive)
+        {
+            playerState = PlayerState.DIVEING;
+        }*/
 
     }
 
@@ -161,6 +164,7 @@ public class PlayerController : MonoBehaviour
         {
             // get the angel from the input manager
             angle = inputMan.Aim(PlayerNumber);
+            
 
 
             // this all keep the player from aging behind them
@@ -179,7 +183,9 @@ public class PlayerController : MonoBehaviour
                 if (angle.x > 0 && angle.y <= 0)
                     angle = new Vector3(0, -1);
             }
+            prevAngle = angle;
         }
+        angle = prevAngle;
 
         // pass our angel to the character controller
         characterController.Aim(angle);
@@ -190,7 +196,6 @@ public class PlayerController : MonoBehaviour
         // the player currently pressing the button to hit the ball
         if (inputMan.Charge(PlayerNumber))
         {
-
             // if we werent already holding down the hit button record the time that we started holding the button at
             if (startTime == 0)
             {
@@ -198,11 +203,9 @@ public class PlayerController : MonoBehaviour
             }
             chargeTime = (Time.time - startTime);
         }
-
         // is wever been holding the hit button long enough were now charging
         if (chargeTime >= .2f)
         {
-
             chargeing = true;
         }
         else { chargeing = false; }
@@ -216,7 +219,7 @@ public class PlayerController : MonoBehaviour
             {
 
                 // if were in the air play the animation for smacking the ball
-                if (!IsGrounded())
+                if (!grounded)
                 {
                     animationController.setTrigger("Smack");
                 }
@@ -278,6 +281,8 @@ public class PlayerController : MonoBehaviour
         }
         if(playerState == PlayerState.JUMP1 && (inputMan.JumpRelease(PlayerNumber) || transform.position.y >= maxJumpHeight))
         {
+            if (characterController.lerper.lerping)
+                characterController.lerper.Stop();
             playerState = PlayerState.FLOATING;
         }
     }
