@@ -37,9 +37,9 @@ public class ControllerInput : MonoBehaviour, IGameInput
         return false;
     }
 
-    public float Move()
+    public int Move()
     {
-        return Mathf.Clamp(input.LeftStickX, -1, 1);
+        return (int)Mathf.Clamp(input.LeftStickX*2, -1, 1);
     }
 
     public Vector2 MoveVec()

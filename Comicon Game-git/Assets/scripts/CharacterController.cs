@@ -11,7 +11,8 @@ public class CharacterController : MonoBehaviour {
     public Transform net;
     public Transform ground;
 
-    
+    public int playerNum;
+
     // the power that the player hits the ball with 1 for a normal hit 2 for a power hit
     public int power;
     // the angle that your aiming, the ball class uses this to determin where to hit the ball
@@ -24,28 +25,24 @@ public class CharacterController : MonoBehaviour {
     public bool grounded;
    
     Rigidbody2D rigidbody;
+
     // this ditance the arrow gameoject can be from you
     int arrowDistance = 2;
-
-    float drag = .05f;
-
-    // the velocity added to your gamebojcet when you jump
-    float jumpVel = 15.5f;
-    
-    // gravity is multiplied by this and added to your gameobject when your jumping
-    float fallMultiplier = 4.5f;
-
+   
     float fallDuration = .5f;
-    float jump1Duration = .5f;
-    float jump2Duration = .2f;
+    float jump1Duration = 1;
+    float jump2Duration = .5f;
 
+    public float maxJumpHeight = 10f;
 
-    // this vector is added to your ridgidBody.velocity  every update
-    Vector2 velocity;
+    float xVelocity;
 
-    // this limits you velocity 
-    float maxVelocity = 7.5f;
-    
+    float maxVelocity = .15f;
+
+    bool moving;
+
+    float drag = .1f;
+
     // the size of your collsion box in the x dimension 
     float xBounds;
     float distToGround;
@@ -58,10 +55,12 @@ public class CharacterController : MonoBehaviour {
     void OnEnable () {
         rigidbody = GetComponent<Rigidbody2D>();
         xBounds = GetComponent<BoxCollider2D>().bounds.extents.x + 1;
-        distToGround = GetComponent<BoxCollider2D>().bounds.extents.y + 0.03f;
+        distToGround = GetComponent<BoxCollider2D>().bounds.extents.y;
 
         gameObject.AddComponent<Lerper>();
         lerper = GetComponent<Lerper>();
+
+        grounded = true;
     }
 	
 	// Update is called once per frame
@@ -81,22 +80,22 @@ public class CharacterController : MonoBehaviour {
             if (rigidbody.isKinematic)
             rigidbody.isKinematic = false;
 
-
             // allows the arrow to move
             arrow.transform.position = angle * arrowDistance + this.transform.position;
 
-            // set x velocity to physics velocity in x 
+            touchingSides();
             
-            
-            /*if (grounded)
-            {
-                rigidbody.velocity = new Vector2(velocity.x,0);
+            transform.position += new Vector3(xVelocity,0,0);
 
-            }
-            else
+            if (!moving)
             {
-                rigidbody.velocity = new Vector2(velocity.x, velocity.y);
-            }*/
+                xVelocity -= xVelocity * drag;
+                if (Mathf.Abs(xVelocity) < 0.001f)
+                {
+                    xVelocity = 0f; // stop
+                }
+            }
+            moving = false;
         }
         else
         {
@@ -113,112 +112,57 @@ public class CharacterController : MonoBehaviour {
         angle = arrowAngle; 
     }
 
-    public void Move(float vel, int playerNum)
+    public void Move(int direction, bool moveSlow)
     {
-        // takes in velocity and the player number from player controller
-
-
-        // theirs probably a better  more efficant way to do all this
-        // basically all this dose is limit the players movement if their touching the left ro right boundarys or the net
-        // if you player 1 ie on the left side of the net you stuck between the net and the left boundary
-        // else if your player 2 your stuck between the net and the right boundary
-        
-
-        // if your moving left
-        if (vel < 0 || rigidbody.velocity.x < 0)// moving left
+        if (!GameManager.paused)
         {
-            if (playerNum == 1)
+            if (direction != 0)
             {
-                if (transform.position.x - xBounds <= left.position.x)
+                if (Mathf.Abs(xVelocity) < maxVelocity)
                 {
-                    rigidbody.velocity = new Vector2(0, rigidbody.velocity.y);
-                    return;
+                    float multiplier = 2f * Mathf.Clamp01(1 - Mathf.Pow(Mathf.Abs(xVelocity) / maxVelocity, 2f));
+                    if (moveSlow)
+                    {
+                        xVelocity += (0.45f * Time.deltaTime) * direction * multiplier;
+                    }
+                    else
+                    {
+                        xVelocity += (0.75f * Time.deltaTime) * direction * multiplier;
+                    }
+                    moving = true; // moved this frame
                 }
             }
-            if (playerNum == 2)
-            {
-                if (transform.position.x - xBounds <= net.position.x)
-                {
-                    rigidbody.velocity = new Vector2(0, rigidbody.velocity.y);
-                    return;
-                }
-            }
-
         }
-
-        // if your moveing right
-        if (vel > 0 || rigidbody.velocity.x > 0)// moving right
-        {
-            if (playerNum == 1)
-            {
-                if (transform.position.x + xBounds >= net.position.x)
-                {
-                    rigidbody.velocity = new Vector2(0, rigidbody.velocity.y);
-                    return;
-                }
-            }
-            if (playerNum == 2)
-            {
-                if (transform.position.x + xBounds >= right.position.x)
-                {
-                    rigidbody.velocity = new Vector2(0, rigidbody.velocity.y);
-                    return;
-                }
-            }
-
-        }
-
-        // only add force if your below the max velocity
-        if (Mathf.Abs(rigidbody.velocity.x) < maxVelocity)
-            rigidbody.AddForce(new Vector2(vel, 0.0f));
-
-        velocity.x = rigidbody.velocity.x - (rigidbody.velocity.x * drag);
-        rigidbody.velocity = new Vector2(velocity.x, 0);
     }
 
-    public void Jump(float jumpHeight)
+    public void Jump()
     {
-        //velocity.y = jumpVel;
-        //transform.position = Vector2.Lerp(transform.position, new Vector2(transform.position.x, ground.position.y + jumpHeight + 1), Time.deltaTime);
-        jumpHeight = ground.position.y + jumpHeight + 1;
+        grounded = false;
+        float jumpHeight = ground.position.y + maxJumpHeight + 1;
+
         if (!lerper.lerping)
         {
-            lerper.SetUpLerp(transform.position.y, jumpHeight, jump1Duration,true);
+            lerper.SetUpLerp(transform.position.y, jumpHeight, jump1Duration);
         }
     }
-    public void Jump2(float jumpHeight)
+    public void Jump2()
     {
-        float jump2Height = transform.position.y + (jumpHeight * .3f);
-        //transform.position = Vector2.Lerp(transform.position, new Vector2(transform.position.x, jump2Height), Time.deltaTime);
-        lerper.SetUpLerp(transform.position.y, jump2Height, jump2Duration,true);
+        float jumpHeight = transform.position.y + (maxJumpHeight * .3f);
+        lerper.SetUpLerp(transform.position.y, jumpHeight, jump2Duration);
     }
 
     public void ApplyGravity()
     {
-        //// if were moving down add more downward force
-        //if (rigidbody.velocity.y <= 0)
-        //{
-        //    transform.position += new Vector3(0, Physics.gravity.y * (fallMultiplier - 1 * 1.5f) * Time.deltaTime);
-        //}
-        //// els if were moving up add less downward force
-        //else if (rigidbody.velocity.y > 0)
-        //{
-        //    transform.position += new Vector3(0, Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime);
-        //}
-
-        if(!lerper.lerping)
+        if (!lerper.lerping && !grounded)
         {
-            lerper.SetUpLerp(transform.position.y, ground.position.y,fallDuration,true);
+            lerper.SetUpLerp(transform.position.y, ground.position.y + distToGround, fallDuration);
         }
-
-        //transform.position = Vector2.Lerp(transform.position, new Vector2(transform.position.x, ground.position.y),Time.deltaTime);
     }
 
     // are we touching the ground
     public bool IsGrounded()
     {
-        Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x, transform.position.y) - Vector2.up * distToGround, Color.red);
-        //return Physics2D.Raycast(transform.position, -Vector2.up, distToGround, 1 << LayerMask.NameToLayer("Ground"));
+        Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x, transform.position.y - distToGround), Color.red);
         if (transform.position.y - distToGround <= ground.position.y)
         {
             grounded = true;
@@ -232,8 +176,6 @@ public class CharacterController : MonoBehaviour {
 
     public IEnumerator setPower(int pow)
     {
-        // takes in the power of you hit from player controller , this info is pased to the ball when your hand colides with it
-
         power = pow;
         // wait a 4th of a second befor you can hit again
         yield return new WaitForSeconds(.25f);
@@ -242,42 +184,62 @@ public class CharacterController : MonoBehaviour {
 
     public void Dive(float length)
     {
-        rigidbody.velocity = new Vector2(0, velocity.y);
-        float t0 = Time.time;
-        float t1 = 10;
-        Vector2 a1 = transform.position;
-        
-        while (t1 > 0)
-        {
-            
-           /* if (transform.position.x + xBounds >= net.position.x)
-            {
-                rigidbody.velocity = new Vector2(0, velocity.y);
-                return;
-            }*/
-
-            t1 -= Time.deltaTime;
-            //Debug.Log(Time.deltaTime);
-
-           // transform.position = Vector2.Lerp(a1,a1 + Vector2.right * 10, (t1 / 200));
-
             //if(grounded)
             //rigidbody.AddForce(Vector2.right * 20);
             //else
             //rigidbody.AddForce(new Vector2(1,-1) * 5);
-
-        }
-        Debug.Log(Time.time - t0);
     }
 
-    
+    bool touchingSides()
+    {
+        if (xVelocity < 0)// moving left
+        {
+            if (playerNum == 1)
+            {
+                if (transform.position.x - xBounds <= left.position.x)
+                {
+                    rigidbody.velocity = new Vector2(0, rigidbody.velocity.y);
+                    xVelocity = 0;
+                    return true;
+                }
+            }
+            if (playerNum == 2)
+            {
+                if (transform.position.x - xBounds <= net.position.x)
+                {
+                    rigidbody.velocity = new Vector2(0, rigidbody.velocity.y);
+                    xVelocity = 0;
+                    return true;
+                }
+            }
+        }
+        // if your moveing right
+        if (xVelocity > 0)// moving right
+        {
+            if (playerNum == 1)
+            {
+                if (transform.position.x + xBounds >= net.position.x)
+                {
+                    rigidbody.velocity = new Vector2(0, rigidbody.velocity.y);
+                    xVelocity = 0;
+                    return true;
+                }
+            }
+            if (playerNum == 2)
+            {
+                if (transform.position.x + xBounds >= right.position.x)
+                {
+                    rigidbody.velocity = new Vector2(0, rigidbody.velocity.y);
+                    xVelocity = 0;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     private void OnTriggerEnter(Collider collision)
     {
-        // this is a new machanic i havnt yet tested, its suposed to allow you to smack the other player if you hit them
-        // esentially what im saying is if the collider on your hand collides with the other player move that player back
-
-
         if (collision.gameObject.tag == "Player")
         {
 

@@ -17,6 +17,7 @@ public class AnimationManager : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         Animate();
+        Debug.Log(isGrounded);
     }
 
     void Animate() {

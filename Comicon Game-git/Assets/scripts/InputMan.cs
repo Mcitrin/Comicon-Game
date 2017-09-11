@@ -21,7 +21,7 @@ public interface IGameInput
     bool JumpPress();
     bool JumpRelease();
     bool Down();
-    float Move();
+    int Move();
     Vector2 MoveVec();
     Vector2 Aim();
     bool Charge();
@@ -123,7 +123,7 @@ public class InputMan : MonoBehaviour {
     }
 
 
-    public float Move(int playerNum)
+    public int Move(int playerNum)
     {
         return GetInputDevice(playerNum).Move();
     }

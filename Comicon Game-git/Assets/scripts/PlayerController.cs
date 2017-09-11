@@ -22,7 +22,6 @@ public class PlayerController : MonoBehaviour
 
     // the angle your aming at to be passed to the character controller 
     Vector2 angle;
-    Vector2 prevAngle;
 
     // the power your hitting the ball with passed to the character controller 
     int power;
@@ -36,15 +35,6 @@ public class PlayerController : MonoBehaviour
     // handel to the apperance delegate (changes sprite colors for cusimization)
     public Appearance appearance;
 
-    // can you current jump, (basically have you jumped hit and are you on the ground)
-    bool canJump;
-
-    bool grounded;
-
-    int numJumps = 0;
-
-    float maxJumpHeight = 10f;
-
     // theses arnt implemented yet but they handel the player diveing for the ball
 
     // are you diveing
@@ -54,25 +44,26 @@ public class PlayerController : MonoBehaviour
     // how long your dive will last
     float diveLength = 1f;
 
-    float VelocityX;
-
   public enum PlayerState
     {
         GROUNDED,
         DIVEING,
-        JUMP1,
-        JUMP2,
+        JUMP1_INIT,
+        JUMP1_MID,
+        JUMP2_INIT,
+        JUMP2_MID,
         FLOATING,
         FLOATING2
     }
 
-    public PlayerState playerState = PlayerState.FLOATING;
+    public PlayerState playerState = PlayerState.GROUNDED;
 
     // Use this for initialization
     void Start()
     {
         inputMan = GameManager.gameManager.inputMan;
         distToGround = GetComponent<BoxCollider2D>().bounds.extents.y + 0.03f;
+        characterController.playerNum = PlayerNumber;
     }
 
 
@@ -81,11 +72,9 @@ public class PlayerController : MonoBehaviour
     // calls all the function related to player input
     void Input()
     {
-        if(playerState != PlayerState.JUMP1)
-        grounded = characterController.IsGrounded();
-
         // handels aiming
         Aiming();
+
         // determins how hard your going to hit the ball ie if your charging
         CalcPower();
 
@@ -105,7 +94,7 @@ public class PlayerController : MonoBehaviour
     {
         // send information to the animation manager so it knows wich animation to play
         animationController.speed = Mathf.Abs(inputMan.Move(PlayerNumber));
-        animationController.isGrounded = grounded;
+        animationController.isGrounded = characterController.grounded;
         animationController.chargeing = chargeing;
     }
 
@@ -114,40 +103,34 @@ public class PlayerController : MonoBehaviour
         //Debug.Log(transform.position.y);
         ManageState();
 
-        if(playerState == PlayerState.JUMP1 && !dive)
+        if(playerState == PlayerState.JUMP1_INIT)
         {
-            characterController.Jump(maxJumpHeight);
+            characterController.Jump();
+            playerState = PlayerState.JUMP1_MID;
         }
 
-        else if(playerState == PlayerState.JUMP2 && !dive)
+        else if(playerState == PlayerState.JUMP2_INIT)
         {
-            characterController.Jump2(maxJumpHeight);
+            characterController.Jump2();
             playerState = PlayerState.FLOATING2;
         }
 
         else if(playerState == PlayerState.FLOATING || playerState == PlayerState.FLOATING2)
         {
+            characterController.IsGrounded();
             characterController.ApplyGravity();
         }
 
         // if were in the air or chargin move slower
-        if (!grounded || chargeing)
+        if (playerState != PlayerState.GROUNDED || chargeing)
         {
-             VelocityX = inputMan.Move(PlayerNumber) * 15.0f;
+            characterController.Move((inputMan.Move(PlayerNumber)), true);
         }
         // else move normal
         else
         {
-             VelocityX = inputMan.Move(PlayerNumber) * 40.0f;
+            characterController.Move((inputMan.Move(PlayerNumber)), false);
         }
-            characterController.Move(VelocityX, PlayerNumber);
-       
-        if(playerState == PlayerState.GROUNDED)
-        {
-            if (characterController.lerper.lerping)
-                characterController.lerper.Stop();
-        }
-
 
         /*if (inputMan.Down(PlayerNumber) && inputMan.Charge(PlayerNumber) && !dive)
         {
@@ -183,9 +166,7 @@ public class PlayerController : MonoBehaviour
                 if (angle.x > 0 && angle.y <= 0)
                     angle = new Vector3(0, -1);
             }
-            prevAngle = angle;
         }
-        angle = prevAngle;
 
         // pass our angel to the character controller
         characterController.Aim(angle);
@@ -219,7 +200,7 @@ public class PlayerController : MonoBehaviour
             {
 
                 // if were in the air play the animation for smacking the ball
-                if (!grounded)
+                if (playerState != PlayerState.GROUNDED)
                 {
                     animationController.setTrigger("Smack");
                 }
@@ -268,29 +249,29 @@ public class PlayerController : MonoBehaviour
 
     void ManageState()
     {
-        if (grounded && playerState != PlayerState.JUMP1)
+        if (characterController.grounded && playerState != PlayerState.JUMP1_INIT)
         {
             playerState = PlayerState.GROUNDED;
         }
         if (inputMan.JumpPress(PlayerNumber))
         {
                 if(playerState == PlayerState.GROUNDED)
-                playerState = PlayerState.JUMP1;
+                playerState = PlayerState.JUMP1_INIT;
                 if(playerState == PlayerState.FLOATING)
-                playerState = PlayerState.JUMP2;
+                playerState = PlayerState.JUMP2_INIT;
         }
-        if(playerState == PlayerState.JUMP1 && (inputMan.JumpRelease(PlayerNumber) || transform.position.y >= maxJumpHeight))
+        if(playerState == PlayerState.JUMP1_MID && (inputMan.JumpRelease(PlayerNumber) || transform.position.y >= characterController.maxJumpHeight))
         {
+            playerState = PlayerState.FLOATING;
+
             if (characterController.lerper.lerping)
                 characterController.lerper.Stop();
-            playerState = PlayerState.FLOATING;
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-
         // pause check
         if (inputMan.Pause(PlayerNumber) && !GameManager.paused)
         {
@@ -301,7 +282,7 @@ public class PlayerController : MonoBehaviour
             GameManager.paused = false;
         }
 
-
+        Debug.Log((inputMan.Move(PlayerNumber)));
         // if the games not paused recive input and allow animation
         if (!GameManager.paused)
         {

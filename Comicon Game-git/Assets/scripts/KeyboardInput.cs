@@ -19,9 +19,9 @@ public class KeyboardInput : MonoBehaviour, IGameInput
         return Input.GetKey("s");
     }
 
-    public float Move()
+    public int Move()
     {
-        return Input.GetAxis("K_Horizontal");
+        return (int)Input.GetAxis("K_Horizontal");
     }
 
     public Vector2 MoveVec()

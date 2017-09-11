@@ -26,11 +26,11 @@ public class Lerper : MonoBehaviour {
                 float d = Duration * (Mathf.Abs(A1 - A0) / 100);
                 float t = (Time.time - T0) / Duration;
 
-               if(A0 > A1)
-               t = t * Mathf.Pow(t, 2);
-               
-               if(A0 < A1)
-               t = t * 1 - Mathf.Pow(t - 1, 4);
+                if(A0 > A1)
+                t = Mathf.Pow(t, 2);
+                
+                if(A0 < A1)
+                t = 1 - Mathf.Pow(t - 1, 4);
 
                 float a = Mathf.Lerp(A0, A1, t);
                 transform.position = new Vector2(transform.position.x, a);
@@ -38,15 +38,16 @@ public class Lerper : MonoBehaviour {
             else
             {
                 Stop();
+                transform.position = new Vector2(transform.position.x, A1);
             }
         }
 
 	}
 
-    public void SetUpLerp(float a0, float a1, float duration, bool lerp)
+    public void SetUpLerp(float a0, float a1, float duration)
     {
         Debug.Log("setUp");
-        lerping = lerp;
+        lerping = true;
         Duration = duration;
         A0 = a0;
         A1 = a1;
@@ -55,6 +56,6 @@ public class Lerper : MonoBehaviour {
 
     public void Stop()
     {
-        SetUpLerp(0, 0, 0, false);
+        lerping = false;
     }
 }
