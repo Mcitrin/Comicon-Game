@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CharacterController : MonoBehaviour {
+public class CharacterController : MonoBehaviour
+{
 
     // put these somewhere else in future
     // these are empy transforms i use to keep the player inside the court
@@ -23,24 +24,32 @@ public class CharacterController : MonoBehaviour {
     public GameObject hand;
 
     public bool grounded;
-   
+    public bool jumping;
+
     Rigidbody2D rigidbody;
 
     // this ditance the arrow gameoject can be from you
     int arrowDistance = 2;
-   
+
     float fallDuration = .5f;
-    float jump1Duration = 1;
+    float jump1Duration = .5f;
     float jump2Duration = .5f;
 
-    public float maxJumpHeight = 10f;
+    float maxJumpHeight = 7.5f; //h
+    float minJumpHeight;
+    float horizontalDist2JumpPeek; // Xh
+
+    float yV0;
+    float G;
+    
 
     float xVelocity;
+    float yVelocity;
 
-    float maxVelocity = .15f;
+    float maxVelocity = .2f;//.15f;
 
     bool moving;
-
+    
     float drag = .1f;
 
     // the size of your collsion box in the x dimension 
@@ -49,10 +58,9 @@ public class CharacterController : MonoBehaviour {
 
     public Lerper lerper;
 
-    public
-
     // Use this for initialization
-    void OnEnable () {
+    void OnEnable()
+    {
         rigidbody = GetComponent<Rigidbody2D>();
         xBounds = GetComponent<BoxCollider2D>().bounds.extents.x + 1;
         distToGround = GetComponent<BoxCollider2D>().bounds.extents.y;
@@ -61,32 +69,58 @@ public class CharacterController : MonoBehaviour {
         lerper = GetComponent<Lerper>();
 
         grounded = true;
-    }
-	
-	// Update is called once per frame
-	void Update () {
 
+        yV0 = (2 * maxJumpHeight) / jump1Duration;
+        G = -2 * maxJumpHeight / Mathf.Pow(jump1Duration, 2);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
 
         // used to vissualy see the size of my collision box
         Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x, transform.position.y) + Vector2.left * xBounds, Color.red);
         Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x, transform.position.y) + Vector2.right * xBounds, Color.red);
 
-        
-        
+
+
         // pause check
         if (!GameManager.paused)
         {
             // if the games not paused do this
             if (rigidbody.isKinematic)
-            rigidbody.isKinematic = false;
+                rigidbody.isKinematic = false;
 
             // allows the arrow to move
             arrow.transform.position = angle * arrowDistance + this.transform.position;
 
             touchingSides();
-            
-            transform.position += new Vector3(xVelocity,0,0);
 
+            if(transform.position.y < ground.position.y + distToGround)
+            {
+                transform.position = new Vector3(transform.position.x, ground.position.y + distToGround, 0);
+            }
+
+            if (!grounded)
+            {
+                float pos = 0;
+                float g = G;
+
+                if (yVelocity < 0||!jumping)
+                {
+                    g = g * 2;
+                }
+
+                pos += yVelocity * Time.deltaTime + (g * .5f) * (Mathf.Pow(Time.deltaTime, 2));
+                //Debug.Log(g);
+                yVelocity += g * Time.deltaTime;
+                transform.position += new Vector3(0, pos, 0);
+
+                IsGrounded();
+            }
+
+            transform.position += new Vector3(xVelocity, 0, 0);
             if (!moving)
             {
                 xVelocity -= xVelocity * drag;
@@ -101,7 +135,7 @@ public class CharacterController : MonoBehaviour {
         {
             // if games is paused set kinimatic to true and zero out velocity
             if (!rigidbody.isKinematic)
-            rigidbody.isKinematic = true;
+                rigidbody.isKinematic = true;
             rigidbody.velocity = Vector2.zero;
         }
     }
@@ -109,7 +143,7 @@ public class CharacterController : MonoBehaviour {
     public void Aim(Vector2 arrowAngle)
     {
         // gets the angle from the player controller object
-        angle = arrowAngle; 
+        angle = arrowAngle;
     }
 
     public void Move(int direction, bool moveSlow)
@@ -123,7 +157,7 @@ public class CharacterController : MonoBehaviour {
                     float multiplier = 2f * Mathf.Clamp01(1 - Mathf.Pow(Mathf.Abs(xVelocity) / maxVelocity, 2f));
                     if (moveSlow)
                     {
-                        xVelocity += (0.45f * Time.deltaTime) * direction * multiplier;
+                        xVelocity += (0.25f * Time.deltaTime) * direction * multiplier;
                     }
                     else
                     {
@@ -137,18 +171,28 @@ public class CharacterController : MonoBehaviour {
 
     public void Jump()
     {
-        grounded = false;
-        float jumpHeight = ground.position.y + maxJumpHeight + 1;
-
-        if (!lerper.lerping)
+        if (!jumping)
         {
-            lerper.SetUpLerp(transform.position.y, jumpHeight, jump1Duration);
+            grounded = false;
+            yVelocity = yV0;
+            jumping = true;
         }
+        //float jumpHeight = ground.position.y + maxJumpHeight + 1;
+        //
+        //if (!lerper.lerping)
+        //{
+        //    lerper.SetUpLerp(transform.position.y, jumpHeight, jump1Duration);
+        //}
     }
     public void Jump2()
     {
-        float jumpHeight = transform.position.y + (maxJumpHeight * .3f);
-        lerper.SetUpLerp(transform.position.y, jumpHeight, jump2Duration);
+        if (!jumping)
+        {
+            yVelocity = yV0;
+            jumping = true;
+        }
+        // float jumpHeight = transform.position.y + (maxJumpHeight * .3f);
+        // lerper.SetUpLerp(transform.position.y, jumpHeight, jump2Duration);
     }
 
     public void ApplyGravity()
@@ -166,6 +210,7 @@ public class CharacterController : MonoBehaviour {
         if (transform.position.y - distToGround <= ground.position.y)
         {
             grounded = true;
+            jumping = false;
         }
         else
         {
@@ -184,10 +229,10 @@ public class CharacterController : MonoBehaviour {
 
     public void Dive(float length)
     {
-            //if(grounded)
-            //rigidbody.AddForce(Vector2.right * 20);
-            //else
-            //rigidbody.AddForce(new Vector2(1,-1) * 5);
+        //if(grounded)
+        //rigidbody.AddForce(Vector2.right * 20);
+        //else
+        //rigidbody.AddForce(new Vector2(1,-1) * 5);
     }
 
     bool touchingSides()
@@ -244,11 +289,11 @@ public class CharacterController : MonoBehaviour {
         {
 
             CharacterController Player = collision.gameObject.GetComponentInParent<CharacterController>();
-            
+
             if (Player.power == 1 || Player.power == 2)
             {
                 Debug.Log(Player.gameObject.name);
-                this.gameObject.GetComponentInParent<Rigidbody>().AddForce((transform.position - collision.transform.position) * 100,ForceMode.Impulse);
+                this.gameObject.GetComponentInParent<Rigidbody>().AddForce((transform.position - collision.transform.position) * 100, ForceMode.Impulse);
             }
         }
     }

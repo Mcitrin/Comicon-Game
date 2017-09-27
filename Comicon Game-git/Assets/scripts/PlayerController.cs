@@ -118,7 +118,7 @@ public class PlayerController : MonoBehaviour
         else if(playerState == PlayerState.FLOATING || playerState == PlayerState.FLOATING2)
         {
             characterController.IsGrounded();
-            characterController.ApplyGravity();
+            //characterController.ApplyGravity();
         }
 
         // if were in the air or chargin move slower
@@ -260,13 +260,16 @@ public class PlayerController : MonoBehaviour
                 if(playerState == PlayerState.FLOATING)
                 playerState = PlayerState.JUMP2_INIT;
         }
-        if(playerState == PlayerState.JUMP1_MID && (inputMan.JumpRelease(PlayerNumber) || transform.position.y >= characterController.maxJumpHeight))
-        {
-            playerState = PlayerState.FLOATING;
+       if(playerState == PlayerState.JUMP1_MID && inputMan.JumpRelease(PlayerNumber))
+       {
+           playerState = PlayerState.FLOATING;
 
-            if (characterController.lerper.lerping)
-                characterController.lerper.Stop();
-        }
+            if (characterController.jumping)
+                characterController.jumping = false;
+
+           //if (characterController.lerper.lerping)
+           //    characterController.lerper.Stop();
+       }
     }
 
     // Update is called once per frame
@@ -282,7 +285,6 @@ public class PlayerController : MonoBehaviour
             GameManager.paused = false;
         }
 
-        Debug.Log((inputMan.Move(PlayerNumber)));
         // if the games not paused recive input and allow animation
         if (!GameManager.paused)
         {
