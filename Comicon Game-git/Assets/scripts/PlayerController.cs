@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour
     // the time your dive will stop at (time.time + diveLength)
     float diveEndTime;
     // how long your dive will last
-    float diveLength = 1f;
+    float diveLength = .25f;
 
   public enum PlayerState
     {
@@ -117,8 +117,9 @@ public class PlayerController : MonoBehaviour
 
         else if(playerState == PlayerState.FLOATING || playerState == PlayerState.FLOATING2)
         {
-            characterController.IsGrounded();
-            //characterController.ApplyGravity();
+
+            if (characterController.jumping)
+                characterController.jumping = false;
         }
 
         // if were in the air or chargin move slower
@@ -132,10 +133,11 @@ public class PlayerController : MonoBehaviour
             characterController.Move((inputMan.Move(PlayerNumber)), false);
         }
 
-        /*if (inputMan.Down(PlayerNumber) && inputMan.Charge(PlayerNumber) && !dive)
+        if (inputMan.Down(PlayerNumber) && inputMan.Charge(PlayerNumber) && !dive)
         {
-            playerState = PlayerState.DIVEING;
-        }*/
+            dive = true;
+            StartCoroutine(characterController.Dive(diveLength));
+        }
 
     }
 
@@ -263,12 +265,6 @@ public class PlayerController : MonoBehaviour
        if(playerState == PlayerState.JUMP1_MID && inputMan.JumpRelease(PlayerNumber))
        {
            playerState = PlayerState.FLOATING;
-
-            if (characterController.jumping)
-                characterController.jumping = false;
-
-           //if (characterController.lerper.lerping)
-           //    characterController.lerper.Stop();
        }
     }
 

@@ -12,6 +12,8 @@ public class CharacterController : MonoBehaviour
     public Transform net;
     public Transform ground;
 
+    float courtSize;
+
     public int playerNum;
 
     // the power that the player hits the ball with 1 for a normal hit 2 for a power hit
@@ -36,25 +38,27 @@ public class CharacterController : MonoBehaviour
     float jump2Duration = .5f;
 
     float maxJumpHeight = 7.5f; //h
-    float minJumpHeight;
-    float horizontalDist2JumpPeek; // Xh
 
     float yV0;
     float G;
-    
+
 
     float xVelocity;
     float yVelocity;
 
-    float maxVelocity = .2f;//.15f;
+    float maxVelocity = .15f;//.15f;
 
     bool moving;
-    
+    bool diveing;
+
+    Vector3 diveDestination;
+    Vector3 diveStart;
+
     float drag = .1f;
 
     // the size of your collsion box in the x dimension 
     float xBounds;
-    float distToGround;
+    float yBounds;
 
     public Lerper lerper;
 
@@ -62,13 +66,14 @@ public class CharacterController : MonoBehaviour
     void OnEnable()
     {
         rigidbody = GetComponent<Rigidbody2D>();
-        xBounds = GetComponent<BoxCollider2D>().bounds.extents.x + 1;
-        distToGround = GetComponent<BoxCollider2D>().bounds.extents.y;
+        xBounds = GetComponent<BoxCollider2D>().bounds.extents.x;
+        yBounds = GetComponent<BoxCollider2D>().bounds.extents.y;
 
         gameObject.AddComponent<Lerper>();
         lerper = GetComponent<Lerper>();
 
         grounded = true;
+        courtSize = net.position.x - left.position.x;
 
         yV0 = (2 * maxJumpHeight) / jump1Duration;
         G = -2 * maxJumpHeight / Mathf.Pow(jump1Duration, 2);
@@ -77,7 +82,7 @@ public class CharacterController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
 
         // used to vissualy see the size of my collision box
         Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x, transform.position.y) + Vector2.left * xBounds, Color.red);
@@ -89,54 +94,73 @@ public class CharacterController : MonoBehaviour
         if (!GameManager.paused)
         {
             // if the games not paused do this
-            if (rigidbody.isKinematic)
-                rigidbody.isKinematic = false;
+            //if (rigidbody.isKinematic)
+            //rigidbody.isKinematic = false;
 
             // allows the arrow to move
             arrow.transform.position = angle * arrowDistance + this.transform.position;
 
-            touchingSides();
 
-            if(transform.position.y < ground.position.y + distToGround)
+            if (transform.position.y < ground.position.y + yBounds)
             {
-                transform.position = new Vector3(transform.position.x, ground.position.y + distToGround, 0);
+                //transform.position = new Vector3(transform.position.x, ground.position.y + distToGround, 0);
             }
 
-            if (!grounded)
+            if (diveing)
             {
-                float pos = 0;
-                float g = G;
+                //if (!touchingSides())
+                //transform.position += new Vector3(DontCrossBorder(GetDiveDirection().x, "X"), DontCrossBorder(GetDiveDirection().y,"Y"),0);
+                float xPos = EaseOutCubic(transform.position.x, diveDestination.x, Time.deltaTime);//Linear(transform.position.x, diveDestination.x,Time.deltaTime);
+                float yPos = EaseOutCubic(transform.position.y, diveDestination.y, Time.deltaTime);//Linear(transform.position.y, diveDestination.y,Time.deltaTime);
+                Debug.Log(new Vector3(xPos, yPos, 0));
+                transform.position = new Vector3(xPos, yPos, 0);
 
-                if (yVelocity < 0||!jumping)
+            }
+            else
+            {
+                if (!grounded) // jumping
                 {
-                    g = g * 2;
+                    float pos = 0;
+                    float g = G;
+
+                    if (yVelocity > 0 || jumping)
+                    {
+                        pos += yVelocity * Time.deltaTime + (g * .5f) * (Mathf.Pow(Time.deltaTime, 2));
+                    }
+                    else if(yVelocity < 0 || !jumping)
+                    {
+                        pos += yVelocity * Time.deltaTime + (g * .5f) * (Mathf.Pow(Time.deltaTime, 2));
+                    }
+
+                    //pos += yVelocity * Time.deltaTime + (g * .5f) * (Mathf.Pow(Time.deltaTime, 2));
+                    yVelocity += g * Time.deltaTime;
+
+                    pos = DontCrossBorder(pos, "Y");
+
+                    transform.position += new Vector3(0, pos, 0);
+
+                    IsGrounded();
                 }
-
-                pos += yVelocity * Time.deltaTime + (g * .5f) * (Mathf.Pow(Time.deltaTime, 2));
-                //Debug.Log(g);
-                yVelocity += g * Time.deltaTime;
-                transform.position += new Vector3(0, pos, 0);
-
-                IsGrounded();
-            }
-
-            transform.position += new Vector3(xVelocity, 0, 0);
-            if (!moving)
-            {
-                xVelocity -= xVelocity * drag;
-                if (Mathf.Abs(xVelocity) < 0.001f)
+                // if (!touchingSides())
+                xVelocity = DontCrossBorder(xVelocity, "X");
+                    transform.position += new Vector3(xVelocity, 0, 0);
+                if (!moving)
                 {
-                    xVelocity = 0f; // stop
+                    xVelocity -= xVelocity * drag;
+                    if (Mathf.Abs(xVelocity) < 0.001f)
+                    {
+                        xVelocity = 0f; // stop
+                    }
                 }
+                moving = false;
             }
-            moving = false;
         }
-        else
+        else // end pause check
         {
             // if games is paused set kinimatic to true and zero out velocity
-            if (!rigidbody.isKinematic)
-                rigidbody.isKinematic = true;
-            rigidbody.velocity = Vector2.zero;
+            //if (!rigidbody.isKinematic)
+            //rigidbody.isKinematic = true;
+            //rigidbody.velocity = Vector2.zero;
         }
     }
 
@@ -177,12 +201,6 @@ public class CharacterController : MonoBehaviour
             yVelocity = yV0;
             jumping = true;
         }
-        //float jumpHeight = ground.position.y + maxJumpHeight + 1;
-        //
-        //if (!lerper.lerping)
-        //{
-        //    lerper.SetUpLerp(transform.position.y, jumpHeight, jump1Duration);
-        //}
     }
     public void Jump2()
     {
@@ -191,23 +209,21 @@ public class CharacterController : MonoBehaviour
             yVelocity = yV0;
             jumping = true;
         }
-        // float jumpHeight = transform.position.y + (maxJumpHeight * .3f);
-        // lerper.SetUpLerp(transform.position.y, jumpHeight, jump2Duration);
     }
 
     public void ApplyGravity()
     {
         if (!lerper.lerping && !grounded)
         {
-            lerper.SetUpLerp(transform.position.y, ground.position.y + distToGround, fallDuration);
+            lerper.SetUpLerp(transform.position.y, ground.position.y + yBounds, fallDuration);
         }
     }
 
     // are we touching the ground
     public bool IsGrounded()
     {
-        Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x, transform.position.y - distToGround), Color.red);
-        if (transform.position.y - distToGround <= ground.position.y)
+        Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x, transform.position.y - yBounds), Color.red);
+        if (transform.position.y - yBounds <= ground.position.y)
         {
             grounded = true;
             jumping = false;
@@ -227,12 +243,43 @@ public class CharacterController : MonoBehaviour
         power = 0;
     }
 
-    public void Dive(float length)
+    public IEnumerator Dive(float length)
     {
-        //if(grounded)
-        //rigidbody.AddForce(Vector2.right * 20);
-        //else
-        //rigidbody.AddForce(new Vector2(1,-1) * 5);
+        diveing = true;
+        diveDestination = GetDiveDirection();
+        diveStart = transform.position;
+        Debug.Log(diveDestination);
+        Debug.Log(diveStart);
+
+        yield return new WaitForSeconds(length);
+        diveing = false;
+    }
+
+    Vector3 GetDiveDirection()
+    {
+
+        if (grounded)
+            return transform.position + Vector3.right * courtSize/2;
+        else
+            return transform.position + new Vector3(1, -1, 0);
+    }
+
+    public static float EaseOutCubic(float start, float end, float value)
+    {
+        value--;
+        end -= start;
+        return end * (value * value * value + 1) + start;
+    }
+
+    public static float EaseOutQuad(float start, float end, float value)
+    {
+        end -= start;
+        return -end * value * (value - 2) + start;
+    }
+
+    public static float Linear(float start, float end, float value)
+    {
+        return Mathf.Lerp(start, end, value);
     }
 
     bool touchingSides()
@@ -243,7 +290,7 @@ public class CharacterController : MonoBehaviour
             {
                 if (transform.position.x - xBounds <= left.position.x)
                 {
-                    rigidbody.velocity = new Vector2(0, rigidbody.velocity.y);
+                    transform.position = new Vector3(left.position.x + xBounds, transform.position.y,0);
                     xVelocity = 0;
                     return true;
                 }
@@ -252,7 +299,7 @@ public class CharacterController : MonoBehaviour
             {
                 if (transform.position.x - xBounds <= net.position.x)
                 {
-                    rigidbody.velocity = new Vector2(0, rigidbody.velocity.y);
+                    transform.position = new Vector3(net.position.x + xBounds, transform.position.y, 0);
                     xVelocity = 0;
                     return true;
                 }
@@ -265,7 +312,7 @@ public class CharacterController : MonoBehaviour
             {
                 if (transform.position.x + xBounds >= net.position.x)
                 {
-                    rigidbody.velocity = new Vector2(0, rigidbody.velocity.y);
+                    transform.position = new Vector3(net.position.x - xBounds, transform.position.y, 0);
                     xVelocity = 0;
                     return true;
                 }
@@ -274,13 +321,64 @@ public class CharacterController : MonoBehaviour
             {
                 if (transform.position.x + xBounds >= right.position.x)
                 {
-                    rigidbody.velocity = new Vector2(0, rigidbody.velocity.y);
+                    transform.position = new Vector3(right.position.x - xBounds, transform.position.y, 0);
                     xVelocity = 0;
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    float DontCrossBorder(float moveDelta, string coordinate)
+    {
+        if (coordinate == "X")
+        {
+            if (xVelocity < 0)// moving left
+            {
+                if (playerNum == 1)
+                {
+                    if (transform.position.x - xBounds < left.position.x)
+                    {
+
+                        return (int)((transform.position.x - xBounds) - left.position.x);
+                    }
+                }
+                if (playerNum == 2)
+                {
+                    if (transform.position.x - xBounds <= net.position.x)
+                    {
+                        return (int)((transform.position.x - xBounds) - net.position.x);
+                    }
+                }
+            }
+            if (xVelocity > 0)// moving right
+            {
+                if (playerNum == 1)
+                {
+                    if ((transform.position.x + xBounds) + moveDelta > net.position.x)
+                    {;
+                        return (int)((transform.position.x + xBounds) - net.position.x);
+                    }
+                }
+                if (playerNum == 2)
+                {
+                    if ((transform.position.x + xBounds) + moveDelta > right.position.x)
+                    {
+                        return (int)((transform.position.x + xBounds) - right.position.x);
+                    }
+                }
+            }
+        }
+        else if (coordinate == "Y")
+        {
+            if ((transform.position.y - yBounds) + moveDelta < ground.position.y)
+            {
+                Debug.Log((transform.position.y - yBounds) - ground.position.y);
+                return -((transform.position.y - yBounds) - ground.position.y);
+            }
+        }
+        return moveDelta;
     }
 
     private void OnTriggerEnter(Collider collision)
