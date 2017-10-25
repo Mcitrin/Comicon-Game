@@ -108,7 +108,6 @@ public class CharacterController : MonoBehaviour
 
             if (diveing)
             {
-                //if (!touchingSides())
                 //transform.position += new Vector3(DontCrossBorder(GetDiveDirection().x, "X"), DontCrossBorder(GetDiveDirection().y,"Y"),0);
                 float xPos = EaseOutCubic(transform.position.x, diveDestination.x, Time.deltaTime);//Linear(transform.position.x, diveDestination.x,Time.deltaTime);
                 float yPos = EaseOutCubic(transform.position.y, diveDestination.y, Time.deltaTime);//Linear(transform.position.y, diveDestination.y,Time.deltaTime);
@@ -141,7 +140,6 @@ public class CharacterController : MonoBehaviour
 
                     IsGrounded();
                 }
-                // if (!touchingSides())
                 xVelocity = DontCrossBorder(xVelocity, "X");
                     transform.position += new Vector3(xVelocity, 0, 0);
                 if (!moving)
@@ -193,22 +191,24 @@ public class CharacterController : MonoBehaviour
         }
     }
 
-    public void Jump()
+    public void Jump(string height)
     {
-        if (!jumping)
-        {
             grounded = false;
-            yVelocity = yV0;
             jumping = true;
-        }
+
+            if (height == "low")
+            {
+                yVelocity = yV0*.5f;
+            }
+            if (height == "high")
+            {
+                yVelocity = yV0;
+            }
     }
     public void Jump2()
     {
-        if (!jumping)
-        {
             yVelocity = yV0;
             jumping = true;
-        }
     }
 
     public void ApplyGravity()

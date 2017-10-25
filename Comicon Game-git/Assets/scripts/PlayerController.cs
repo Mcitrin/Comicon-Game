@@ -8,8 +8,6 @@ public class PlayerController : MonoBehaviour
     public InputMan inputMan;
     // the players nubmer 1 or 2
     public int PlayerNumber;
-    // used for stilling if were touching the ground
-    float distToGround;
 
     // the time that you started charging your shot at
     float startTime;
@@ -35,7 +33,8 @@ public class PlayerController : MonoBehaviour
     // handel to the apperance delegate (changes sprite colors for cusimization)
     public Appearance appearance;
 
-    // theses arnt implemented yet but they handel the player diveing for the ball
+    float jumpHoldTime;
+    float jumpHoldLimit = .25f;
 
     // are you diveing
     bool dive;
@@ -48,10 +47,8 @@ public class PlayerController : MonoBehaviour
     {
         GROUNDED,
         DIVEING,
-        JUMP1_INIT,
-        JUMP1_MID,
-        JUMP2_INIT,
-        JUMP2_MID,
+        JUMP1,
+        JUMP2,
         FLOATING,
         FLOATING2
     }
@@ -62,7 +59,6 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         inputMan = GameManager.gameManager.inputMan;
-        distToGround = GetComponent<BoxCollider2D>().bounds.extents.y + 0.03f;
         characterController.playerNum = PlayerNumber;
     }
 
@@ -77,6 +73,11 @@ public class PlayerController : MonoBehaviour
 
         // determins how hard your going to hit the ball ie if your charging
         CalcPower();
+
+        if(playerState == PlayerState.JUMP1)
+        {
+            StartCoroutine(CalcJumpHeight());
+        }
 
         // if your diving run this
         if (dive)
@@ -100,27 +101,11 @@ public class PlayerController : MonoBehaviour
 
     void Move()
     {
-        //Debug.Log(transform.position.y);
-        ManageState();
-
-        if(playerState == PlayerState.JUMP1_INIT)
-        {
-            characterController.Jump();
-            playerState = PlayerState.JUMP1_MID;
-        }
-
-        else if(playerState == PlayerState.JUMP2_INIT)
-        {
-            characterController.Jump2();
-            playerState = PlayerState.FLOATING2;
-        }
-
-        else if(playerState == PlayerState.FLOATING || playerState == PlayerState.FLOATING2)
-        {
-
-            if (characterController.jumping)
-                characterController.jumping = false;
-        }
+       if(playerState == PlayerState.JUMP2)
+       {
+           characterController.Jump2();
+           playerState = PlayerState.FLOATING2;
+       }
 
         // if were in the air or chargin move slower
         if (playerState != PlayerState.GROUNDED || chargeing)
@@ -233,6 +218,27 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+    IEnumerator CalcJumpHeight()
+    {
+        jumpHoldTime += Time.deltaTime;
+
+        if(jumpHoldTime >= jumpHoldLimit)
+        {
+            characterController.Jump("high");
+            jumpHoldTime = 0;
+            yield return new WaitForSeconds(.1f);
+            playerState = PlayerState.FLOATING;
+        }
+        else if(inputMan.JumpRelease(PlayerNumber))
+        {
+            characterController.Jump("low");
+            jumpHoldTime = 0;
+            yield return new WaitForSeconds(.1f);
+            playerState = PlayerState.FLOATING;
+        }
+
+        yield return new WaitForSeconds(0);
+    }
 
     void HandleDive()
     {
@@ -251,21 +257,17 @@ public class PlayerController : MonoBehaviour
 
     void ManageState()
     {
-        if (characterController.grounded && playerState != PlayerState.JUMP1_INIT)
+        if (characterController.grounded && playerState != PlayerState.JUMP1)
         {
             playerState = PlayerState.GROUNDED;
         }
         if (inputMan.JumpPress(PlayerNumber))
         {
                 if(playerState == PlayerState.GROUNDED)
-                playerState = PlayerState.JUMP1_INIT;
+                playerState = PlayerState.JUMP1;
                 if(playerState == PlayerState.FLOATING)
-                playerState = PlayerState.JUMP2_INIT;
+                playerState = PlayerState.JUMP2;
         }
-       if(playerState == PlayerState.JUMP1_MID && inputMan.JumpRelease(PlayerNumber))
-       {
-           playerState = PlayerState.FLOATING;
-       }
     }
 
     // Update is called once per frame
@@ -286,6 +288,7 @@ public class PlayerController : MonoBehaviour
         {
             Input();
             Animate();
+            ManageState();
         }
         else
         {
