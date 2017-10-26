@@ -41,7 +41,7 @@ public class PlayerController : MonoBehaviour
     // the time your dive will stop at (time.time + diveLength)
     float diveEndTime;
     // how long your dive will last
-    float diveLength = .25f;
+    float diveLength = 1;
 
   public enum PlayerState
     {
@@ -80,11 +80,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // if your diving run this
-        if (dive)
-        {
-            HandleDive();
-        }
-        else
+        if (!dive)
         {
             Move();
         }
@@ -121,7 +117,7 @@ public class PlayerController : MonoBehaviour
         if (inputMan.Down(PlayerNumber) && inputMan.Charge(PlayerNumber) && !dive)
         {
             dive = true;
-            StartCoroutine(characterController.Dive(diveLength));
+            StartCoroutine(HandleDive());
         }
 
     }
@@ -240,19 +236,12 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(0);
     }
 
-    void HandleDive()
+    IEnumerator HandleDive()
     {
-        // if were not currently diving
-        if (diveEndTime == 0)
-        {
-            diveEndTime = Time.time + diveLength;
-        }
-        // if our dives over
-        else if (diveEndTime <= Time.time)
-        {
-            dive = false;
-            diveEndTime = 0;
-        }
+        playerState = PlayerState.FLOATING2;
+        StartCoroutine(characterController.Dive(diveLength));
+        yield return new WaitForSeconds(diveLength);
+        dive = false;
     }
 
     void ManageState()

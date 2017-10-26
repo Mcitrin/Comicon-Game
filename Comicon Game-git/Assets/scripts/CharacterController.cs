@@ -250,18 +250,32 @@ public class CharacterController : MonoBehaviour
         diveStart = transform.position;
         Debug.Log(diveDestination);
         Debug.Log(diveStart);
-
+        yVelocity = 0;
         yield return new WaitForSeconds(length);
         diveing = false;
     }
 
     Vector3 GetDiveDirection()
     {
+        Vector3 dir = Vector3.zero;
 
         if (grounded)
-            return transform.position + Vector3.right * courtSize/2;
+        {
+            if ((transform.position.x + xBounds) + (courtSize / 2) > net.position.x)
+            {
+                dir = Vector3.right * (net.position.x - (transform.position.x + xBounds));
+            }
+            else
+            {
+                dir = Vector3.right * (courtSize / 2);
+            }
+        }
         else
-            return transform.position + new Vector3(1, -1, 0);
+        {
+            dir = new Vector3(1, -1, 0);
+        }
+
+        return transform.position + dir;
     }
 
     public static float EaseOutCubic(float start, float end, float value)
