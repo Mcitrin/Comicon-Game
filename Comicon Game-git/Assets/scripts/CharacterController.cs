@@ -4,14 +4,6 @@ using System.Collections;
 public class CharacterController : MonoBehaviour
 {
 
-    // put these somewhere else in future
-    // these are empy transforms i use to keep the player inside the court
-    // im meaning to move them to some class that would contatin information about the level later, but fo4r right now im just testing them
-    public Transform left;
-    public Transform right;
-    public Transform net;
-    public Transform ground;
-
     float courtSize;
 
     public int playerNum;
@@ -60,8 +52,6 @@ public class CharacterController : MonoBehaviour
     float xBounds;
     float yBounds;
 
-    public Lerper lerper;
-
     // Use this for initialization
     void OnEnable()
     {
@@ -70,10 +60,9 @@ public class CharacterController : MonoBehaviour
         yBounds = GetComponent<BoxCollider2D>().bounds.extents.y;
 
         gameObject.AddComponent<Lerper>();
-        lerper = GetComponent<Lerper>();
 
         grounded = true;
-        courtSize = net.position.x - left.position.x;
+        courtSize = GameManager.net.position.x - GameManager.left.position.x;
 
         yV0 = (2 * maxJumpHeight) / jump1Duration;
         G = -2 * maxJumpHeight / Mathf.Pow(jump1Duration, 2);
@@ -101,22 +90,22 @@ public class CharacterController : MonoBehaviour
             arrow.transform.position = angle * arrowDistance + this.transform.position;
 
 
-            if (transform.position.y < ground.position.y + yBounds)
+            if (transform.position.y < GameManager.ground.position.y + yBounds)
             {
                 //transform.position = new Vector3(transform.position.x, ground.position.y + distToGround, 0);
             }
 
-            if (diveing)
-            {
-                //transform.position += new Vector3(DontCrossBorder(GetDiveDirection().x, "X"), DontCrossBorder(GetDiveDirection().y,"Y"),0);
-                float xPos = EaseOutCubic(transform.position.x, diveDestination.x, Time.deltaTime);//Linear(transform.position.x, diveDestination.x,Time.deltaTime);
-                float yPos = EaseOutCubic(transform.position.y, diveDestination.y, Time.deltaTime);//Linear(transform.position.y, diveDestination.y,Time.deltaTime);
-                Debug.Log(new Vector3(xPos, yPos, 0));
-                transform.position = new Vector3(xPos, yPos, 0);
-
-            }
-            else
-            {
+            //if (diveing)
+            //{
+            //    //transform.position += new Vector3(DontCrossBorder(GetDiveDirection().x, "X"), DontCrossBorder(GetDiveDirection().y,"Y"),0);
+            //    float xPos = Linear(transform.position.x, diveDestination.x, Time.deltaTime);//Linear(transform.position.x, diveDestination.x,Time.deltaTime);
+            //    float yPos = Linear(transform.position.y, diveDestination.y, Time.deltaTime);//Linear(transform.position.y, diveDestination.y,Time.deltaTime);
+            //    Debug.Log(new Vector3(xPos, yPos, 0));
+            //    transform.position = new Vector3(xPos, yPos, 0);
+            //
+            //}
+            //else
+            //{
                 if (!grounded) // jumping
                 {
                     float pos = 0;
@@ -151,7 +140,7 @@ public class CharacterController : MonoBehaviour
                     }
                 }
                 moving = false;
-            }
+           //}
         }
         else // end pause check
         {
@@ -196,9 +185,11 @@ public class CharacterController : MonoBehaviour
             grounded = false;
             jumping = true;
 
+        //Debug.Log(height);
+
             if (height == "low")
             {
-                yVelocity = yV0*.5f;
+                yVelocity = yV0*.75f;
             }
             if (height == "high")
             {
@@ -211,19 +202,11 @@ public class CharacterController : MonoBehaviour
             jumping = true;
     }
 
-    public void ApplyGravity()
-    {
-        if (!lerper.lerping && !grounded)
-        {
-            lerper.SetUpLerp(transform.position.y, ground.position.y + yBounds, fallDuration);
-        }
-    }
-
     // are we touching the ground
     public bool IsGrounded()
     {
         Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x, transform.position.y - yBounds), Color.red);
-        if (transform.position.y - yBounds <= ground.position.y)
+        if (transform.position.y - yBounds <= GameManager.ground.position.y)
         {
             grounded = true;
             jumping = false;
@@ -261,9 +244,9 @@ public class CharacterController : MonoBehaviour
 
         if (grounded)
         {
-            if ((transform.position.x + xBounds) + (courtSize / 2) > net.position.x)
+            if ((transform.position.x + xBounds) + (courtSize / 2) > GameManager.net.position.x)
             {
-                dir = Vector3.right * (net.position.x - (transform.position.x + xBounds));
+                dir = Vector3.right * (GameManager.net.position.x - (transform.position.x + xBounds));
             }
             else
             {
@@ -272,10 +255,11 @@ public class CharacterController : MonoBehaviour
         }
         else
         {
-            dir = new Vector3(1, -1, 0);
+            //dir = new Vector3(1, -1, 0);
+            dir  = new Vector3(0,(transform.position.y - yBounds) - GameManager.ground.position.y);
         }
 
-        return transform.position + dir;
+        return transform.position - dir;
     }
 
     public static float EaseOutCubic(float start, float end, float value)
@@ -302,18 +286,18 @@ public class CharacterController : MonoBehaviour
         {
             if (playerNum == 1)
             {
-                if (transform.position.x - xBounds <= left.position.x)
+                if (transform.position.x - xBounds <= GameManager.left.position.x)
                 {
-                    transform.position = new Vector3(left.position.x + xBounds, transform.position.y,0);
+                    transform.position = new Vector3(GameManager.left.position.x + xBounds, transform.position.y,0);
                     xVelocity = 0;
                     return true;
                 }
             }
             if (playerNum == 2)
             {
-                if (transform.position.x - xBounds <= net.position.x)
+                if (transform.position.x - xBounds <= GameManager.net.position.x)
                 {
-                    transform.position = new Vector3(net.position.x + xBounds, transform.position.y, 0);
+                    transform.position = new Vector3(GameManager.net.position.x + xBounds, transform.position.y, 0);
                     xVelocity = 0;
                     return true;
                 }
@@ -324,18 +308,18 @@ public class CharacterController : MonoBehaviour
         {
             if (playerNum == 1)
             {
-                if (transform.position.x + xBounds >= net.position.x)
+                if (transform.position.x + xBounds >= GameManager.net.position.x)
                 {
-                    transform.position = new Vector3(net.position.x - xBounds, transform.position.y, 0);
+                    transform.position = new Vector3(GameManager.net.position.x - xBounds, transform.position.y, 0);
                     xVelocity = 0;
                     return true;
                 }
             }
             if (playerNum == 2)
             {
-                if (transform.position.x + xBounds >= right.position.x)
+                if (transform.position.x + xBounds >= GameManager.right.position.x)
                 {
-                    transform.position = new Vector3(right.position.x - xBounds, transform.position.y, 0);
+                    transform.position = new Vector3(GameManager.right.position.x - xBounds, transform.position.y, 0);
                     xVelocity = 0;
                     return true;
                 }
@@ -352,17 +336,17 @@ public class CharacterController : MonoBehaviour
             {
                 if (playerNum == 1)
                 {
-                    if (transform.position.x - xBounds < left.position.x)
+                    if (transform.position.x - xBounds < GameManager.left.position.x)
                     {
 
-                        return (int)((transform.position.x - xBounds) - left.position.x);
+                        return (int)((transform.position.x - xBounds) - GameManager.left.position.x);
                     }
                 }
                 if (playerNum == 2)
                 {
-                    if (transform.position.x - xBounds <= net.position.x)
+                    if (transform.position.x - xBounds <= GameManager.net.position.x)
                     {
-                        return (int)((transform.position.x - xBounds) - net.position.x);
+                        return (int)((transform.position.x - xBounds) - GameManager.net.position.x);
                     }
                 }
             }
@@ -370,26 +354,26 @@ public class CharacterController : MonoBehaviour
             {
                 if (playerNum == 1)
                 {
-                    if ((transform.position.x + xBounds) + moveDelta > net.position.x)
+                    if ((transform.position.x + xBounds) + moveDelta > GameManager.net.position.x)
                     {;
-                        return (int)((transform.position.x + xBounds) - net.position.x);
+                        return (int)((transform.position.x + xBounds) - GameManager.net.position.x);
                     }
                 }
                 if (playerNum == 2)
                 {
-                    if ((transform.position.x + xBounds) + moveDelta > right.position.x)
+                    if ((transform.position.x + xBounds) + moveDelta > GameManager.gameManager.right.position.x)
                     {
-                        return (int)((transform.position.x + xBounds) - right.position.x);
+                        return (int)((transform.position.x + xBounds) - GameManager.gameManager.right.position.x);
                     }
                 }
             }
         }
         else if (coordinate == "Y")
         {
-            if ((transform.position.y - yBounds) + moveDelta < ground.position.y)
+            if ((transform.position.y - yBounds) + moveDelta < GameManager.gameManager.ground.position.y)
             {
-                Debug.Log((transform.position.y - yBounds) - ground.position.y);
-                return -((transform.position.y - yBounds) - ground.position.y);
+                //Debug.Log((transform.position.y - yBounds) - ground.position.y);
+                return -((transform.position.y - yBounds) - GameManager.gameManager.ground.position.y);
             }
         }
         return moveDelta;

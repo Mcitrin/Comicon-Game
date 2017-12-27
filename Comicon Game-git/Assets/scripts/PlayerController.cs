@@ -18,8 +18,13 @@ public class PlayerController : MonoBehaviour
     // werether or not your currently charging a shot
     bool chargeing = false;
 
+    //if cacl jump is running
+    bool runningCalcJump = false;
+
     // the angle your aming at to be passed to the character controller 
     Vector2 angle;
+    // the angle to lerp to
+    Vector2 angleTo = Vector3.zero;
 
     // the power your hitting the ball with passed to the character controller 
     int power;
@@ -76,7 +81,11 @@ public class PlayerController : MonoBehaviour
 
         if(playerState == PlayerState.JUMP1)
         {
-            StartCoroutine(CalcJumpHeight());
+            if (!runningCalcJump)
+            {
+                runningCalcJump = true;
+                StartCoroutine(CalcJumpHeight());
+            }
         }
 
         // if your diving run this
@@ -114,11 +123,11 @@ public class PlayerController : MonoBehaviour
             characterController.Move((inputMan.Move(PlayerNumber)), false);
         }
 
-        if (inputMan.Down(PlayerNumber) && inputMan.Charge(PlayerNumber) && !dive)
-        {
-            dive = true;
-            StartCoroutine(HandleDive());
-        }
+        //if (inputMan.Down(PlayerNumber) && inputMan.Charge(PlayerNumber) && !dive)
+        //{
+        //    dive = true;
+        //    StartCoroutine(HandleDive());
+        //}
 
     }
 
@@ -129,31 +138,41 @@ public class PlayerController : MonoBehaviour
         if (inputMan.Aim(PlayerNumber) != Vector2.zero)
         {
             // get the angel from the input manager
-            angle = inputMan.Aim(PlayerNumber);
             
-
-
+            angleTo = inputMan.Aim(PlayerNumber);
+            
             // this all keep the player from aging behind them
             // lock to front 180 arc
             if (PlayerNumber == 1)
             {
-                if (angle.x < 0 && angle.y >= 0)
-                    angle = new Vector3(0, 1);
-                if (angle.x < 0 && angle.y <= 0)
-                    angle = new Vector3(0, -1);
+                if (angleTo.x < 0 && angleTo.y >= 0)
+                    angleTo = new Vector3(0, 1);
+                if (angleTo.x < 0 && angleTo.y <= 0)
+                    angleTo = new Vector3(0, -1);
             }
             if (PlayerNumber == 2)
             {
-                if (angle.x > 0 && angle.y >= 0)
-                    angle = new Vector3(0, 1);
-                if (angle.x > 0 && angle.y <= 0)
-                    angle = new Vector3(0, -1);
+                if (angleTo.x > 0 && angleTo.y >= 0)
+                    angleTo = new Vector3(0, 1);
+                if (angleTo.x > 0 && angleTo.y <= 0)
+                    angleTo = new Vector3(0, -1);
             }
+
+            float xPos = Linear(angle.x, angleTo.x, Time.deltaTime);
+            float yPos = Linear(angle.y, angleTo.y, Time.deltaTime);
+            angle = new Vector2(xPos, yPos).normalized;
         }
+        
 
         // pass our angel to the character controller
-        characterController.Aim(angle);
+        characterController.Aim(angle.normalized);
     }
+
+    public static float Linear(float start, float end, float value)
+    {
+        return Mathf.Lerp(start, end, value*10);
+    }
+
 
     void CalcPower()
     {
@@ -233,6 +252,7 @@ public class PlayerController : MonoBehaviour
             playerState = PlayerState.FLOATING;
         }
 
+        runningCalcJump = false;
         yield return new WaitForSeconds(0);
     }
 

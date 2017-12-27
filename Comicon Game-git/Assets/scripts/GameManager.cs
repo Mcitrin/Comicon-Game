@@ -15,6 +15,16 @@ public class GameManager : MonoBehaviour {
     public InputMan inputMan;
     public static bool paused;
     public static int numPlayers = 1;
+    public CharacterController player1;
+    public CharacterController player2;
+    public BallV2 ball;
+
+    public Transform left;
+    public Transform right;
+    public Transform net;
+    public Transform ground;
+
+
 
     // Use this for initialization
     private void Awake()

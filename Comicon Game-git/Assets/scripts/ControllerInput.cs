@@ -17,6 +17,7 @@ public class ControllerInput : MonoBehaviour, IGameInput
     // Update is called once per frame
     void Update()
     {
+        //Debug.Log(input.LeftStickX);
     }
 
     public bool JumpPress()
@@ -31,7 +32,9 @@ public class ControllerInput : MonoBehaviour, IGameInput
 
     public bool Down()
     {
-        if (Mathf.Clamp(input.LeftStickY, -1, 0) < 0)
+        if (Mathf.Clamp(input.LeftStickY, -1, 0) < 0 &&
+            (input.LeftStickX <= 0.2f) &&
+            (input.LeftStickX >= -0.2f))
             return true;
 
         return false;
