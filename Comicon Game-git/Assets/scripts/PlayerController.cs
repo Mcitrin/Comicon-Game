@@ -259,7 +259,7 @@ public class PlayerController : MonoBehaviour
     IEnumerator HandleDive()
     {
         playerState = PlayerState.FLOATING2;
-        StartCoroutine(characterController.Dive(diveLength));
+        //StartCoroutine(characterController.Dive(diveLength));
         yield return new WaitForSeconds(diveLength);
         dive = false;
     }

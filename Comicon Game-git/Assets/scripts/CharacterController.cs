@@ -16,11 +16,13 @@ public class CharacterController : MonoBehaviour
     public GameObject arrow;
     // and empty transform with a collsion box set to trigger. fallows the hand of the sprite used for colliding with the ball
     public GameObject hand;
+    public float handXBounds;
+    public float handYBounds;
+
+
 
     public bool grounded;
     public bool jumping;
-
-    Rigidbody2D rigidbody;
 
     // this ditance the arrow gameoject can be from you
     int arrowDistance = 2;
@@ -48,21 +50,23 @@ public class CharacterController : MonoBehaviour
 
     float drag = .1f;
 
-    // the size of your collsion box in the x dimension 
+    // the size of your collsion box
     float xBounds;
     float yBounds;
 
     // Use this for initialization
-    void OnEnable()
+    public void Init()
     {
-        rigidbody = GetComponent<Rigidbody2D>();
         xBounds = GetComponent<BoxCollider2D>().bounds.extents.x;
         yBounds = GetComponent<BoxCollider2D>().bounds.extents.y;
+        handXBounds = hand.GetComponent<BoxCollider2D>().bounds.extents.x;
+        handYBounds = hand.GetComponent<BoxCollider2D>().bounds.extents.y;
+
 
         gameObject.AddComponent<Lerper>();
 
         grounded = true;
-        courtSize = GameManager.net.position.x - GameManager.left.position.x;
+        //courtSize = GameManager.gameManager.net.position.x - GameManager.gameManager.left.position.x;
 
         yV0 = (2 * maxJumpHeight) / jump1Duration;
         G = -2 * maxJumpHeight / Mathf.Pow(jump1Duration, 2);
@@ -82,18 +86,9 @@ public class CharacterController : MonoBehaviour
         // pause check
         if (!GameManager.paused)
         {
-            // if the games not paused do this
-            //if (rigidbody.isKinematic)
-            //rigidbody.isKinematic = false;
 
             // allows the arrow to move
             arrow.transform.position = angle * arrowDistance + this.transform.position;
-
-
-            if (transform.position.y < GameManager.ground.position.y + yBounds)
-            {
-                //transform.position = new Vector3(transform.position.x, ground.position.y + distToGround, 0);
-            }
 
             //if (diveing)
             //{
@@ -144,10 +139,7 @@ public class CharacterController : MonoBehaviour
         }
         else // end pause check
         {
-            // if games is paused set kinimatic to true and zero out velocity
-            //if (!rigidbody.isKinematic)
-            //rigidbody.isKinematic = true;
-            //rigidbody.velocity = Vector2.zero;
+
         }
     }
 
@@ -206,7 +198,7 @@ public class CharacterController : MonoBehaviour
     public bool IsGrounded()
     {
         Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x, transform.position.y - yBounds), Color.red);
-        if (transform.position.y - yBounds <= GameManager.ground.position.y)
+        if (transform.position.y - yBounds <= GameManager.gameManager.ground.position.y)
         {
             grounded = true;
             jumping = false;
@@ -226,7 +218,7 @@ public class CharacterController : MonoBehaviour
         power = 0;
     }
 
-    public IEnumerator Dive(float length)
+   /* public IEnumerator Dive(float length)
     {
         diveing = true;
         diveDestination = GetDiveDirection();
@@ -260,7 +252,7 @@ public class CharacterController : MonoBehaviour
         }
 
         return transform.position - dir;
-    }
+    }*/
 
     public static float EaseOutCubic(float start, float end, float value)
     {
@@ -280,54 +272,6 @@ public class CharacterController : MonoBehaviour
         return Mathf.Lerp(start, end, value);
     }
 
-    bool touchingSides()
-    {
-        if (xVelocity < 0)// moving left
-        {
-            if (playerNum == 1)
-            {
-                if (transform.position.x - xBounds <= GameManager.left.position.x)
-                {
-                    transform.position = new Vector3(GameManager.left.position.x + xBounds, transform.position.y,0);
-                    xVelocity = 0;
-                    return true;
-                }
-            }
-            if (playerNum == 2)
-            {
-                if (transform.position.x - xBounds <= GameManager.net.position.x)
-                {
-                    transform.position = new Vector3(GameManager.net.position.x + xBounds, transform.position.y, 0);
-                    xVelocity = 0;
-                    return true;
-                }
-            }
-        }
-        // if your moveing right
-        if (xVelocity > 0)// moving right
-        {
-            if (playerNum == 1)
-            {
-                if (transform.position.x + xBounds >= GameManager.net.position.x)
-                {
-                    transform.position = new Vector3(GameManager.net.position.x - xBounds, transform.position.y, 0);
-                    xVelocity = 0;
-                    return true;
-                }
-            }
-            if (playerNum == 2)
-            {
-                if (transform.position.x + xBounds >= GameManager.right.position.x)
-                {
-                    transform.position = new Vector3(GameManager.right.position.x - xBounds, transform.position.y, 0);
-                    xVelocity = 0;
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     float DontCrossBorder(float moveDelta, string coordinate)
     {
         if (coordinate == "X")
@@ -336,17 +280,17 @@ public class CharacterController : MonoBehaviour
             {
                 if (playerNum == 1)
                 {
-                    if (transform.position.x - xBounds < GameManager.left.position.x)
+                    if (transform.position.x - xBounds < GameManager.gameManager.left.position.x)
                     {
 
-                        return (int)((transform.position.x - xBounds) - GameManager.left.position.x);
+                        return (int)((transform.position.x - xBounds) - GameManager.gameManager.left.position.x);
                     }
                 }
                 if (playerNum == 2)
                 {
-                    if (transform.position.x - xBounds <= GameManager.net.position.x)
+                    if (transform.position.x - xBounds <= GameManager.gameManager.net.position.x)
                     {
-                        return (int)((transform.position.x - xBounds) - GameManager.net.position.x);
+                        return (int)((transform.position.x - xBounds) - GameManager.gameManager.net.position.x);
                     }
                 }
             }
@@ -354,9 +298,9 @@ public class CharacterController : MonoBehaviour
             {
                 if (playerNum == 1)
                 {
-                    if ((transform.position.x + xBounds) + moveDelta > GameManager.net.position.x)
+                    if ((transform.position.x + xBounds) + moveDelta > GameManager.gameManager.net.position.x)
                     {;
-                        return (int)((transform.position.x + xBounds) - GameManager.net.position.x);
+                        return (int)((transform.position.x + xBounds) - GameManager.gameManager.net.position.x);
                     }
                 }
                 if (playerNum == 2)
