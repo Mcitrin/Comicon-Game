@@ -8,16 +8,9 @@ public class ControllerInput : MonoBehaviour, IGameInput
     public
         InputDevice input;
 
-    // Use this for initialization
-    void Start()
-    {
-
-    }
-
     // Update is called once per frame
     void Update()
     {
-        //Debug.Log(input.LeftStickX);
     }
 
     public bool JumpPress()

@@ -5,7 +5,6 @@ public class CharacterController : MonoBehaviour
 {
 
     float courtSize;
-
     public int playerNum;
 
     // the power that the player hits the ball with 1 for a normal hit 2 for a power hit
@@ -14,6 +13,9 @@ public class CharacterController : MonoBehaviour
     public Vector3 angle;
     // a gameobject with a sprite used to visualize where the players aiming
     public GameObject arrow;
+    // this ditance the arrow gameoject can be from you (it radious)
+    int arrowDistance = 2;
+
     // and empty transform with a collsion box set to trigger. fallows the hand of the sprite used for colliding with the ball
     public GameObject hand;
     public float handXBounds;
@@ -21,38 +23,27 @@ public class CharacterController : MonoBehaviour
 
 
 
-    public bool grounded;
-    public bool jumping;
-
-    // this ditance the arrow gameoject can be from you
-    int arrowDistance = 2;
-
-    float fallDuration = .5f;
+    public bool grounded = true;
+    public bool falling = false;
     float jump1Duration = .5f;
-    float jump2Duration = .5f;
+    float maxJumpHeight = 12.5f; //h
 
-    float maxJumpHeight = 7.5f; //h
-
-    float yV0;
-    float G;
-
-
-    float xVelocity;
+    public float yV0;
+    public float G;
+    public float xVelocity;
     float yVelocity;
 
     float maxVelocity = .15f;//.15f;
-
     bool moving;
-    bool diveing;
-
-    Vector3 diveDestination;
-    Vector3 diveStart;
-
     float drag = .1f;
 
     // the size of your collsion box
     float xBounds;
     float yBounds;
+
+    // Evants
+    public delegate void JumpApexReached(int playerNumber);
+    public event JumpApexReached jumpApexReached;
 
     // Use this for initialization
     public void Init()
@@ -61,71 +52,52 @@ public class CharacterController : MonoBehaviour
         yBounds = GetComponent<BoxCollider2D>().bounds.extents.y;
         handXBounds = hand.GetComponent<BoxCollider2D>().bounds.extents.x;
         handYBounds = hand.GetComponent<BoxCollider2D>().bounds.extents.y;
-
-
-        gameObject.AddComponent<Lerper>();
-
-        grounded = true;
         //courtSize = GameManager.gameManager.net.position.x - GameManager.gameManager.left.position.x;
-
-        yV0 = (2 * maxJumpHeight) / jump1Duration;
-        G = -2 * maxJumpHeight / Mathf.Pow(jump1Duration, 2);
     }
 
     // Update is called once per frame
     void Update()
     {
-
-
         // used to vissualy see the size of my collision box
         Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x, transform.position.y) + Vector2.left * xBounds, Color.red);
         Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x, transform.position.y) + Vector2.right * xBounds, Color.red);
 
-
-
+       
         // pause check
         if (!GameManager.paused)
         {
 
             // allows the arrow to move
             arrow.transform.position = angle * arrowDistance + this.transform.position;
+            
 
-            //if (diveing)
-            //{
-            //    //transform.position += new Vector3(DontCrossBorder(GetDiveDirection().x, "X"), DontCrossBorder(GetDiveDirection().y,"Y"),0);
-            //    float xPos = Linear(transform.position.x, diveDestination.x, Time.deltaTime);//Linear(transform.position.x, diveDestination.x,Time.deltaTime);
-            //    float yPos = Linear(transform.position.y, diveDestination.y, Time.deltaTime);//Linear(transform.position.y, diveDestination.y,Time.deltaTime);
-            //    Debug.Log(new Vector3(xPos, yPos, 0));
-            //    transform.position = new Vector3(xPos, yPos, 0);
-            //
-            //}
-            //else
-            //{
-                if (!grounded) // jumping
+            if (!grounded) // jumping
                 {
-                    float pos = 0;
-                    float g = G;
-
-                    if (yVelocity > 0 || jumping)
+                float yPos = 0;
+                if (yVelocity > 0)
                     {
-                        pos += yVelocity * Time.deltaTime + (g * .5f) * (Mathf.Pow(Time.deltaTime, 2));
+                        yPos += yVelocity * Time.deltaTime + (G * .5f) * (Mathf.Pow(Time.deltaTime, 2));
                     }
-                    else if(yVelocity < 0 || !jumping)
+                    else if(yVelocity < 0)
                     {
-                        pos += yVelocity * Time.deltaTime + (g * .5f) * (Mathf.Pow(Time.deltaTime, 2));
+                        yPos += yVelocity * Time.deltaTime + (G* .5f) * (Mathf.Pow(Time.deltaTime, 2));
+                        if(!falling)
+                        {
+                            falling = true;
+                            if (jumpApexReached != null)
+                                jumpApexReached(playerNum);
+                        }
                     }
-
-                    //pos += yVelocity * Time.deltaTime + (g * .5f) * (Mathf.Pow(Time.deltaTime, 2));
-                    yVelocity += g * Time.deltaTime;
-
-                    pos = DontCrossBorder(pos, "Y");
-
-                    transform.position += new Vector3(0, pos, 0);
-
-                    IsGrounded();
+                
+                yVelocity += G * Time.deltaTime;
+                transform.position += new Vector3(0, yPos, 0);
+                IsGrounded();
                 }
-                xVelocity = DontCrossBorder(xVelocity, "X");
-                    transform.position += new Vector3(xVelocity, 0, 0);
+                
+
+                //xVelocity = DontCrossBorder(xVelocity, "X");
+                transform.position += new Vector3(xVelocity, 0, 0);
+
                 if (!moving)
                 {
                     xVelocity -= xVelocity * drag;
@@ -135,7 +107,8 @@ public class CharacterController : MonoBehaviour
                     }
                 }
                 moving = false;
-           //}
+
+            ClampPosition();
         }
         else // end pause check
         {
@@ -172,26 +145,16 @@ public class CharacterController : MonoBehaviour
         }
     }
 
-    public void Jump(string height)
+    public void Jump(float jumpPercentage)
     {
-            grounded = false;
-            jumping = true;
+        Debug.Log(jumpPercentage);
+        grounded = false;
 
-        //Debug.Log(height);
+        float jumpHeight = maxJumpHeight * jumpPercentage;
 
-            if (height == "low")
-            {
-                yVelocity = yV0*.75f;
-            }
-            if (height == "high")
-            {
-                yVelocity = yV0;
-            }
-    }
-    public void Jump2()
-    {
-            yVelocity = yV0;
-            jumping = true;
+        yV0 = (2 * jumpHeight) / (jump1Duration*jumpPercentage);
+        G = (-2 * jumpHeight) / Mathf.Pow(jump1Duration * jumpPercentage, 2);
+        yVelocity = yV0;
     }
 
     // are we touching the ground
@@ -201,7 +164,7 @@ public class CharacterController : MonoBehaviour
         if (transform.position.y - yBounds <= GameManager.gameManager.ground.position.y)
         {
             grounded = true;
-            jumping = false;
+            falling = false;
         }
         else
         {
@@ -217,124 +180,28 @@ public class CharacterController : MonoBehaviour
         yield return new WaitForSeconds(.25f);
         power = 0;
     }
-
-   /* public IEnumerator Dive(float length)
+    void ClampPosition()
     {
-        diveing = true;
-        diveDestination = GetDiveDirection();
-        diveStart = transform.position;
-        Debug.Log(diveDestination);
-        Debug.Log(diveStart);
-        yVelocity = 0;
-        yield return new WaitForSeconds(length);
-        diveing = false;
-    }
 
-    Vector3 GetDiveDirection()
-    {
-        Vector3 dir = Vector3.zero;
+        float yClamp = Mathf.Clamp(transform.position.y, GameManager.gameManager.ground.position.y + yBounds, 1000);
+        float xClamp = 0;
 
-        if (grounded)
+
+        if (playerNum == 1)
         {
-            if ((transform.position.x + xBounds) + (courtSize / 2) > GameManager.net.position.x)
-            {
-                dir = Vector3.right * (GameManager.net.position.x - (transform.position.x + xBounds));
-            }
-            else
-            {
-                dir = Vector3.right * (courtSize / 2);
-            }
+             xClamp = Mathf.Clamp(transform.position.x, GameManager.gameManager.left.position.x + xBounds, 
+                                                             GameManager.gameManager.net.position.x - xBounds);
         }
-        else
+        else if(playerNum == 2)
         {
-            //dir = new Vector3(1, -1, 0);
-            dir  = new Vector3(0,(transform.position.y - yBounds) - GameManager.ground.position.y);
+             xClamp = Mathf.Clamp(transform.position.x, GameManager.gameManager.right.position.x - xBounds,
+                                                             GameManager.gameManager.net.position.x + xBounds);
         }
-
-        return transform.position - dir;
-    }*/
-
-    public static float EaseOutCubic(float start, float end, float value)
-    {
-        value--;
-        end -= start;
-        return end * (value * value * value + 1) + start;
-    }
-
-    public static float EaseOutQuad(float start, float end, float value)
-    {
-        end -= start;
-        return -end * value * (value - 2) + start;
+        transform.position = new Vector3(xClamp, yClamp);
     }
 
     public static float Linear(float start, float end, float value)
     {
-        return Mathf.Lerp(start, end, value);
-    }
-
-    float DontCrossBorder(float moveDelta, string coordinate)
-    {
-        if (coordinate == "X")
-        {
-            if (xVelocity < 0)// moving left
-            {
-                if (playerNum == 1)
-                {
-                    if (transform.position.x - xBounds < GameManager.gameManager.left.position.x)
-                    {
-
-                        return (int)((transform.position.x - xBounds) - GameManager.gameManager.left.position.x);
-                    }
-                }
-                if (playerNum == 2)
-                {
-                    if (transform.position.x - xBounds <= GameManager.gameManager.net.position.x)
-                    {
-                        return (int)((transform.position.x - xBounds) - GameManager.gameManager.net.position.x);
-                    }
-                }
-            }
-            if (xVelocity > 0)// moving right
-            {
-                if (playerNum == 1)
-                {
-                    if ((transform.position.x + xBounds) + moveDelta > GameManager.gameManager.net.position.x)
-                    {;
-                        return (int)((transform.position.x + xBounds) - GameManager.gameManager.net.position.x);
-                    }
-                }
-                if (playerNum == 2)
-                {
-                    if ((transform.position.x + xBounds) + moveDelta > GameManager.gameManager.right.position.x)
-                    {
-                        return (int)((transform.position.x + xBounds) - GameManager.gameManager.right.position.x);
-                    }
-                }
-            }
-        }
-        else if (coordinate == "Y")
-        {
-            if ((transform.position.y - yBounds) + moveDelta < GameManager.gameManager.ground.position.y)
-            {
-                //Debug.Log((transform.position.y - yBounds) - ground.position.y);
-                return -((transform.position.y - yBounds) - GameManager.gameManager.ground.position.y);
-            }
-        }
-        return moveDelta;
-    }
-
-    private void OnTriggerEnter(Collider collision)
-    {
-        if (collision.gameObject.tag == "Player")
-        {
-
-            CharacterController Player = collision.gameObject.GetComponentInParent<CharacterController>();
-
-            if (Player.power == 1 || Player.power == 2)
-            {
-                Debug.Log(Player.gameObject.name);
-                this.gameObject.GetComponentInParent<Rigidbody>().AddForce((transform.position - collision.transform.position) * 100, ForceMode.Impulse);
-            }
-        }
+        return Mathf.Lerp(start, end, value * 10);
     }
 }

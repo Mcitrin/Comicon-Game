@@ -4,6 +4,11 @@ using InControl;
 
 public class KeyboardInput : MonoBehaviour, IGameInput
 {
+    // Update is called once per frame
+    void Update()
+    {
+    }
+
     public bool JumpPress()
     {
         return Input.GetKeyDown("space");
