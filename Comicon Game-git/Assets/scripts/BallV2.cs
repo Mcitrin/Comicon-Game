@@ -31,10 +31,22 @@ public class BallV2 : MonoBehaviour {
     // Use this for initialization
      public void Init()
     {
-        Players = GameManager.gameManager.Players;
-        HeldBy = Players[0];
+        HeldBy = GameManager.gameManager.Players[0];
         xBounds = GetComponent<BoxCollider2D>().bounds.extents.x;
         yBounds = GetComponent<BoxCollider2D>().bounds.extents.y;
+
+        GameManager.gameManager.Players[0].hitBallAttempt += delegate (Vector2 angle, float pow, Vector2 handBounds, Vector2 handPosition)
+        {
+            if(InHand(handBounds, handPosition))
+            {
+                SetVelocity(angle * (pow*10));
+                if(bState == BallState.Held)
+                {
+                    bState = BallState.InPlay;
+                }
+            }
+        };
+
     }
 
     // Update is called once per frame
@@ -47,8 +59,6 @@ public class BallV2 : MonoBehaviour {
                 case BallState.Held:
 
                     transform.position = HeldBy.GetComponent<CharacterController>().hand.transform.position;
-                    if(!checkingForHit)
-                    CheckForHit(HeldBy);
                     break;
 
                 case BallState.InPlay:
@@ -61,12 +71,6 @@ public class BallV2 : MonoBehaviour {
                     }
                     else
                     {
-                        for (int i = 0; i < Players.Capacity; i++)
-                        {
-                            if (!checkingForHit)
-                                CheckForHit(Players[i]);
-                        }
-                        
                         Integrate();
                     }
                     break;
@@ -83,34 +87,12 @@ public class BallV2 : MonoBehaviour {
 
     }
     
-    void CheckForHit(CharacterController Player)
+    bool InHand(Vector2 handBounds, Vector2 handPosition)
     {
-        checkingForHit = true;
-
-        if (Player.power > 0 && InHand(Player))
-        {
-            if (LastHitTime == 0 || Time.time - LastHitTime >= .25f)
-            {
-                SetVelocity(Player.angle * Player.power * 10);
-                LastHitTime = Time.time;
-
-                if (HeldBy != null)
-                {
-                    bState = BallState.InPlay;
-                    HeldBy = null;
-                }
-                Debug.Log("HittingBall");
-            }
-        }
-        checkingForHit = false;
-    }
-
-    bool InHand(CharacterController Player)
-    {
-        if (transform.position.x + xBounds <= Player.hand.transform.position.x + Player.handXBounds &&
-           transform.position.x - xBounds >= Player.hand.transform.position.x - Player.handXBounds &&
-           transform.position.y + yBounds <= Player.hand.transform.position.y + Player.handYBounds &&
-           transform.position.y - yBounds >= Player.hand.transform.position.y - Player.handYBounds)
+        if (transform.position.x + xBounds <= handPosition.x + handBounds.x &&
+           transform.position.x - xBounds >= handPosition.x - handBounds.x &&
+           transform.position.y + yBounds <= handPosition.y + handBounds.y &&
+           transform.position.y - yBounds >= handPosition.y - handBounds.y)
             return true;
         else
             return false;
@@ -139,16 +121,14 @@ public class BallV2 : MonoBehaviour {
              newV = new Vector3(V.x, V.y + (G * 2.5f) * Time.deltaTime, 0);
         }
 
-        transform.position = transform.position + (((V + newV) / 2) * Time.deltaTime);
+        transform.position = transform.position + (((V + newV) / 2) * (Time.deltaTime * .85f));
         SetVelocity(newV);
     }
 
     IEnumerator Reset()
     {
         yield return new WaitForSeconds(3);
-        LastHitTime = 0;
         bState = BallState.Held;
-        HeldBy = Players[0];
     }
 
 }

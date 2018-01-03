@@ -9,17 +9,10 @@ public class PlayerController : MonoBehaviour
     // the players nubmer 1 or 2
     public int playerNumber;
 
-    // the time that you started charging your shot at
-    float startTime;
-
-    // how long youve been charging for (time.time - startTime)
-    float chargeTime;
-
     // werether or not your currently charging a shot
-    bool chargeing = false;
-
+    bool chargeingHit = false;
     //if cacl jump is running
-    bool runningCalcJump = false;
+    bool chargeingJump = false;
 
     // the angle your aming at to be passed to the character controller 
     Vector2 angle;
@@ -27,7 +20,7 @@ public class PlayerController : MonoBehaviour
     Vector2 angleTo = Vector3.zero;
 
     // the power your hitting the ball with passed to the character controller 
-    int power;
+    //int power;
 
     // handel to the character controller delegate
     CharacterController characterController;
@@ -41,6 +34,10 @@ public class PlayerController : MonoBehaviour
     float jumpHoldTime;
     float jumpHoldLimit = 1.5f;
     float jumpHoldMin = .4f;
+
+    float hitHoldTime;
+    float hitHoldLimit = 1.5f;
+    float hitHoldMin = .4f;
 
     // are you diveing
     bool dive;
@@ -87,24 +84,25 @@ public class PlayerController : MonoBehaviour
     {
         // handels aiming
         Aiming();
-
-        // determins how hard your going to hit the ball
-        CalcPower();
-
         Move();
 
+        // determins how hard your going to hit the ball
+        if(chargeingHit)
+        {
+            CalcHitPower();
+        }
+        
         if (playerState == PlayerState.CHARGEJUMP)
         {
-            if (!runningCalcJump)
+            if (!chargeingJump)
             {
-                runningCalcJump = true;
+                chargeingJump = true;
                 CalcJumpHeight();
             }
         }
-
+        
         sliders.SetValue("jump", jumpHoldTime / jumpHoldLimit);
-
-        //Debug.Log(jumpHoldTime / jumpHoldLimit);
+        sliders.SetValue("hit", hitHoldTime / hitHoldLimit);
     }
 
     void Animate()
@@ -112,7 +110,7 @@ public class PlayerController : MonoBehaviour
         // send information to the animation manager so it knows wich animation to play
         animationController.speed = Mathf.Abs(inputMan.Move(playerNumber));
         animationController.isGrounded = characterController.grounded;
-        animationController.chargeing = chargeing;
+        animationController.chargeingHit = chargeingHit;
     }
 
     void Move()
@@ -123,8 +121,17 @@ public class PlayerController : MonoBehaviour
        //    playerState = PlayerState.FLOATING2;
        //}
 
+        if((playerState == PlayerState.JUMP || playerState == PlayerState.FLOATING) && inputMan.Down(playerNumber))
+        {
+            characterController.GMultiplier = 5;
+        }
+        else
+        {
+            characterController.GMultiplier = 1;
+        }
+        
         // if were in the air or chargin move slower
-        if (playerState != PlayerState.GROUNDED || chargeing)
+        if (playerState != PlayerState.GROUNDED || chargeingHit)
         {
             characterController.Move((inputMan.Move(playerNumber)), true);
         }
@@ -175,84 +182,43 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    void CalcPower()
+    void CalcHitPower()
     {
-        // the player currently pressing the button to hit the ball
-        if (inputMan.Charge(playerNumber))
+        hitHoldTime += Time.deltaTime;
+        hitHoldTime = Mathf.Clamp(hitHoldTime, 0, hitHoldLimit);
+
+        if (hitHoldTime < hitHoldMin)
         {
-            // if we werent already holding down the hit button record the time that we started holding the button at
-            if (startTime == 0)
+            hitHoldTime = hitHoldMin;
+        }
+        if (inputMan.ChargeRelease(playerNumber))
+        {
+            
+            if (hitHoldTime < hitHoldMin)
             {
-                startTime = Time.time;
+                hitHoldTime = hitHoldMin;
             }
-            chargeTime = (Time.time - startTime);
-        }
-        // is wever been holding the hit button long enough were now charging
-        if (chargeTime >= .2f)
-        {
-            chargeing = true;
-        }
-        else { chargeing = false; }
-
-        // if the hit button is not currently beign pressd 
-        if (!inputMan.Charge(playerNumber))
-        {
-            // if start time is not zero this means we have pressed the button down befor it has regesterd that it is not currently pressed
-            // ie we have just done a smack
-            if (startTime != 0)
+            if (playerState != PlayerState.GROUNDED)
             {
-
-                // if were in the air play the animation for smacking the ball
-                if (playerState != PlayerState.GROUNDED)
-                {
-                    animationController.setTrigger("Smack");
-                }
-                // if were on the ground play the animation for setting the ball
-                else
-                {
-                    animationController.setTrigger("Set");
-                }
-
-                // if weve charged long enough were doing a power hit
-                if (chargeTime >= .65)
-                {
-                    power = 2;
-                }
-                // else its just a nomral hit
-                else
-                {
-                    power = 1;
-                }
-                // tell the character controller we just smacked and give it the power of the smack
-                StartCoroutine(characterController.setPower(power));
-                // flash red if our power is 2 
-                if (power == 2)
-                    StartCoroutine(appearance.Flash());
-
-                chargeTime = 0;
-                startTime = 0;
+                animationController.setTrigger("Smack");
             }
+            else
+            {
+                animationController.setTrigger("Set");
+                Debug.Log("Set");
+            }
+            characterController.setPower(hitHoldTime / hitHoldLimit);
+            //if (power == 2)
+                //StartCoroutine(appearance.Flash());
+            hitHoldTime = 0;
+            chargeingHit = false;
         }
+        return;  
     }
     void CalcJumpHeight()
     {
         jumpHoldTime += Time.deltaTime;
         jumpHoldTime = Mathf.Clamp(jumpHoldTime, 0, jumpHoldLimit);
-
-        //if(jumpHoldTime >= jumpHoldLimit)
-        //{
-        //    characterController.Jump("high");
-        //    jumpHoldTime = 0;
-        //    yield return new WaitForSeconds(.1f);
-        //    playerState = PlayerState.FLOATING;
-        //}
-        //else if(inputMan.JumpRelease(playerNumber))
-        //{
-        //    characterController.Jump("low");
-        //    jumpHoldTime = 0;
-        //    yield return new WaitForSeconds(.1f);
-        //    playerState = PlayerState.FLOATING;
-        //}
 
         if(inputMan.JumpRelease(playerNumber))
         {
@@ -265,9 +231,8 @@ public class PlayerController : MonoBehaviour
             jumpHoldTime = 0;
         }
 
-        runningCalcJump = false;
+        chargeingJump = false;
         return;
-        //yield return new WaitForSeconds(0);
     }
 
     void ManageState()
@@ -283,6 +248,10 @@ public class PlayerController : MonoBehaviour
                 playerState = PlayerState.CHARGEJUMP;
                 //if(playerState == PlayerState.FLOATING)
                 //playerState = PlayerState.JUMP2;
+        }
+        if (!chargeingHit && inputMan.Charge(playerNumber))
+        {
+            chargeingHit = true;
         }
     }
 

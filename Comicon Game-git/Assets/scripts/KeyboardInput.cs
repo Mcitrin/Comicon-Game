@@ -55,6 +55,11 @@ public class KeyboardInput : MonoBehaviour, IGameInput
         return Input.GetMouseButton(0);
     }
 
+    public bool ChargeRelease()
+    {
+        return Input.GetMouseButtonUp(0);
+    }
+
     public bool Enter()
     {
         return Input.GetMouseButton(0);

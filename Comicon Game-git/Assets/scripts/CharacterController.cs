@@ -20,16 +20,16 @@ public class CharacterController : MonoBehaviour
     public GameObject hand;
     public float handXBounds;
     public float handYBounds;
-
-
-
+    
     public bool grounded = true;
     public bool falling = false;
-    float jump1Duration = .5f;
+    float jump1Duration = 1;
     float maxJumpHeight = 12.5f; //h
 
     public float yV0;
     public float G;
+
+    public float GMultiplier;
     public float xVelocity;
     float yVelocity;
 
@@ -44,6 +44,9 @@ public class CharacterController : MonoBehaviour
     // Evants
     public delegate void JumpApexReached(int playerNumber);
     public event JumpApexReached jumpApexReached;
+
+    public delegate void HitBallAttempt(Vector2 angle, float power, Vector2 handBounds, Vector2 handPosition);
+    public event HitBallAttempt hitBallAttempt;
 
     // Use this for initialization
     public void Init()
@@ -74,13 +77,14 @@ public class CharacterController : MonoBehaviour
             if (!grounded) // jumping
                 {
                 float yPos = 0;
+                float g = G * GMultiplier;
                 if (yVelocity > 0)
                     {
-                        yPos += yVelocity * Time.deltaTime + (G * .5f) * (Mathf.Pow(Time.deltaTime, 2));
+                        yPos += yVelocity * Time.deltaTime + (g * .5f) * (Mathf.Pow(Time.deltaTime, 2));
                     }
                     else if(yVelocity < 0)
                     {
-                        yPos += yVelocity * Time.deltaTime + (G* .5f) * (Mathf.Pow(Time.deltaTime, 2));
+                        yPos += yVelocity * Time.deltaTime + (g* .5f) * (Mathf.Pow(Time.deltaTime, 2));
                         if(!falling)
                         {
                             falling = true;
@@ -89,13 +93,11 @@ public class CharacterController : MonoBehaviour
                         }
                     }
                 
-                yVelocity += G * Time.deltaTime;
+                yVelocity += g * Time.deltaTime;
                 transform.position += new Vector3(0, yPos, 0);
                 IsGrounded();
                 }
-                
 
-                //xVelocity = DontCrossBorder(xVelocity, "X");
                 transform.position += new Vector3(xVelocity, 0, 0);
 
                 if (!moving)
@@ -173,12 +175,10 @@ public class CharacterController : MonoBehaviour
         return grounded;
     }
 
-    public IEnumerator setPower(int pow)
+    public void setPower(float pow)
     {
-        power = pow;
-        // wait a 4th of a second befor you can hit again
-        yield return new WaitForSeconds(.25f);
-        power = 0;
+        if (hitBallAttempt != null)
+            hitBallAttempt(angle, pow, new Vector2(handXBounds,handYBounds),hand.transform.position);
     }
     void ClampPosition()
     {

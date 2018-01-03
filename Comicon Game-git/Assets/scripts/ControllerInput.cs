@@ -61,6 +61,11 @@ public class ControllerInput : MonoBehaviour, IGameInput
         return input.RightTrigger;
     }
 
+    public bool ChargeRelease()
+    {
+        return input.RightTrigger.WasReleased;
+    }
+
     public bool Enter()
     {
         return input.Action1;

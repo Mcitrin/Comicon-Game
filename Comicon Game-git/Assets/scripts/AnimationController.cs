@@ -5,7 +5,7 @@ public class AnimationController : MonoBehaviour {
 
     public Animator Animator;
     public bool isGrounded;
-    public bool chargeing;
+    public bool chargeingHit;
     public float speed;
 
 
@@ -30,11 +30,11 @@ public class AnimationController : MonoBehaviour {
         if (isGrounded)
         {
             Animator.SetBool("ChargeSmack", false);
-            Animator.SetBool("ChargeSet", chargeing);
+            Animator.SetBool("ChargeSet", chargeingHit);
         }
         else
         {
-            Animator.SetBool("ChargeSmack", chargeing);
+            Animator.SetBool("ChargeSmack", chargeingHit);
             Animator.SetBool("ChargeSet", false);
         }
 

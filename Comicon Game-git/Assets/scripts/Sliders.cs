@@ -34,20 +34,20 @@ public class Sliders : MonoBehaviour {
             jumpSliderBorder.GetComponent<SpriteRenderer>().enabled = false;
         }
 
-        //if (hitSliderValue > 0)
-        //{
-        //    hitSlider.transform.localScale = new Vector3(.24f, jumpSliderValue * 2);
-        //    hitSlider.GetComponent<SpriteRenderer>().enabled = true;
-        //    hitSliderBorder.GetComponent<SpriteRenderer>().enabled = true;
-        //    hitSlider.GetComponent<SpriteRenderer>().color = new Color(1, 1 - jumpSliderValue, 1 - jumpSliderValue);
-        //
-        //}
-        //else
-        //{
-        //    hitSlider.transform.localScale = new Vector3(.24f, 1);
-        //    hitSlider.GetComponent<SpriteRenderer>().enabled = false;
-        //    hitSliderBorder.GetComponent<SpriteRenderer>().enabled = false;
-        //}
+       if (hitSliderValue > 0)
+       {
+           hitSlider.transform.localScale = new Vector3(.24f, hitSliderValue * 2);
+           hitSlider.GetComponent<SpriteRenderer>().enabled = true;
+           hitSliderBorder.GetComponent<SpriteRenderer>().enabled = true;
+           hitSlider.GetComponent<SpriteRenderer>().color = new Color(1, 1 - hitSliderValue, 1 - hitSliderValue);
+       
+       }
+       else
+       {
+           hitSlider.transform.localScale = new Vector3(.24f, 1);
+           hitSlider.GetComponent<SpriteRenderer>().enabled = false;
+           hitSliderBorder.GetComponent<SpriteRenderer>().enabled = false;
+       }
 
     }
 

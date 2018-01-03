@@ -25,6 +25,7 @@ public interface IGameInput
     Vector2 MoveVec();
     Vector2 Aim();
     bool Charge();
+    bool ChargeRelease();
     bool Enter();
     bool Pause();
 }
@@ -142,6 +143,11 @@ public class InputMan : MonoBehaviour {
     public bool Charge(int playerNum)
     {
         return GetInputDevice(playerNum).Charge();
+    }
+
+    public bool ChargeRelease(int playerNum)
+    {
+        return GetInputDevice(playerNum).ChargeRelease();
     }
 
     public bool Enter(int playerNum)
