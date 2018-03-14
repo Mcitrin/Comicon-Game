@@ -14,12 +14,12 @@ public class CharacterController : MonoBehaviour
     // a gameobject with a sprite used to visualize where the players aiming
     public GameObject arrow;
     // this ditance the arrow gameoject can be from you (it radious)
-    int arrowDistance = 2;
+    float arrowDistance = 4f;
 
     // and empty transform with a collsion box set to trigger. fallows the hand of the sprite used for colliding with the ball
-    public GameObject hand;
-    public float handXBounds;
-    public float handYBounds;
+    public Transform hand;
+    public float handRadious;
+    public bool hitting;
     
     public bool grounded = true;
     public bool falling = false;
@@ -40,21 +40,20 @@ public class CharacterController : MonoBehaviour
     // the size of your collsion box
     float xBounds;
     float yBounds;
+    float yOffset;
 
     // Evants
     public delegate void JumpApexReached(int playerNumber);
     public event JumpApexReached jumpApexReached;
-
-    public delegate void HitBallAttempt(Vector2 angle, float power, Vector2 handBounds, Vector2 handPosition);
-    public event HitBallAttempt hitBallAttempt;
 
     // Use this for initialization
     public void Init()
     {
         xBounds = GetComponent<BoxCollider2D>().bounds.extents.x;
         yBounds = GetComponent<BoxCollider2D>().bounds.extents.y;
-        handXBounds = hand.GetComponent<BoxCollider2D>().bounds.extents.x;
-        handYBounds = hand.GetComponent<BoxCollider2D>().bounds.extents.y;
+        yOffset = GetComponent<BoxCollider2D>().offset.y;
+        handRadious = hand.GetComponent<CircleCollider2D>().radius;
+        //handYBounds = hand.GetComponent<BoxCollider2D>().bounds.extents.y;
         //courtSize = GameManager.gameManager.net.position.x - GameManager.gameManager.left.position.x;
     }
 
@@ -64,8 +63,8 @@ public class CharacterController : MonoBehaviour
         // used to vissualy see the size of my collision box
         Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x, transform.position.y) + Vector2.left * xBounds, Color.red);
         Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x, transform.position.y) + Vector2.right * xBounds, Color.red);
+        Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x, (transform.position.y + yOffset) - yBounds), Color.red);
 
-       
         // pause check
         if (!GameManager.paused)
         {
@@ -149,7 +148,7 @@ public class CharacterController : MonoBehaviour
 
     public void Jump(float jumpPercentage)
     {
-        Debug.Log(jumpPercentage);
+        //Debug.Log(jumpPercentage);
         grounded = false;
 
         float jumpHeight = maxJumpHeight * jumpPercentage;
@@ -162,8 +161,7 @@ public class CharacterController : MonoBehaviour
     // are we touching the ground
     public bool IsGrounded()
     {
-        Debug.DrawLine(new Vector2(transform.position.x, transform.position.y), new Vector2(transform.position.x, transform.position.y - yBounds), Color.red);
-        if (transform.position.y - yBounds <= GameManager.gameManager.ground.position.y)
+        if ((transform.position.y + yOffset) - yBounds <= GameManager.gameManager.ground.position.y)
         {
             grounded = true;
             falling = false;
@@ -175,15 +173,19 @@ public class CharacterController : MonoBehaviour
         return grounded;
     }
 
-    public void setPower(float pow)
+    public void setHitMagnitude(int pow)
     {
-        if (hitBallAttempt != null)
-            hitBallAttempt(angle, pow, new Vector2(handXBounds,handYBounds),hand.transform.position);
+        power = pow;   
     }
+    public Vector3 getHitVector()
+    {
+        return new Vector3(angle.x,angle.y,power);
+    }
+
     void ClampPosition()
     {
 
-        float yClamp = Mathf.Clamp(transform.position.y, GameManager.gameManager.ground.position.y + yBounds, 1000);
+        float yClamp = Mathf.Clamp(transform.position.y, GameManager.gameManager.ground.position.y + (yBounds - yOffset), 1000);
         float xClamp = 0;
 
 

@@ -37,16 +37,8 @@ public class KeyboardInput : MonoBehaviour, IGameInput
 
     public Vector2 Aim()
     {
-        Vector2 vec = Vector2.zero;
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        Vector3 target = Vector2.zero;
-
-        if (Physics.Raycast(ray, out hit, 100))
-        {
-            target = new Vector2(hit.point.x, hit.point.y);
-            vec = (target - GameObject.Find("Player1New").transform.position).normalized;
-        }
+        Vector3 target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 vec = (target - GameObject.Find("Player1New").transform.position).normalized;
         return vec;
     }
 

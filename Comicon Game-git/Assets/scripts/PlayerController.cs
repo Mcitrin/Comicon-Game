@@ -32,12 +32,14 @@ public class PlayerController : MonoBehaviour
     public Appearance appearance;
 
     float jumpHoldTime;
-    float jumpHoldLimit = 1.5f;
-    float jumpHoldMin = .4f;
+    float jumpHoldLimit = .25f;
+    float jumpMinValue = .5f;
+    float jumpMaxValue = 1;
 
     float hitHoldTime;
-    float hitHoldLimit = 1.5f;
-    float hitHoldMin = .4f;
+    float hitHoldLimit = .4f;
+    int hitMinValue = 1;
+    int hitMaxValue = 2;
 
     // are you diveing
     bool dive;
@@ -45,9 +47,7 @@ public class PlayerController : MonoBehaviour
     float diveEndTime;
     // how long your dive will last
     float diveLength = 1;
-
-    public Sliders sliders;
-
+    
   public enum PlayerState
     {
         GROUNDED,
@@ -87,22 +87,15 @@ public class PlayerController : MonoBehaviour
         Move();
 
         // determins how hard your going to hit the ball
-        if(chargeingHit)
-        {
+        //if(inputMan.Charge(playerNumber))
+        //{
             CalcHitPower();
-        }
+        //}
         
         if (playerState == PlayerState.CHARGEJUMP)
         {
-            if (!chargeingJump)
-            {
-                chargeingJump = true;
                 CalcJumpHeight();
-            }
         }
-        
-        sliders.SetValue("jump", jumpHoldTime / jumpHoldLimit);
-        sliders.SetValue("hit", hitHoldTime / hitHoldLimit);
     }
 
     void Animate()
@@ -111,6 +104,15 @@ public class PlayerController : MonoBehaviour
         animationController.speed = Mathf.Abs(inputMan.Move(playerNumber));
         animationController.isGrounded = characterController.grounded;
         animationController.chargeingHit = chargeingHit;
+
+
+        //Debug.Log(animationController.Animator.GetCurrentAnimatorStateInfo(1).IsTag("Hit"));
+       if (characterController.hitting && animationController.Animator.GetCurrentAnimatorStateInfo(1).IsTag("Hit"))
+       {
+            if (animationController.Animator.GetCurrentAnimatorStateInfo(1).normalizedTime % 1 >.80f)
+            //Debug.Log("true;");
+            characterController.hitting = false;
+        }
     }
 
     void Move()
@@ -154,10 +156,10 @@ public class PlayerController : MonoBehaviour
             // lock to front arc
             if (playerNumber == 1)
             {
-                if (angleTo.x < 0 && angleTo.y >= 0)
-                    angleTo = new Vector3(0, 1);
-                if (angleTo.x < .3f && angleTo.y <= 0)
-                    angleTo = new Vector3(.3f, -1);
+                if (angleTo.x < 0)
+                    angleTo = -angleTo;
+                //if (angleTo.x < .3f && angleTo.y <= 0)
+                //    angleTo = new Vector3(.3f, -1);
             }
             if (playerNumber == 2)
             {
@@ -184,55 +186,67 @@ public class PlayerController : MonoBehaviour
 
     void CalcHitPower()
     {
-        hitHoldTime += Time.deltaTime;
-        hitHoldTime = Mathf.Clamp(hitHoldTime, 0, hitHoldLimit);
+        chargeingHit = inputMan.Charge(playerNumber);
+        bool power;
 
-        if (hitHoldTime < hitHoldMin)
+        if (hitHoldTime != 0 && Time.time - hitHoldTime >= hitHoldLimit)
         {
-            hitHoldTime = hitHoldMin;
+
+            animationController.Animator.SetBool("Charged", true);
+        }
+        else
+        {
+
+            animationController.Animator.SetBool("Charged", false);
+        }
+
+            if (inputMan.Charge(playerNumber) && hitHoldTime == 0)
+        {
+            hitHoldTime = Time.time;
         }
         if (inputMan.ChargeRelease(playerNumber))
         {
-            
-            if (hitHoldTime < hitHoldMin)
+            // power hit
+            if (Time.time - hitHoldTime >= hitHoldLimit)
             {
-                hitHoldTime = hitHoldMin;
+                characterController.setHitMagnitude(hitMaxValue);
+                power = true;
+                //StartCoroutine(appearance.Flash());
             }
-            if (playerState != PlayerState.GROUNDED)
-            {
-                animationController.setTrigger("Smack");
-            }
+            // normal hit
             else
             {
-                animationController.setTrigger("Set");
-                Debug.Log("Set");
+                characterController.setHitMagnitude(hitMinValue);
+                power = false;
             }
-            characterController.setPower(hitHoldTime / hitHoldLimit);
-            //if (power == 2)
-                //StartCoroutine(appearance.Flash());
+            animationController.hitBall(power);
+            //animationController.Animator.SetTrigger("Set");
+            characterController.hitting = true;
             hitHoldTime = 0;
-            chargeingHit = false;
         }
-        return;  
     }
     void CalcJumpHeight()
     {
-        jumpHoldTime += Time.deltaTime;
-        jumpHoldTime = Mathf.Clamp(jumpHoldTime, 0, jumpHoldLimit);
-
-        if(inputMan.JumpRelease(playerNumber))
+        if (inputMan.Charge(playerNumber) && jumpHoldTime == 0)
         {
-            if(jumpHoldTime < jumpHoldMin)
-            {
-                jumpHoldTime = jumpHoldMin;
-            }
-            playerState = PlayerState.JUMP;
-            characterController.Jump(jumpHoldTime / jumpHoldLimit);
-            jumpHoldTime = 0;
+            jumpHoldTime = Time.time;
         }
 
-        chargeingJump = false;
-        return;
+        if(inputMan.JumpRelease(playerNumber) || Time.time - jumpHoldTime >= jumpHoldLimit)
+        {
+            // high jump
+            if(Time.time - jumpHoldTime >= jumpHoldLimit)
+            {
+                characterController.Jump(jumpMaxValue);
+            }
+            // normal jump
+            else
+            {
+                characterController.Jump(jumpMinValue);
+            }
+            playerState = PlayerState.JUMP;
+            jumpHoldTime = 0;
+        }
     }
 
     void ManageState()
@@ -248,10 +262,6 @@ public class PlayerController : MonoBehaviour
                 playerState = PlayerState.CHARGEJUMP;
                 //if(playerState == PlayerState.FLOATING)
                 //playerState = PlayerState.JUMP2;
-        }
-        if (!chargeingHit && inputMan.Charge(playerNumber))
-        {
-            chargeingHit = true;
         }
     }
 

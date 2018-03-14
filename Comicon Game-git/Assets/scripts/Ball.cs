@@ -49,7 +49,7 @@ public class Ball : MonoBehaviour
                 rigidbody.isKinematic = false;
 
             if (HeldBy && !wait && manager.winner == -1) // -1 = is default value
-                transform.position = HeldBy.GetComponent<CharacterController>().hand.transform.position;
+                //transform.position = HeldBy.GetComponent<CharacterController>().hand;
 
             if (transform.position.y <= .5f)
                 transform.position = new Vector3(transform.position.x, .6f, 0);
@@ -251,7 +251,7 @@ public class Ball : MonoBehaviour
         {
             HeldBy = Players[playerNum];
             wait = false;
-            transform.position = HeldBy.GetComponent<CharacterController>().hand.transform.position;
+            //transform.position = HeldBy.GetComponent<CharacterController>().hand;
         }
     }
 

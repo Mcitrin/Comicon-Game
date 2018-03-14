@@ -26,23 +26,27 @@ public class AnimationController : MonoBehaviour {
         Animator.SetBool("Jump", !isGrounded);
 
         Animator.SetFloat("Speed", speed);
-
-        if (isGrounded)
-        {
-            Animator.SetBool("ChargeSmack", false);
-            Animator.SetBool("ChargeSet", chargeingHit);
-        }
-        else
-        {
-            Animator.SetBool("ChargeSmack", chargeingHit);
-            Animator.SetBool("ChargeSet", false);
-        }
+        Animator.SetBool("Chargeing", chargeingHit);
+        
 
     }
 
     public void setTrigger(string trigger)
     {
         Animator.SetTrigger(trigger);
+    }
+
+    public void hitBall(bool power)
+    {
+        if (isGrounded)
+            Animator.SetTrigger("Set");
+        else
+        {
+            if(power)
+            Animator.SetTrigger("PowerSmack");
+            else
+            Animator.SetTrigger("Smack");
+        }
     }
 
 
