@@ -47,6 +47,8 @@ public class PlayerController : MonoBehaviour
     float diveEndTime;
     // how long your dive will last
     float diveLength = 1;
+
+    public AimReticle reticle;
     
   public enum PlayerState
     {
@@ -96,6 +98,11 @@ public class PlayerController : MonoBehaviour
         {
                 CalcJumpHeight();
         }
+        if(hitHoldTime != 0)
+        reticle.Value = Mathf.Clamp((Time.time - hitHoldTime),0,.8f);
+        else
+        reticle.Value = 0;
+
     }
 
     void Animate()
@@ -156,18 +163,18 @@ public class PlayerController : MonoBehaviour
             // lock to front arc
             if (playerNumber == 1)
             {
-                if (angleTo.x < 0)
-                    angleTo = -angleTo;
-                //if (angleTo.x < .3f && angleTo.y <= 0)
-                //    angleTo = new Vector3(.3f, -1);
-            }
-            if (playerNumber == 2)
-            {
-                if (angleTo.x > 0 && angleTo.y >= 0)
+                if (angleTo.x < 0 && angleTo.y >= 0)
                     angleTo = new Vector3(0, 1);
-                if (angleTo.x > .3f && angleTo.y <= 0)
+                if (angleTo.x < .3f && angleTo.y <= 0)
                     angleTo = new Vector3(.3f, -1);
             }
+           if (playerNumber == 2)
+           {
+               if (angleTo.x > 0 && angleTo.y >= 0)
+                   angleTo = new Vector3(0, 1);
+               if (angleTo.x > .3f && angleTo.y <= 0)
+                   angleTo = new Vector3(.3f, -1);
+           }
 
             float xPos = Linear(angle.x, angleTo.x, Time.deltaTime);
             float yPos = Linear(angle.y, angleTo.y, Time.deltaTime);

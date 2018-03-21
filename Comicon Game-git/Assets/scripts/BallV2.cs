@@ -16,7 +16,8 @@ public class BallV2 : MonoBehaviour {
 
     bool reseting = false;
 
-    float radious;
+    public float landingPoint = 0;
+    public float radious;
     float yBounds;
 
     Vector2 net;
@@ -92,7 +93,7 @@ public class BallV2 : MonoBehaviour {
                 if (player.hitting && lastPlayerHit != player)
                 {
                     Vector3 V1 = new Vector3(player.getHitVector().x, player.getHitVector().y) * (player.getHitVector().z * 10);
-                    SetVelocity(V1);
+                    SetVelocity(V1, true);
                     lastPlayerHit = player; 
                     recentlyHitNet = false; // allow the ball to hit the net again
                 }
@@ -118,7 +119,7 @@ public class BallV2 : MonoBehaviour {
                     if (transform.position.x + radious >= net.x)
                     {
                         // net animate right
-                        SetVelocity(new Vector3(-V.x * .5f, V.y * .5f, 0));
+                        SetVelocity(new Vector3(-V.x * .5f, V.y * .5f, 0), true);
                         recentlyHitNet = true; // we just hit the net
                         //lastPlayerHit = null; // allow the player to hit the ball again
                     }
@@ -128,7 +129,7 @@ public class BallV2 : MonoBehaviour {
                     if (transform.position.x - radious <= net.x)
                     {
                         // net animate left
-                        SetVelocity(new Vector3(-V.x * .5f, V.y * .5f, 0));
+                        SetVelocity(new Vector3(-V.x * .5f, V.y * .5f, 0), true);
                         recentlyHitNet = true; 
                         //lastPlayerHit = null; 
                     }
@@ -140,7 +141,7 @@ public class BallV2 : MonoBehaviour {
                     && transform.position.x <= net.x + radious
                     && transform.position.x >= net.x - radious)
                 {
-                    SetVelocity(new Vector3(Mathf.Sign(V.x) * 2, -V.y * .5f, 0));
+                    SetVelocity(new Vector3(Mathf.Sign(V.x) * 2, -V.y * .5f, 0), true);
                     recentlyHitNet = true; // we just hit the net
                 }
 
@@ -170,29 +171,54 @@ public class BallV2 : MonoBehaviour {
         {
             CourtSide = 'R';
         }
+
+        if(transform.position.x > GameManager.gameManager.right.position.x 
+            || transform.position.x < GameManager.gameManager.left.position.x)
+        {
+            CourtSide = 'O';
+        }
     }
 
-    void SetVelocity(Vector3 V1)
+    void SetVelocity(Vector3 V1, bool getLandingPoint)
     {
         V = V1;
         if (bState == BallState.Held) bState = BallState.InPlay;
+
+        if(getLandingPoint)
+        {
+           solve4DX();
+        }
+    }
+
+    float solve4T()
+    {
+        float T = 0;
+        float Y0 = transform.position.y;
+        float Y1 = GameManager.gameManager.ground.transform.position.y;
+
+        float plus = (-V.y + Mathf.Sqrt((V.y * V.y) - (2 * -9.8f) * Y1)) / -9.8f;
+        float minus = (-V.y - Mathf.Sqrt((V.y * V.y) - (2 * -9.8f) * Y1)) / -9.8f;
+
+        if (plus > 0) { T = plus; }
+        else if (minus > 0) { T = minus; }
+        Debug.Log(T);
+        return T;
+    }
+
+    void solve4DX()
+    {
+        float T = solve4T();
+        float DX = GameManager.gameManager.ball.transform.position.x + (V.x * T);
+        landingPoint = DX;
     }
 
     void Integrate()
     {
         Vector3 newV = Vector3.zero;
+        newV = new Vector3(V.x, V.y + G * Time.deltaTime, 0);
 
-        if (V.y > 0)
-        {
-             newV = new Vector3(V.x, V.y + G * Time.deltaTime, 0);
-        }
-        else
-        {
-             newV = new Vector3(V.x, V.y + (G * 2.5f) * Time.deltaTime, 0);
-        }
-
-        transform.position = transform.position + (((V + newV) / 2) * (Time.deltaTime * .85f));
-        SetVelocity(newV);
+        transform.position = transform.position + (((V + newV) / 2) * (Time.deltaTime));
+        SetVelocity(newV, false);
     }
 
     IEnumerator Reset()
@@ -200,6 +226,7 @@ public class BallV2 : MonoBehaviour {
         reseting = true;
         yield return new WaitForSeconds(3);
         bState = BallState.Held;
+        landingPoint = 0;
         reseting = false;
     }
 

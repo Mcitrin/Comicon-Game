@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour {
 
         ball.Init();
         Players[0].Init();
-        //Players[1].Init();
+        Players[1].Init();
 
     }
 

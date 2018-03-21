@@ -120,7 +120,7 @@ public class CharacterController : MonoBehaviour
     public void Aim(Vector2 arrowAngle)
     {
         // gets the angle from the player controller object
-        angle = arrowAngle;
+        angle = arrowAngle.normalized;
     }
 
     public void Move(int direction, bool moveSlow)
@@ -192,12 +192,14 @@ public class CharacterController : MonoBehaviour
         if (playerNum == 1)
         {
              xClamp = Mathf.Clamp(transform.position.x, GameManager.gameManager.left.position.x + xBounds, 
-                                                             GameManager.gameManager.net.position.x - xBounds);
+                                                        GameManager.gameManager.net.position.x - xBounds);
         }
         else if(playerNum == 2)
         {
-             xClamp = Mathf.Clamp(transform.position.x, GameManager.gameManager.right.position.x - xBounds,
-                                                             GameManager.gameManager.net.position.x + xBounds);
+             xClamp = Mathf.Clamp(transform.position.x,GameManager.gameManager.net.position.x + xBounds,
+                                                       GameManager.gameManager.right.position.x - xBounds);
+
+
         }
         transform.position = new Vector3(xClamp, yClamp);
     }
