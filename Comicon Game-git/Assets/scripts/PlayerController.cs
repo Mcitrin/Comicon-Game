@@ -99,7 +99,7 @@ public class PlayerController : MonoBehaviour
                 CalcJumpHeight();
         }
         if(hitHoldTime != 0)
-        reticle.Value = Mathf.Clamp((Time.time - hitHoldTime),0,.8f);
+        reticle.Value = Mathf.Clamp((Time.time - hitHoldTime),0,1);
         else
         reticle.Value = 0;
 

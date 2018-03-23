@@ -23,6 +23,8 @@ public class GameManager : MonoBehaviour {
     public Transform net;
     public Transform ground;
 
+    public float courtSize;
+
 
 
     // Use this for initialization
@@ -37,6 +39,8 @@ public class GameManager : MonoBehaviour {
         ball.Init();
         Players[0].Init();
         Players[1].Init();
+
+        courtSize = net.position.x - left.position.x;
 
     }
 

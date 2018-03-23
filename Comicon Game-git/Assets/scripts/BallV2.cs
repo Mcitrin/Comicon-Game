@@ -7,6 +7,7 @@ public class BallV2 : MonoBehaviour {
     public CharacterController lastPlayerHit = null;
     float G = -9.8f;
     public Vector3 V = Vector3.zero;
+    Vector3 V1 = Vector3.zero;
 
     public Animator animator;
     public CharacterController HeldBy;
@@ -22,6 +23,8 @@ public class BallV2 : MonoBehaviour {
 
     Vector2 net;
     bool recentlyHitNet;
+
+    float tmpTime = 0;
 
     public enum BallState
     {
@@ -92,7 +95,14 @@ public class BallV2 : MonoBehaviour {
                 // is the player trying to hit the ball and have they already done so
                 if (player.hitting && lastPlayerHit != player)
                 {
-                    Vector3 V1 = new Vector3(player.getHitVector().x, player.getHitVector().y) * (player.getHitVector().z * 10);
+                    if (player.getHitVector().z == 1)
+                    {
+                         V1 = new Vector3(player.getHitVector().x, player.getHitVector().y) * (player.getHitVector().z * 15);
+                    }
+                    if (player.getHitVector().z == 2)
+                    {
+                         V1 = new Vector3(player.getHitVector().x, player.getHitVector().y) * (player.getHitVector().z * 9);
+                    }
                     SetVelocity(V1, true);
                     lastPlayerHit = player; 
                     recentlyHitNet = false; // allow the ball to hit the net again
@@ -187,6 +197,7 @@ public class BallV2 : MonoBehaviour {
         if(getLandingPoint)
         {
            solve4DX();
+            tmpTime = Time.time;
         }
     }
 
@@ -196,12 +207,12 @@ public class BallV2 : MonoBehaviour {
         float Y0 = transform.position.y;
         float Y1 = GameManager.gameManager.ground.transform.position.y;
 
-        float plus = (-V.y + Mathf.Sqrt((V.y * V.y) - (2 * -9.8f) * Y1)) / -9.8f;
-        float minus = (-V.y - Mathf.Sqrt((V.y * V.y) - (2 * -9.8f) * Y1)) / -9.8f;
+        float plus = (-V.y + Mathf.Sqrt((V.y * V.y) - (2 * G) * Y0)) / G;
+        float minus = (-V.y - Mathf.Sqrt((V.y * V.y) - (2 * G) * Y0)) / G;
 
         if (plus > 0) { T = plus; }
         else if (minus > 0) { T = minus; }
-        Debug.Log(T);
+        //Debug.Log(T);
         return T;
     }
 
@@ -224,6 +235,7 @@ public class BallV2 : MonoBehaviour {
     IEnumerator Reset()
     {
         reseting = true;
+        //Debug.Log(Time.time - tmpTime);
         yield return new WaitForSeconds(3);
         bState = BallState.Held;
         landingPoint = 0;
