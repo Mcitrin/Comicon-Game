@@ -23,6 +23,10 @@ public class GameManager : MonoBehaviour {
     public Transform net;
     public Transform ground;
 
+
+    public int hardHit = 18;
+    public int normHit = 15;
+
     public float courtSize;
 
 

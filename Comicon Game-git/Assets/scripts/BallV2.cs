@@ -97,11 +97,11 @@ public class BallV2 : MonoBehaviour {
                 {
                     if (player.getHitVector().z == 1)
                     {
-                         V1 = new Vector3(player.getHitVector().x, player.getHitVector().y) * (player.getHitVector().z * 15);
+                         V1 = new Vector3(player.getHitVector().x, player.getHitVector().y) * (GameManager.gameManager.normHit);
                     }
                     if (player.getHitVector().z == 2)
                     {
-                         V1 = new Vector3(player.getHitVector().x, player.getHitVector().y) * (player.getHitVector().z * 9);
+                         V1 = new Vector3(player.getHitVector().x, player.getHitVector().y) * (GameManager.gameManager.hardHit);
                     }
                     SetVelocity(V1, true);
                     lastPlayerHit = player; 
@@ -212,7 +212,7 @@ public class BallV2 : MonoBehaviour {
 
         if (plus > 0) { T = plus; }
         else if (minus > 0) { T = minus; }
-        //Debug.Log(T);
+        Debug.Log(T);
         return T;
     }
 
