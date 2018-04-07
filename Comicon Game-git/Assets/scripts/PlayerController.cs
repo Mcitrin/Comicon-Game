@@ -76,6 +76,11 @@ public class PlayerController : MonoBehaviour
                 playerState = PlayerState.FLOATING;
             }
         };
+
+
+
+        int direction2Net = (int)Mathf.Sign(transform.position.x - GameManager.gameManager.net.position.x) * -1;
+        angle = new Vector2(direction2Net, 1);
     }
 
 

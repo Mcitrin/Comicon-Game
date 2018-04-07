@@ -53,6 +53,7 @@ public class CharacterController : MonoBehaviour
         yBounds = GetComponent<BoxCollider2D>().bounds.extents.y;
         yOffset = GetComponent<BoxCollider2D>().offset.y;
         handRadious = hand.GetComponent<CircleCollider2D>().radius;
+        
         //handYBounds = hand.GetComponent<BoxCollider2D>().bounds.extents.y;
         //courtSize = GameManager.gameManager.net.position.x - GameManager.gameManager.left.position.x;
     }

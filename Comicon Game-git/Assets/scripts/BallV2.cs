@@ -46,6 +46,7 @@ public class BallV2 : MonoBehaviour {
     // Update is called once per frame
     void Update ()
     {
+
         PlayerColission();
         CheckCourtSide();
 
@@ -131,7 +132,6 @@ public class BallV2 : MonoBehaviour {
                         // net animate right
                         SetVelocity(new Vector3(-V.x * .5f, V.y * .5f, 0), true);
                         recentlyHitNet = true; // we just hit the net
-                        //lastPlayerHit = null; // allow the player to hit the ball again
                     }
                 }
                else if (CourtSide == 'R') // right side of court
@@ -141,7 +141,6 @@ public class BallV2 : MonoBehaviour {
                         // net animate left
                         SetVelocity(new Vector3(-V.x * .5f, V.y * .5f, 0), true);
                         recentlyHitNet = true; 
-                        //lastPlayerHit = null; 
                     }
                 }
             }
@@ -197,7 +196,6 @@ public class BallV2 : MonoBehaviour {
         if(getLandingPoint)
         {
            solve4DX();
-            tmpTime = Time.time;
         }
     }
 
@@ -212,7 +210,7 @@ public class BallV2 : MonoBehaviour {
 
         if (plus > 0) { T = plus; }
         else if (minus > 0) { T = minus; }
-        Debug.Log(T);
+        //Debug.Log(T);
         return T;
     }
 
@@ -228,14 +226,13 @@ public class BallV2 : MonoBehaviour {
         Vector3 newV = Vector3.zero;
         newV = new Vector3(V.x, V.y + G * Time.deltaTime, 0);
 
-        transform.position = transform.position + (((V + newV) / 2) * (Time.deltaTime));
+        transform.position = transform.position + (((V + newV) * .5f) * (Time.deltaTime));
         SetVelocity(newV, false);
     }
 
     IEnumerator Reset()
     {
         reseting = true;
-        //Debug.Log(Time.time - tmpTime);
         yield return new WaitForSeconds(3);
         bState = BallState.Held;
         landingPoint = 0;

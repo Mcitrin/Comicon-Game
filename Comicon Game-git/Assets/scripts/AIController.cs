@@ -53,6 +53,10 @@ public class AIController : MonoBehaviour
         characterController = GetComponent<CharacterController>();
         characterController.playerNum = playerNumber;
         ball = GameManager.gameManager.ball;
+
+        int direction2Net = (int)Mathf.Sign(transform.position.x - GameManager.gameManager.net.position.x) * -1;
+        angle = new Vector2(direction2Net, 1);
+        angleTo = angle;
     }
 
     // Update is called once per frame
@@ -114,8 +118,14 @@ public class AIController : MonoBehaviour
     {
         if(ball.landingPoint != lastBallLandingPoint)
         {
-            angleTo = GetAimVector();
-            lastBallLandingPoint = ball.landingPoint;
+            if (playerNumber == 1 && Mathf.Sign(ball.V.x) * 1 == -1 ||
+                playerNumber == 2 && Mathf.Sign(ball.V.x) * 1 == 1)
+            {
+
+
+                angleTo = GetAimVector();
+                lastBallLandingPoint = ball.landingPoint;
+            }
         }
 
         //lock to front arc
@@ -157,15 +167,15 @@ public class AIController : MonoBehaviour
     }
     int GitHitMag()
     {
-        float dist2Net = Mathf.Abs(GameManager.gameManager.net.transform.position.x - transform.position.x);
+        float dist2Net = Mathf.Abs(GameManager.gameManager.net.transform.position.x - ball.landingPoint);
         int pow = 0;
         if (dist2Net <= GameManager.gameManager.courtSize * .5f)
         {
-            pow = GameManager.gameManager.normHit;
+            pow = 1;
         }
         else
         {
-            pow = GameManager.gameManager.hardHit;
+            pow = 2;
         }
         return pow;
     }
@@ -185,16 +195,21 @@ public class AIController : MonoBehaviour
                GameManager.gameManager.right.position.x - ball.radious);
         }
 
+        // magnitue of hit vector
+        float M = GitHitMag();
+
+        if (M == 1) { M = GameManager.gameManager.normHit; }
+        else if (M == 2) { M = GameManager.gameManager.hardHit; }
+        
         float dx = landingPoint - ball.landingPoint;
-        Debug.Log(dx);
         float T = 3 + Random.value;
-        Debug.Log(T);
-        int Z = GitHitMag();
-        Debug.Log(Z);
         float V0x = dx / T;
-        Debug.Log(V0x);
-        float V0y = Mathf.Sqrt((Z * Z) - (V0x * V0x));
-        Debug.Log(V0y);
+        float V0y = Mathf.Sqrt((M * M) - (V0x * V0x));
+
+        if(float.IsNaN(V0y))
+        {
+            Debug.Log("is nan");
+        }
 
         tmp = new Vector2(landingPoint, 0);
 
@@ -226,8 +241,13 @@ public class AIController : MonoBehaviour
 
     bool ShouldhitBall()
     {
-        if (Vector2.Distance(ball.transform.position, transform.position) <= ball.radious + characterController.handRadious + 3f
-            && !justHitBall && Mathf.Abs(GameManager.gameManager.net.transform.position.x - ball.landingPoint) > GameManager.gameManager.courtSize)
+        float aiDistance2Ball = Vector2.Distance(ball.transform.position, transform.position);
+        float ballDistnace2Net = Mathf.Abs(GameManager.gameManager.net.transform.position.x - ball.landingPoint);
+        float contactDistance = ball.radious + characterController.handRadious;
+
+        if (aiDistance2Ball <= contactDistance && 
+            !justHitBall &&
+            ballDistnace2Net <= GameManager.gameManager.courtSize)
             return true;
 
         return false;
