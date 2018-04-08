@@ -30,6 +30,9 @@ public class GameManager : MonoBehaviour {
     public float courtSize;
 
 
+    public float hitMag = 15;
+
+
 
     // Use this for initialization
     private void Awake()

@@ -14,7 +14,7 @@ public class predictProjectile2 : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-        if(transform.position == Vector3.zero)
+        //if(transform.position == Vector3.zero)
         transform.position = ai.tmp;
 
 

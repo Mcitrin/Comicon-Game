@@ -118,14 +118,14 @@ public class AIController : MonoBehaviour
     {
         if(ball.landingPoint != lastBallLandingPoint)
         {
-            if (playerNumber == 1 && Mathf.Sign(ball.V.x) * 1 == -1 ||
-                playerNumber == 2 && Mathf.Sign(ball.V.x) * 1 == 1)
-            {
+           // if (playerNumber == 1 && Mathf.Sign(ball.V.x) * 1 == -1 ||
+           //     playerNumber == 2 && Mathf.Sign(ball.V.x) * 1 == 1)
+           // {
 
 
-                angleTo = GetAimVector();
+                //angleTo = GetAimVector();
                 lastBallLandingPoint = ball.landingPoint;
-            }
+           // }
         }
 
         //lock to front arc
@@ -144,16 +144,19 @@ public class AIController : MonoBehaviour
         //        angleTo = new Vector3(.3f, -1);
         //}
 
-        float xPos = Linear(angle.x, angleTo.x, Time.deltaTime);
-        float yPos = Linear(angle.y, angleTo.y, Time.deltaTime);
-        angle = new Vector2(xPos, yPos).normalized;
+        //float xPos = Linear(angle.x, angleTo.x, Time.deltaTime);
+        //float yPos = Linear(angle.y, angleTo.y, Time.deltaTime);
+       // angle = new Vector2(xPos, yPos).normalized;
 
         // pass our angel to the character controller
-        characterController.Aim(angle.normalized);
+        //characterController.Aim(angle.normalized);
 
         // hit the ball
         if (ShouldhitBall())
         {
+            angle = GetAimVector();
+            characterController.Aim(angle.normalized);
+
             characterController.setHitMagnitude(GitHitMag());
             animationController.hitBall(GitHitMag() == 2);
             characterController.hitting = true;
@@ -200,20 +203,94 @@ public class AIController : MonoBehaviour
 
         if (M == 1) { M = GameManager.gameManager.normHit; }
         else if (M == 2) { M = GameManager.gameManager.hardHit; }
-        
-        float dx = landingPoint - ball.landingPoint;
-        float T = 3 + Random.value;
-        float V0x = dx / T;
-        float V0y = Mathf.Sqrt((M * M) - (V0x * V0x));
 
-        if(float.IsNaN(V0y))
-        {
-            Debug.Log("is nan");
-        }
+        float Y0 = ball.transform.position.y;
+
+        float DX = landingPoint - ball.transform.position.x;
+
+        float Theta = solve4T2(M, -DX, -Y0);
+
+        float V0x = -(M * Mathf.Cos(Theta));
+        float V0y = M * Mathf.Sin(Theta);
+
+        float b = 0;
+
+        ///float T = 3.0f  + Random.value;
+
+        //float V0x = dx / T;
+        //
+        //float V0y = Mathf.Sqrt((M * M) - (dx^2 / T^2));
+        //
+        //
+        //
+        //
+        //
+        //float apex = 12;
+        //
+        //float Y0 = ball.transform.position.y;
+        //
+        //float halfT = Mathf.Sqrt(2.0f * ((apex - Y0)) / 9.8f);
+        //float T = 2.0f * (halfT);// + Random.value;
+        //
+        //float V0y = ((apex - Y0 + ((9.8f * (halfT * halfT)) * 0.5f)) / halfT);
+        //
+        //float t = solve4T(-V0y, Y0);
+        //
+        //float V0x = dx / (T + t);
+        //
+        //
+        //
+        //
+        //GameManager.gameManager.hitMag = Mathf.Sqrt((V0y * V0y) + (V0x * V0x));
+
+        //float V0y = Mathf.Sqrt((M * M) - (V0x * V0x));
+
+        //if(float.IsNaN(V0y))
+        //{
+        //    Debug.Log("is nan");
+        //}
 
         tmp = new Vector2(landingPoint, 0);
 
         return new Vector2(V0x,V0y);
+    }
+
+    float solve4T2(float M,float DX,float Y0)
+    {
+        // https://en.wikipedia.org/wiki/Projectile_motion
+        float G = 9.8f;
+        float root1 = Mathf.Atan(((M * M) + Mathf.Sqrt((M * M * M * M) - G * (G * (DX * DX) + (2.0f * Y0 * (M * M))))) / (G * DX));
+        float root2 = Mathf.Atan(((M * M) - Mathf.Sqrt((M * M * M * M) - G * (G * (DX * DX) + (2.0f * Y0 * (M * M))))) / (G * DX));
+
+        float Theta = -100;
+
+        if (root1 > Theta) Theta = root1;
+        if (root2 > Theta) Theta = root2;
+
+        return Theta;
+    }
+
+    float solve4T(float M, float DX)
+    {
+        float G = 9.8f;
+
+        //https://www.wolframalpha.com/input/?i=0+%3D+-g%2F2*x%5E4+%2B+M*x%5E2+-+d
+
+        //float roots[] = {0,0,0,0};
+
+        float root1 = -Mathf.Sqrt(M - Mathf.Sqrt((M * M) - (2.0f * DX * G)) / G);
+        float root2 = Mathf.Sqrt(M - Mathf.Sqrt((M * M) - (2.0f * DX * G)) / G);
+        float root3 = -Mathf.Sqrt(M + Mathf.Sqrt((M * M) - (2.0f * DX * G)) / G);
+        float root4 = Mathf.Sqrt(M + Mathf.Sqrt((M * M) - (2.0f * DX * G)) / G);
+        
+        float T = 0;
+
+        if (root1 > T) T = root1;
+        if (root2 > T) T = root2;
+        if (root1 > T) T = root3;
+        if (root4 > T) T = root4;
+
+        return T;
     }
 
     public static float Linear(float start, float end, float value)

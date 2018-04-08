@@ -132,6 +132,7 @@ public class BallV2 : MonoBehaviour {
                         // net animate right
                         SetVelocity(new Vector3(-V.x * .5f, V.y * .5f, 0), true);
                         recentlyHitNet = true; // we just hit the net
+                        SetAimation("Stop");
                     }
                 }
                else if (CourtSide == 'R') // right side of court
@@ -140,7 +141,8 @@ public class BallV2 : MonoBehaviour {
                     {
                         // net animate left
                         SetVelocity(new Vector3(-V.x * .5f, V.y * .5f, 0), true);
-                        recentlyHitNet = true; 
+                        recentlyHitNet = true;
+                        SetAimation("Stop");
                     }
                 }
             }
@@ -152,6 +154,7 @@ public class BallV2 : MonoBehaviour {
                 {
                     SetVelocity(new Vector3(Mathf.Sign(V.x) * 2, -V.y * .5f, 0), true);
                     recentlyHitNet = true; // we just hit the net
+                    SetAimation("Stop");
                 }
 
             }
@@ -197,16 +200,23 @@ public class BallV2 : MonoBehaviour {
         {
            solve4DX();
         }
+
+        if(V.magnitude >= GameManager.gameManager.hardHit && V.y < 0)
+        {
+            if (V.x > 0) SetAimation("Right");
+            else if (V.x < 0) SetAimation("Left");
+        }
+
     }
 
     float solve4T()
     {
         float T = 0;
         float Y0 = transform.position.y;
-        float Y1 = GameManager.gameManager.ground.transform.position.y;
+        float Y1 = GameManager.gameManager.ground.transform.position.y ;
 
-        float plus = (-V.y + Mathf.Sqrt((V.y * V.y) - (2 * G) * Y0)) / G;
-        float minus = (-V.y - Mathf.Sqrt((V.y * V.y) - (2 * G) * Y0)) / G;
+        float plus = (-V.y + Mathf.Sqrt((V.y * V.y) - (2.0f * G) * Y0)) / G;
+        float minus = (-V.y - Mathf.Sqrt((V.y * V.y) - (2.0f * G) * Y0)) / G;
 
         if (plus > 0) { T = plus; }
         else if (minus > 0) { T = minus; }
@@ -230,8 +240,17 @@ public class BallV2 : MonoBehaviour {
         SetVelocity(newV, false);
     }
 
+    void SetAimation(string state)
+    {
+        animator.SetBool("Left", false);
+        animator.SetBool("Right", false);
+        if(state != "Stop")
+        animator.SetBool(state, true);
+    }
+
     IEnumerator Reset()
     {
+        SetAimation("Stop");
         reseting = true;
         yield return new WaitForSeconds(3);
         bState = BallState.Held;
