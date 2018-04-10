@@ -10,6 +10,7 @@ public class BallV2 : MonoBehaviour {
     Vector3 V1 = Vector3.zero;
 
     public Animator animator;
+    public Animator netting;
     public CharacterController HeldBy;
     public ParticleSystem sand;
 
@@ -129,7 +130,7 @@ public class BallV2 : MonoBehaviour {
                 {
                     if (transform.position.x + radious >= net.x)
                     {
-                        // net animate right
+                        netting.SetTrigger("right");
                         SetVelocity(new Vector3(-V.x * .5f, V.y * .5f, 0), true);
                         recentlyHitNet = true; // we just hit the net
                         SetAimation("Stop");
@@ -139,7 +140,7 @@ public class BallV2 : MonoBehaviour {
                 {
                     if (transform.position.x - radious <= net.x)
                     {
-                        // net animate left
+                        netting.SetTrigger("left");
                         SetVelocity(new Vector3(-V.x * .5f, V.y * .5f, 0), true);
                         recentlyHitNet = true;
                         SetAimation("Stop");
@@ -201,10 +202,14 @@ public class BallV2 : MonoBehaviour {
            solve4DX();
         }
 
-        if(V.magnitude >= GameManager.gameManager.hardHit && V.y < 0)
+        if(V.magnitude >= GameManager.gameManager.hardHit && V1.y < 0)
         {
             if (V.x > 0) SetAimation("Right");
             else if (V.x < 0) SetAimation("Left");
+        }
+        else
+        {
+            SetAimation("Stop");
         }
 
     }
