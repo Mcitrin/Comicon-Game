@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviour
     // handel to the apperance delegate (changes sprite colors for cusimization)
     public Appearance appearance;
 
-    float jumpHoldTime;
+   public float jumpHoldTime;
     float jumpHoldLimit = .25f;
     float jumpMinValue = .5f;
     float jumpMaxValue = 1;
@@ -107,7 +107,6 @@ public class PlayerController : MonoBehaviour
         reticle.Value = Mathf.Clamp((Time.time - hitHoldTime),0,1);
         else
         reticle.Value = 0;
-
     }
 
     void Animate()
@@ -239,7 +238,7 @@ public class PlayerController : MonoBehaviour
     }
     void CalcJumpHeight()
     {
-        if (inputMan.Charge(playerNumber) && jumpHoldTime == 0)
+        if (inputMan.JumpPress(playerNumber) && jumpHoldTime == 0)
         {
             jumpHoldTime = Time.time;
         }

@@ -215,41 +215,6 @@ public class AIController : MonoBehaviour
 
         float b = 0;
 
-        ///float T = 3.0f  + Random.value;
-
-        //float V0x = dx / T;
-        //
-        //float V0y = Mathf.Sqrt((M * M) - (dx^2 / T^2));
-        //
-        //
-        //
-        //
-        //
-        //float apex = 12;
-        //
-        //float Y0 = ball.transform.position.y;
-        //
-        //float halfT = Mathf.Sqrt(2.0f * ((apex - Y0)) / 9.8f);
-        //float T = 2.0f * (halfT);// + Random.value;
-        //
-        //float V0y = ((apex - Y0 + ((9.8f * (halfT * halfT)) * 0.5f)) / halfT);
-        //
-        //float t = solve4T(-V0y, Y0);
-        //
-        //float V0x = dx / (T + t);
-        //
-        //
-        //
-        //
-        //GameManager.gameManager.hitMag = Mathf.Sqrt((V0y * V0y) + (V0x * V0x));
-
-        //float V0y = Mathf.Sqrt((M * M) - (V0x * V0x));
-
-        //if(float.IsNaN(V0y))
-        //{
-        //    Debug.Log("is nan");
-        //}
-
         tmp = new Vector2(landingPoint, 0);
 
         return new Vector2(V0x,V0y);

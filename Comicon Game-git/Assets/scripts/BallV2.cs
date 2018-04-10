@@ -14,6 +14,8 @@ public class BallV2 : MonoBehaviour {
     public CharacterController HeldBy;
     public ParticleSystem sand;
 
+    public SlowTime slowTime;
+
     public char CourtSide;
 
     bool reseting = false;
@@ -194,6 +196,18 @@ public class BallV2 : MonoBehaviour {
 
     void SetVelocity(Vector3 V1, bool getLandingPoint)
     {
+        if (V.magnitude >= GameManager.gameManager.hardHit && V1.y < 0)
+        {
+            if (V.x > 0) SetAimation("Right");
+            else if (V.x < 0) SetAimation("Left");
+            V1 = V1.normalized * 22;
+            //slowTime.SlowEffect();
+        }
+        else
+        {
+            SetAimation("Stop");
+        }
+
         V = V1;
         if (bState == BallState.Held) bState = BallState.InPlay;
 
@@ -201,17 +215,6 @@ public class BallV2 : MonoBehaviour {
         {
            solve4DX();
         }
-
-        if(V.magnitude >= GameManager.gameManager.hardHit && V1.y < 0)
-        {
-            if (V.x > 0) SetAimation("Right");
-            else if (V.x < 0) SetAimation("Left");
-        }
-        else
-        {
-            SetAimation("Stop");
-        }
-
     }
 
     float solve4T()

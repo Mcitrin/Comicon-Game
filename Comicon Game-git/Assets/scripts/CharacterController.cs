@@ -77,7 +77,7 @@ public class CharacterController : MonoBehaviour
             if (!grounded) // jumping
                 {
                 float yPos = 0;
-                float g = G * GMultiplier;
+                float g = G;// * GMultiplier;
                 if (yVelocity > 0)
                     {
                         yPos += yVelocity * Time.deltaTime + (g * .5f) * (Mathf.Pow(Time.deltaTime, 2));

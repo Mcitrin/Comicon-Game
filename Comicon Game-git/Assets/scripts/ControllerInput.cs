@@ -15,7 +15,7 @@ public class ControllerInput : MonoBehaviour, IGameInput
 
     public bool JumpPress()
     {
-        return input.LeftTrigger.WasPressed;
+        return input.LeftTrigger.IsPressed;
     }
 
     public bool JumpRelease()
