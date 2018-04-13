@@ -29,6 +29,10 @@ public class BallV2 : MonoBehaviour {
 
     float tmpTime = 0;
 
+    // Evants
+    public delegate void PointScored(int playerNumber);
+    public event PointScored pointScored;
+
     public enum BallState
     {
         Held,
@@ -41,7 +45,7 @@ public class BallV2 : MonoBehaviour {
     // Use this for initialization
      public void Init()
     {
-        HeldBy = GameManager.gameManager.Players[0];
+        HeldBy = GameManager.gameManager.Players[Random.Range(0,2)];
         radious = GetComponent<CircleCollider2D>().radius;
         net = GameManager.gameManager.net.position;
     }
@@ -49,7 +53,6 @@ public class BallV2 : MonoBehaviour {
     // Update is called once per frame
     void Update ()
     {
-
         PlayerColission();
         CheckCourtSide();
 
@@ -58,7 +61,6 @@ public class BallV2 : MonoBehaviour {
             switch (bState)
             {
                 case BallState.Held:
-
                     transform.position = HeldBy.GetComponent<CharacterController>().hand.position;
                     break;
 
@@ -79,7 +81,11 @@ public class BallV2 : MonoBehaviour {
                     break;
 
                 case BallState.Reset:
-                    if (!reseting) StartCoroutine(Reset());
+                    if (!reseting)
+                    {
+                        reseting = true;
+                        StartCoroutine(Reset());
+                    }
                     break;
                 default:
                     break;
@@ -196,12 +202,12 @@ public class BallV2 : MonoBehaviour {
 
     void SetVelocity(Vector3 V1, bool getLandingPoint)
     {
-        if (V.magnitude >= GameManager.gameManager.hardHit && V1.y < 0)
+        if (V.magnitude >= GameManager.gameManager.hardHit 
+            && V1.y < 0 && lastPlayerHit!=null)
         {
             if (V.x > 0) SetAimation("Right");
             else if (V.x < 0) SetAimation("Left");
             V1 = V1.normalized * 22;
-            //slowTime.SlowEffect();
         }
         else
         {
@@ -209,7 +215,11 @@ public class BallV2 : MonoBehaviour {
         }
 
         V = V1;
-        if (bState == BallState.Held) bState = BallState.InPlay;
+        if (bState == BallState.Held)
+        {
+            bState = BallState.InPlay;
+            HeldBy = null;
+        }
 
         if(getLandingPoint)
         {
@@ -259,11 +269,49 @@ public class BallV2 : MonoBehaviour {
     IEnumerator Reset()
     {
         SetAimation("Stop");
-        reseting = true;
         yield return new WaitForSeconds(3);
         bState = BallState.Held;
         landingPoint = 0;
+
+        int scorer = WhoScored();
+        if(scorer != 0)
+        {
+            if (pointScored != null)
+                pointScored(scorer);
+
+            HeldBy = GameManager.gameManager.Players[scorer - 1];
+        }
+
         reseting = false;
+    }
+
+    int WhoScored()
+    {
+        // p2 scores
+        if(CourtSide == 'L')
+        {
+            return 2;
+        }
+        // p1 scores
+        else if(CourtSide == 'R')
+        {
+            return 1;
+        }
+        // balls out of bounds
+        else if (CourtSide == 'O')
+        {
+            // out of bounds p2 scores
+            if (transform.position.x > GameManager.gameManager.right.position.x)
+            {
+                return 2;
+            }
+            // out of bounds p1 scores
+            if (transform.position.x < GameManager.gameManager.left.position.x)
+            {
+                return 1;
+            }
+        }
+        return 0;
     }
 
 }
