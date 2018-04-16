@@ -143,6 +143,8 @@ public class AIController : MonoBehaviour
     }
     void Animate()
     {
+        animationController.isGrounded = characterController.grounded;
+
         if (characterController.hitting && animationController.Animator.GetCurrentAnimatorStateInfo(1).IsTag("Hit"))
         {
             if (animationController.Animator.GetCurrentAnimatorStateInfo(1).normalizedTime % 1 > .80f)
@@ -212,11 +214,11 @@ public class AIController : MonoBehaviour
         if (playerNumber == 2)
         {
             landingPoint = Random.Range(GameManager.gameManager.left.position.x + ball.radious,
-                GameManager.gameManager.net.position.x - ball.radious);
+                GameManager.gameManager.net.position.x - ball.radious*2);
         }
         else if (playerNumber == 1)
         {
-            landingPoint = Random.Range(GameManager.gameManager.net.position.x + ball.radious,
+            landingPoint = Random.Range(GameManager.gameManager.net.position.x + ball.radious*2,
                GameManager.gameManager.right.position.x - ball.radious);
         }
 
@@ -230,22 +232,38 @@ public class AIController : MonoBehaviour
         float Y0 = characterController.hand.position.y + ball.radious;//ball.transform.position.y;
 
         float DX;
-        if (aiState != AIState.SERVING)
+        if (aiState == AIState.SERVING)
+        {
+            //Debug.Log(landingPoint);
+            //Debug.Log(ball.transform.position.x);
+            DX = landingPoint - characterController.hand.transform.position.x;
+
+            Debug.Log(landingPoint);
+            Debug.Log(characterController.hand.transform.position.x);
+            Debug.Log(DX);
+        }
+        else
         {
             //Debug.Log(landingPoint);
             //Debug.Log(ball.landingPoint);
             DX = landingPoint - ball.landingPoint;
         }
+
+
+        float Theta;
+        float V0x;
+
+        if (playerNumber == 2)
+        {
+             Theta = solve4T2(M, -DX, -Y0);
+             V0x = -(M * Mathf.Cos(Theta));
+        }
         else
         {
-            Debug.Log(landingPoint);
-            Debug.Log(ball.transform.position.x);
-            DX = landingPoint - ball.transform.position.x;
+             Theta = solve4T2(M, DX, -Y0);
+             V0x = (M * Mathf.Cos(Theta));
         }
-
-        float Theta = solve4T2(M, -DX, -Y0);
-
-        float V0x = -(M * Mathf.Cos(Theta));
+        
         float V0y = M * Mathf.Sin(Theta);
 
         tmp = new Vector2(landingPoint, 0);
@@ -394,7 +412,6 @@ public class AIController : MonoBehaviour
                 {
                     ServeWaitTimer = Time.time;
                     ServeWaitTime = Random.Range(ServeWaitRange.x, ServeWaitRange.y);
-                    Debug.Log(ServeWaitTime);
                 }
                 else if(Time.time - ServeWaitTimer >= ServeWaitTime)
                 {

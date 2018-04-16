@@ -33,7 +33,7 @@ public interface IGameInput
 
 public class InputMan : MonoBehaviour {
 
-    
+
 
     public InputDevice joystick1; // player 2 is joystick1 unless theirs only one player in wich case they use joystick 1
     public InputDevice joystick2; // player 1 is joystick2 if their are two controlers pluged in otherwise they use mouse and keyboard
@@ -58,7 +58,7 @@ public class InputMan : MonoBehaviour {
     IEnumerator CheckJoystickCountCo()
     {
         while (true)
-        {  
+        {
             CheckJoystickCount();
             yield return new WaitForSeconds(1f);
         }
@@ -88,29 +88,42 @@ public class InputMan : MonoBehaviour {
             joystick2 = null;
             GotTwoJoysticks = false;
         }
-        
 
-      
+
+
     }
 
     IGameInput GetInputDevice(int playerNum)
     {
-        // if your player 1 and theirs 2 joysticks pluged in
+        // if your player 1 and theirs 2 joysticks pluged
         if (playerNum == 1 && InputManager.Devices.Count > 1)
         {
             controller.input = joystick2;
             return controller;
-            
         }
-        else if ((playerNum == 2 || GameManager.numPlayers == 1) && !NoJoysticks)
+
+        // if your player 1 and theirs 1 joystick pluged in and player 2 is an AI
+       else if (playerNum == 1 && InputManager.Devices.Count == 1 && GameManager.gameManager.player2IsAI)
         {
             controller.input = joystick1;
             return controller;
         }
-        else
+
+        // if your player 1 and player 2 is not an AI and theirs only 1 controller
+        else if (playerNum == 1 && (NoJoysticks || !GameManager.gameManager.player2IsAI))
         {
             return keyboard;
         }
+
+        // if your player 2 and thiers at least one joystick
+        else if (playerNum == 2)
+        {
+            controller.input = joystick1;
+            return controller;
+        }
+
+        Debug.Log("null");
+        return null;
     }
 
     public bool JumpPress(int playerNum)
@@ -156,9 +169,30 @@ public class InputMan : MonoBehaviour {
 
     }
 
-    public bool Pause(int playerNum)
+    public bool Pause()
     {
-        return GetInputDevice(playerNum).Pause();
+        if(InputManager.Devices.Count < 1)
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                return true;
+            }
+        }
+        else if(InputManager.Devices.Count == 1)
+        {
+            if (joystick1.MenuWasPressed || Input.GetKeyDown(KeyCode.Escape))
+            {
+                return true;
+            }
+        }
+        else
+        {
+            if (joystick1.MenuWasPressed || joystick2.MenuWasPressed || Input.GetKeyDown(KeyCode.Escape))
+            {
+                return true;
+            }
+        }
+            return false;
     }
 
     public bool Down(int playerNum)

@@ -280,14 +280,14 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         // pause check
-        if (inputMan.Pause(playerNumber) && !GameManager.paused)
-        {
-            GameManager.paused = true;
-        }
-        else if (inputMan.Pause(playerNumber) && GameManager.paused)
-        {
-            GameManager.paused = false;
-        }
+        //if (inputMan.Pause(playerNumber) && !GameManager.paused)
+        //{
+        //    GameManager.paused = true;
+        //}
+        //else if (inputMan.Pause(playerNumber) && GameManager.paused)
+       // {
+       //     GameManager.paused = false;
+       // }
 
         // if the games not paused recive input and allow animation
         if (!GameManager.paused)

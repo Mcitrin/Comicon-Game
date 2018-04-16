@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 public class ButtonActions : MonoBehaviour {
 
@@ -9,8 +11,8 @@ public class ButtonActions : MonoBehaviour {
    public PlayerInfo playInfo;
 
 	// Use this for initialization
-	void Awake () {
-        manager = GameManager.gameManager.GetComponent<PlayManager>();
+	/*void Awake () {
+        //manager = null;//GameManager.gameManager.GetComponent<PlayManager>();
     }
 	
 	// Update is called once per frame
@@ -67,6 +69,28 @@ public class ButtonActions : MonoBehaviour {
             manager.ScoreIndex++;
         else
             manager.ScoreIndex = 0;
+    }
+    */
+    public void B_Player1Switch()
+    {
+        GameObject obj = GameObject.Find("Player1_ControllerSwitch");
+
+        if (!GameManager.gameManager.player1IsAI)
+            obj.GetComponentInChildren<Text>().text = "Switch\nPlayer1: AI";
+        else if (GameManager.gameManager.player1IsAI)
+            obj.GetComponentInChildren<Text>().text = "Switch\nPlayer1: Player";
+        GameManager.gameManager.ChangePlayerController(1);
+    }
+
+    public void B_Player2Switch()
+    {
+        GameObject obj = GameObject.Find("Player2_ControllerSwitch");
+
+        if (!GameManager.gameManager.player2IsAI)
+            obj.GetComponentInChildren<Text>().text = "Switch\nPlayer2: AI";
+        else if (GameManager.gameManager.player2IsAI)
+            obj.GetComponentInChildren<Text>().text = "Switch\nPlayer2: Player";
+        GameManager.gameManager.ChangePlayerController(2);
     }
 
 

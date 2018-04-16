@@ -49,12 +49,12 @@ public class Move : MonoBehaviour
             Debug.Log(angle);
 
         // pause check
-        if (inputMan.Pause(PlayerNumber) && !GameManager.paused)
+        if (inputMan.Pause() && !GameManager.paused)
         {
             animator.SetFloat("Speed", 0);
             GameManager.paused = true;
         }
-        else if (inputMan.Pause(PlayerNumber) && GameManager.paused)
+        else if (inputMan.Pause() && GameManager.paused)
         {
             GameManager.paused = false;
         }
