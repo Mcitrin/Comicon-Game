@@ -116,6 +116,7 @@ public class BallV2 : MonoBehaviour {
                     SetVelocity(V1, true);
                     lastPlayerHit = player; 
                     recentlyHitNet = false; // allow the ball to hit the net again
+                    CheckAnimationState();
                 }
             }
             else // if were not in range
@@ -202,18 +203,6 @@ public class BallV2 : MonoBehaviour {
 
     void SetVelocity(Vector3 V1, bool getLandingPoint)
     {
-        if (V.magnitude >= GameManager.gameManager.hardHit 
-            && V1.y < 0 && lastPlayerHit!=null)
-        {
-            if (V.x > 0) SetAimation("Right");
-            else if (V.x < 0) SetAimation("Left");
-            V1 = V1.normalized * 22;
-        }
-        else
-        {
-            SetAimation("Stop");
-        }
-
         V = V1;
         if (bState == BallState.Held)
         {
@@ -221,9 +210,9 @@ public class BallV2 : MonoBehaviour {
             HeldBy = null;
         }
 
-        if(getLandingPoint)
+        if(getLandingPoint) // if this is true the ball has either the net or a player
         {
-           solve4DX();
+            solve4DX();
         }
     }
 
@@ -258,6 +247,21 @@ public class BallV2 : MonoBehaviour {
         SetVelocity(newV, false);
     }
 
+    void CheckAnimationState()
+    {
+        if (V.magnitude >= GameManager.gameManager.hardHit
+          && V1.y < 0 && lastPlayerHit != null)
+        {
+            if (V.x > 0) SetAimation("Right");
+            else if (V.x < 0) SetAimation("Left");
+            V1 = V1.normalized * 22;
+        }
+        else
+        {
+            SetAimation("Stop");
+        }
+    }
+
     void SetAimation(string state)
     {
         animator.SetBool("Left", false);
@@ -269,10 +273,6 @@ public class BallV2 : MonoBehaviour {
     IEnumerator Reset()
     {
         SetAimation("Stop");
-        yield return new WaitForSeconds(3);
-        bState = BallState.Held;
-        landingPoint = 0;
-
         int scorer = WhoScored();
         if(scorer != 0)
         {
@@ -281,6 +281,12 @@ public class BallV2 : MonoBehaviour {
 
             HeldBy = GameManager.gameManager.Players[scorer - 1];
         }
+
+        yield return new WaitForSeconds(4);
+        bState = BallState.Held;
+        landingPoint = 0;
+
+     
 
         reseting = false;
     }

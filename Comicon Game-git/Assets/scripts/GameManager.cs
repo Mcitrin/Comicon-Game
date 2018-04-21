@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour {
     public bool player1IsAI;
     public bool player2IsAI;
 
+    PlayManager playManager;
 
     // Use this for initialization
     private void Awake()
@@ -47,9 +48,12 @@ public class GameManager : MonoBehaviour {
         DontDestroyOnLoad(gameObject);
         Random.seed = (int)System.DateTime.Now.Ticks;
 
+        playManager = GetComponent<PlayManager>();
+
         ball.Init();
         Players[0].Init();
         Players[1].Init();
+        playManager.Init();
 
         courtSize = net.position.x - left.position.x;
 

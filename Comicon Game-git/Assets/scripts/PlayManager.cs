@@ -13,45 +13,38 @@ public class PlayManager : MonoBehaviour
         PlayingGame
     };
 
-    public InputMan inputMan;
-    public PlayerInfo playerInfo;
-    public GameState gameState = GameState.MainMenu;
+    public GameState gameState = GameState.PlayingGame;
 
-    public GameObject TimeScoreWarning;
-    public GameObject ControllerWarning;
-    public Text P1WinsLabel;
-    public Text P2WinsLabel;
-    public Text ScoreLabel;
-    public Text TimeLabel;
-    public int ScoreIndex;
-    public int TimeIndex;
-    GameObject P1ScoreDisplay;
-    GameObject P2ScoreDisplay;
-    GameObject ClockDisplay;
-    GameObject Crown;
-    GameObject PauseMenu;
-   public GameObject WhoScores;
-    int P1ScoreCount;
-    int P2ScoreCount;
-    int ClockCount;
+    public ScoarBoard scoreBoard;
 
-    int ScoreLimit;
-    int TimeLimit;
+    int P1ScoreCount = 0;
+    int P2ScoreCount = 0;
+    int ClockCount_min = 0;
+    int ClockCount_sec = 0;
 
-    int interval;
-    float nextTime;
-    int seconds;
+    int ScoreLimit = 25;
+    float TimeLimit = 60;
 
-    bool crowned = false;
+    float deltaTimeTally;
+
     public int winner;
-    //public bool paused;
 
 
     // Use this for initialization
-    void Awake()
+    public void Init()
     {
-        inputMan = GameManager.gameManager.GetComponent<InputMan>();
-        playerInfo = GameObject.Find("PlayerInfo").GetComponent<PlayerInfo>();
+        GameManager.gameManager.ball.pointScored += delegate (int PlayerNumber)
+        {
+            if (PlayerNumber == 1)
+            {
+                P1ScoreCount++;
+            }
+            else if (PlayerNumber == 2)
+            {
+                P2ScoreCount++;
+            }
+            StartCoroutine(scoreBoard.PointScored(PlayerNumber));
+        };
     }
 
     // Update is called once per frame
@@ -59,8 +52,6 @@ public class PlayManager : MonoBehaviour
     {
         if (!GameManager.paused)
         {
-            if (gameState != GameState.MainMenu && gameState != GameState.SetUp && PauseMenu.activeInHierarchy == true) { PauseMenu.SetActive(false);} // if we have handle on pause panel and player is not pausing disable pannel
-
             switch (gameState)
             {
                 case GameState.MainMenu:
@@ -70,12 +61,6 @@ public class PlayManager : MonoBehaviour
                     SetUp();
                     break;
                 case GameState.waiting:
-                    if (crowned)
-                    {
-                        Crown.transform.position = GameObject.Find("Player" + winner).transform.position + Vector3.up * 1.75f;
-                        Crown.transform.Rotate(Vector3.up, .3f);
-                    }
-
                     break;
                 case GameState.PlayingGame:
                     PlayingGame();
@@ -83,202 +68,66 @@ public class PlayManager : MonoBehaviour
                     break;
             }
         }
-        else
-        {
-            if (PauseMenu.activeInHierarchy == false && gameState != GameState.MainMenu) { PauseMenu.SetActive(true); } // else in enalbe pannel if player is pausing
-        }
-
-
     }
 
     void MainMenu()
     {
-        P1WinsLabel.text = "Wins: " + playerInfo.P1Wins;
-        P2WinsLabel.text = "Wins: " + playerInfo.P2Wins;
-
-        if (ScoreIndex == 0 && TimeIndex == 0)
-        {
-            TimeScoreWarning.SetActive(true);
-        }
-        else
-        {
-            TimeScoreWarning.SetActive(false);
-        }
-
-        if (inputMan.NoJoysticks)
-        {
-            ControllerWarning.SetActive(true);
-        }
-        else
-        {
-            ControllerWarning.SetActive(false);
-        }
-        
-        
-        setGameSettings(ScoreIndex, TimeIndex);
+     
     }
 
     void SetUp()
     {
-        ClockDisplay = GameObject.Find("Clock");
-        P1ScoreDisplay = GameObject.Find("P1Score");
-        P2ScoreDisplay = GameObject.Find("P2Score");
-        Crown = GameObject.Find("Crown");
-        PauseMenu = GameObject.Find("PauseMenu");
-        WhoScores = GameObject.Find("WhoScores");
-
-        interval = 1;
-        nextTime = 0;
-        seconds = 0;
-
-        if (ClockDisplay != null &&
-            P1ScoreDisplay != null &&
-            P2ScoreDisplay != null &&
-            Crown != null &&
-            PauseMenu != null &&
-            WhoScores != null
-            )
-        {
-            ClockCount = TimeLimit;
-            ClockDisplay.GetComponent<Text>().text = (ClockCount / 60) + ":" + "00";
-            PauseMenu.SetActive(false);
-            WhoScores.SetActive(false);
-            gameState = GameState.waiting;
-        }
+        
     }
 
     void PlayingGame()
     {
-        if (ClockCount != 0)
             Count();
-
-        if (ClockCount <= 0 && TimeLimit != 0)
-            CalculateWinner();
+        scoreBoard.SetNumber("Min", ClockCount_min);
+        scoreBoard.SetNumber("Sec", ClockCount_sec);
+        scoreBoard.SetNumber("Player1", P1ScoreCount);
+        scoreBoard.SetNumber("Player2", P2ScoreCount);
     }
 
     void CalculateWinner()
     {
 
-        WhoScores.SetActive(true);
-        if (P1ScoreCount > P2ScoreCount)
-        {
-            winner = 1;
-            playerInfo.P1Wins++;
-            WhoScores.GetComponentInChildren<Text>().text = "  Player 1 Wins!";
-        }
-        else if (P1ScoreCount < P2ScoreCount)
-        {
-            winner = 2;
-            playerInfo.P2Wins++;
-            WhoScores.GetComponentInChildren<Text>().text = "  Player 2 Wins!";
-        }
-        else
-        {
-            winner = 0; // Draw
-            WhoScores.GetComponentInChildren<Text>().text = "Draw";
-        }
-        StartCoroutine(WaitBeforReset(winner));
 
     }
 
     IEnumerator WaitBeforReset(int winner)
     {
-        if (winner != 0)
-        {
-            crowned = true;
-        }
-
         yield return new WaitForSeconds(10);
-        Application.LoadLevel("Menu");
-        Destroy(gameObject);
     }
 
     void Count()
     {
-        if (Time.time >= nextTime)
+        if (ClockCount_min < TimeLimit)
         {
-            ClockCount--;
-            seconds--;
-            if (seconds < 0) { seconds = 59; }
-            if (seconds >= 10)
-                ClockDisplay.GetComponent<Text>().text = (ClockCount / 60) + ":" + seconds;
+            if (Mathf.FloorToInt(deltaTimeTally) >= 60)
+            {
+                ClockCount_min++;
+                ClockCount_sec = 0;
+                deltaTimeTally = 0;
+            }
             else
-                ClockDisplay.GetComponent<Text>().text = (ClockCount / 60) + ":0" + seconds;
-
-            nextTime = (int)Time.time + interval;
+            {
+                deltaTimeTally += Time.deltaTime;
+                ClockCount_sec = Mathf.FloorToInt(deltaTimeTally);
+            }
         }
+
     }
 
     public void IncrementScore(int player)
     {
         if (player == 1)
         {
-            P1ScoreCount++;
-            P1ScoreDisplay.GetComponent<Text>().text = "" + P1ScoreCount;
+
         }
         if (player == 2)
         {
-            P2ScoreCount++;
-            P2ScoreDisplay.GetComponent<Text>().text = "" + P2ScoreCount;
+           
         }
-
-        if (ScoreLimit != 0)
-        {
-            if (P1ScoreCount == ScoreLimit || P2ScoreCount == ScoreLimit)
-            {
-                CalculateWinner();
-            }
-        }
-    }
-
-    public void setGameSettings(int ScoreI,int TimeI)
-    {
-        switch (ScoreI)
-        {
-            case 0:
-                ScoreLabel.text = "0";
-                ScoreLimit = 0;
-                break;
-            case 1:
-                ScoreLabel.text = "10";
-                ScoreLimit = 10;
-                break;
-            case 2:
-                ScoreLabel.text = "25";
-                ScoreLimit = 25;
-                break;
-            case 3:
-                ScoreLabel.text = "50";
-                ScoreLimit = 50;
-                break;
-            case 4:
-                ScoreLabel.text = "100";
-                ScoreLimit = 100;
-                break;
-        }
-        switch (TimeI)
-        {
-            case 0:
-                TimeLabel.text = "0:00";
-                TimeLimit = 0;
-                break;
-            case 1:
-                TimeLabel.text = "5:00";
-                TimeLimit = 5 * 60;
-                break;
-            case 2:
-                TimeLabel.text = "10:00";
-                TimeLimit = 10 * 60;
-                break;
-            case 3:
-                TimeLabel.text = "15:00";
-                TimeLimit = 15 * 60;
-                break;
-            case 4:
-                TimeLabel.text = "20:00";
-                TimeLimit = 20 * 60;
-                break;
-        }
-
     }
 }

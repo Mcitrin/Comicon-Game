@@ -70,7 +70,7 @@ public class AIController : MonoBehaviour
         {
             if (PlayerNumber == playerNumber)
             {
-                aiState = AIState.SERVING;
+                //aiState = AIState.SERVING;
             }
         };
 
@@ -132,7 +132,7 @@ public class AIController : MonoBehaviour
         }
 
         // redundant check, should only be necessary if game starts with us serving
-        if (ball.HeldBy == characterController && aiState != AIState.SERVING)
+        if (ball.bState == BallV2.BallState.Held && ball.HeldBy == characterController && aiState != AIState.SERVING)
         {
             aiState = AIState.SERVING;
         }
@@ -238,9 +238,9 @@ public class AIController : MonoBehaviour
             //Debug.Log(ball.transform.position.x);
             DX = landingPoint - characterController.hand.transform.position.x;
 
-            Debug.Log(landingPoint);
-            Debug.Log(characterController.hand.transform.position.x);
-            Debug.Log(DX);
+            //Debug.Log(landingPoint);
+            //Debug.Log(characterController.hand.transform.position.x);
+            //Debug.Log(DX);
         }
         else
         {

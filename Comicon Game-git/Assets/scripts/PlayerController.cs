@@ -285,9 +285,9 @@ public class PlayerController : MonoBehaviour
         //    GameManager.paused = true;
         //}
         //else if (inputMan.Pause(playerNumber) && GameManager.paused)
-       // {
-       //     GameManager.paused = false;
-       // }
+        // {
+        //     GameManager.paused = false;
+        // }
 
         // if the games not paused recive input and allow animation
         if (!GameManager.paused)

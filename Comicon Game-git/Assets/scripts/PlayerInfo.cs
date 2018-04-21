@@ -39,17 +39,17 @@ public class PlayerInfo : MonoBehaviour
         {
             if (GameObject.Find("Player1_UI") != null && GameObject.Find("Player2_UI") != null)
             {
-                GameManager.gameManager.GetComponent<PlayManager>().setGameSettings(ScoreIndex, TimeIndex);
-                GameManager.gameManager.GetComponent<PlayManager>().ScoreIndex = ScoreIndex;
-                GameManager.gameManager.GetComponent<PlayManager>().TimeIndex = TimeIndex;
+                //GameManager.gameManager.GetComponent<PlayManager>().setGameSettings(ScoreIndex, TimeIndex);
+               // GameManager.gameManager.GetComponent<PlayManager>().ScoreIndex = ScoreIndex;
+               // GameManager.gameManager.GetComponent<PlayManager>().TimeIndex = TimeIndex;
                 SetCustomizerColors();
                 Debug.Log("SetCustomizerColors();");
             }
 
             if (GameObject.Find("Player1") != null && GameObject.Find("Player2") != null)
             {
-                ScoreIndex = GameManager.gameManager.GetComponent<PlayManager>().ScoreIndex;
-                TimeIndex = GameManager.gameManager.GetComponent<PlayManager>().TimeIndex;
+               // ScoreIndex = GameManager.gameManager.GetComponent<PlayManager>().ScoreIndex;
+               // TimeIndex = GameManager.gameManager.GetComponent<PlayManager>().TimeIndex;
                 SetPlayersColors();
                 Debug.Log("SetPlayersColors();");
             }
