@@ -76,9 +76,13 @@ public class ButtonActions : MonoBehaviour {
         GameObject obj = GameObject.Find("Player1_ControllerSwitch");
 
         if (!GameManager.gameManager.player1IsAI)
+        {
             obj.GetComponentInChildren<Text>().text = "Switch\nPlayer1: AI";
+        }
         else if (GameManager.gameManager.player1IsAI)
+        {
             obj.GetComponentInChildren<Text>().text = "Switch\nPlayer1: Player";
+        }
         GameManager.gameManager.ChangePlayerController(1);
     }
 
@@ -87,9 +91,13 @@ public class ButtonActions : MonoBehaviour {
         GameObject obj = GameObject.Find("Player2_ControllerSwitch");
 
         if (!GameManager.gameManager.player2IsAI)
+        {
             obj.GetComponentInChildren<Text>().text = "Switch\nPlayer2: AI";
+        }
         else if (GameManager.gameManager.player2IsAI)
+        {
             obj.GetComponentInChildren<Text>().text = "Switch\nPlayer2: Player";
+        }
         GameManager.gameManager.ChangePlayerController(2);
     }
 

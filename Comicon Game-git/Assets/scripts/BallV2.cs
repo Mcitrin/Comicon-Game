@@ -100,7 +100,7 @@ public class BallV2 : MonoBehaviour {
         foreach (var player in GameManager.gameManager.Players)
         {
             // if the players hand in range of teh ball
-            if (Vector2.Distance(transform.position, player.hand.position) <= player.handRadious)
+            if (Vector2.Distance(transform.position, player.hand.position) <= player.handRadious*2)
             {
                 // is the player trying to hit the ball and have they already done so
                 if (player.hitting && lastPlayerHit != player)
